@@ -4,6 +4,7 @@ const id = route.params.id as string
 
 const { data: vacancy, refresh } = await useFetch(`/api/vacancies/${id}`)
 const { data: stages } = await useFetch('/api/pipeline-stages')
+const { data: cvList } = await useFetch('/api/cv-versions')
 
 if (!vacancy.value) {
   throw createError({ statusCode: 404, statusMessage: 'Vacancy not found' })
@@ -34,6 +35,34 @@ async function changeStage(newId: number | null) {
 
 watch(selectedStageId, (val) => {
   if (val !== vacancy.value?.stageId) changeStage(val)
+})
+
+// CV version selector
+const cvOptions = computed(() =>
+  [{ label: '— без CV —', value: null as number | null }].concat(
+    (cvList.value ?? []).map((cv: { id: number, filename: string }) => ({
+      label: cv.filename,
+      value: cv.id as number | null,
+    })),
+  ),
+)
+
+const selectedCvId = ref<number | null>(vacancy.value?.cvVersionId ?? null)
+const cvSaving = ref(false)
+
+async function changeCv(newId: number | null) {
+  cvSaving.value = true
+  try {
+    await $fetch(`/api/vacancies/${id}`, { method: 'PATCH', body: { cvVersionId: newId } })
+    await refresh()
+  }
+  finally {
+    cvSaving.value = false
+  }
+}
+
+watch(selectedCvId, (val) => {
+  if (val !== vacancy.value?.cvVersionId) changeCv(val)
 })
 
 // Edit notes inline
@@ -155,6 +184,18 @@ async function saveNotes() {
             <p class="font-medium">
               {{ vacancy.createdAt?.slice(0, 10) }}
             </p>
+          </div>
+          <div class="col-span-2">
+            <span class="text-gray-500">Версія CV</span>
+            <USelect
+              v-model="selectedCvId"
+              :items="cvOptions"
+              value-key="value"
+              label-key="label"
+              :loading="cvSaving"
+              class="mt-1 w-full"
+              size="sm"
+            />
           </div>
         </div>
       </UCard>

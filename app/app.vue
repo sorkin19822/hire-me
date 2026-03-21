@@ -36,6 +36,9 @@ const { loggedIn, user } = useUserSession()
           <UButton to="/analytics" variant="ghost" icon="i-lucide-chart-bar" size="sm">
             Аналітика
           </UButton>
+          <UButton to="/cv-versions" variant="ghost" icon="i-lucide-file-text" size="sm">
+            CV
+          </UButton>
           <UButton to="/import" variant="ghost" icon="i-lucide-upload" size="sm">
             Імпорт
           </UButton>

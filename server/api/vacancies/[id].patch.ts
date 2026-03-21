@@ -12,6 +12,7 @@ const schema = z.object({
   urlDou: z.string().url().nullable().optional().or(z.literal('')),
   urlLinkedin: z.string().url().nullable().optional().or(z.literal('')),
   urlSite: z.string().url().nullable().optional().or(z.literal('')),
+  cvVersionId: z.number().int().positive().nullable().optional(),
 }).strict()
 
 export default defineEventHandler(async (event) => {
