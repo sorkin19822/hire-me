@@ -41,6 +41,9 @@ const editingNotes = ref(false)
 const notesValue = ref(vacancy.value?.notes ?? '')
 const notesSaving = ref(false)
 
+// Messages timeline ref
+const timeline = ref<{ refresh: () => Promise<void> } | null>(null)
+
 // Recruiters
 const { data: recruitersList, refresh: refreshRecruiters } = await useFetch(`/api/recruiters?vacancy_id=${id}`)
 
@@ -243,14 +246,18 @@ async function saveNotes() {
         </p>
       </UCard>
 
-      <!-- Messages placeholder -->
+      <!-- Messages timeline -->
       <UCard class="mb-4">
         <template #header>
-          <span class="font-semibold">Повідомлення</span>
+          <span class="font-semibold">Переписка</span>
         </template>
-        <p class="text-sm text-gray-400">
-          Таймлайн повідомлень — буде у наступній ітерації
-        </p>
+        <MessagesTimeline ref="timeline" :vacancy-id="Number(id)" />
+        <ManualMessageForm
+          :vacancy-id="Number(id)"
+          :recruiters="(recruitersList ?? []).map((r: { id: number, name: string }) => ({ id: r.id, name: r.name }))"
+          class="mt-4"
+          @saved="timeline?.refresh()"
+        />
       </UCard>
 
       <!-- AI analysis placeholder -->
