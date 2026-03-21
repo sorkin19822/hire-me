@@ -230,7 +230,11 @@ async function saveNotes() {
             :key="r.id"
             class="flex items-center justify-between border-b last:border-0 border-gray-100 dark:border-gray-700"
           >
-            <RecruiterCard :recruiter="r" />
+            <RecruiterCard
+              :recruiter="r"
+              :vacancy-id="Number(id)"
+              @synced="timeline?.refresh()"
+            />
             <UButton
               variant="ghost"
               icon="i-lucide-trash-2"

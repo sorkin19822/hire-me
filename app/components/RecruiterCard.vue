@@ -1,5 +1,5 @@
 <script setup lang="ts">
-defineProps<{
+const props = defineProps<{
   recruiter: {
     id: number
     name: string
@@ -7,7 +7,40 @@ defineProps<{
     email: string | null
     linkedin: string | null
   }
+  vacancyId?: number
 }>()
+
+const emit = defineEmits<{ synced: [] }>()
+
+const toast = useToast()
+const syncing = ref(false)
+
+async function syncTelegram() {
+  if (!props.recruiter.telegram || !props.vacancyId) return
+  syncing.value = true
+  try {
+    const result = await $fetch<{ imported: number, total: number }>('/api/integrations/telegram', {
+      method: 'POST',
+      body: {
+        recruiterId: props.recruiter.id,
+        vacancyId: props.vacancyId,
+        telegramUsername: props.recruiter.telegram,
+      },
+    })
+    toast.add({
+      title: `Telegram: завантажено ${result.imported} нових повідомлень`,
+      color: 'success',
+      icon: 'i-simple-icons-telegram',
+    })
+    emit('synced')
+  }
+  catch {
+    toast.add({ title: 'Помилка синхронізації Telegram', color: 'error', icon: 'i-lucide-alert-circle' })
+  }
+  finally {
+    syncing.value = false
+  }
+}
 </script>
 
 <template>
@@ -46,5 +79,16 @@ defineProps<{
         </a>
       </div>
     </div>
+
+    <!-- Telegram sync button — only when telegram is set and vacancyId provided -->
+    <UButton
+      v-if="recruiter.telegram && vacancyId"
+      variant="ghost"
+      icon="i-simple-icons-telegram"
+      size="xs"
+      :loading="syncing"
+      title="Завантажити з Telegram"
+      @click.prevent="syncTelegram"
+    />
   </div>
 </template>

@@ -24,6 +24,7 @@ export default defineNuxtConfig({
     imapUser: process.env.IMAP_USER || '',
     imapPassword: process.env.IMAP_PASSWORD || '',
     googleDriveMcpUrl: process.env.GOOGLE_DRIVE_MCP_URL || '',
+    telegramMcpUrl: process.env.TELEGRAM_MCP_URL || '',
     public: {}
   },
 
