@@ -41,6 +41,41 @@ const editingNotes = ref(false)
 const notesValue = ref(vacancy.value?.notes ?? '')
 const notesSaving = ref(false)
 
+// Recruiters
+const { data: recruitersList, refresh: refreshRecruiters } = await useFetch(`/api/recruiters?vacancy_id=${id}`)
+
+const showAddRecruiter = ref(false)
+const recruiterForm = reactive({ name: '', telegram: '', email: '', linkedin: '' })
+const recruiterSaving = ref(false)
+
+async function addRecruiter() {
+  if (!recruiterForm.name) return
+  recruiterSaving.value = true
+  try {
+    await $fetch('/api/recruiters', {
+      method: 'POST',
+      body: {
+        vacancyId: Number(id),
+        name: recruiterForm.name,
+        telegram: recruiterForm.telegram || undefined,
+        email: recruiterForm.email || undefined,
+        linkedin: recruiterForm.linkedin || undefined,
+      },
+    })
+    showAddRecruiter.value = false
+    Object.assign(recruiterForm, { name: '', telegram: '', email: '', linkedin: '' })
+    await refreshRecruiters()
+  }
+  finally {
+    recruiterSaving.value = false
+  }
+}
+
+async function deleteRecruiter(recruiterId: number) {
+  await $fetch(`/api/recruiters/${recruiterId}`, { method: 'DELETE' })
+  await refreshRecruiters()
+}
+
 async function saveNotes() {
   notesSaving.value = true
   try {
@@ -156,19 +191,54 @@ async function saveNotes() {
         </div>
       </UCard>
 
-      <!-- Recruiters placeholder -->
+      <!-- Recruiters -->
       <UCard class="mb-4">
         <template #header>
-          <span class="font-semibold">Рекрутери</span>
+          <div class="flex items-center justify-between">
+            <span class="font-semibold">Рекрутери</span>
+            <UButton
+              variant="ghost"
+              icon="i-lucide-plus"
+              size="xs"
+              @click="showAddRecruiter = !showAddRecruiter"
+            />
+          </div>
         </template>
-        <div v-if="vacancy.recruiters?.length">
-          <div v-for="r in vacancy.recruiters" :key="r.id" class="flex items-center gap-2 py-1 text-sm">
-            <UIcon name="i-lucide-user" />
-            <span>{{ r.name }}</span>
-            <span v-if="r.telegram" class="text-gray-400">{{ r.telegram }}</span>
+
+        <!-- Add recruiter form -->
+        <div v-if="showAddRecruiter" class="mb-4 p-3 rounded-lg bg-gray-50 dark:bg-gray-800 space-y-2">
+          <UInput v-model="recruiterForm.name" placeholder="Ім'я *" size="sm" />
+          <UInput v-model="recruiterForm.telegram" placeholder="@telegram" size="sm" />
+          <UInput v-model="recruiterForm.email" placeholder="email@example.com" size="sm" type="email" />
+          <UInput v-model="recruiterForm.linkedin" placeholder="LinkedIn URL" size="sm" />
+          <div class="flex gap-2 justify-end">
+            <UButton size="xs" variant="ghost" @click="showAddRecruiter = false">
+              Скасувати
+            </UButton>
+            <UButton size="xs" :loading="recruiterSaving" :disabled="!recruiterForm.name" @click="addRecruiter">
+              Додати
+            </UButton>
           </div>
         </div>
-        <p v-else class="text-sm text-gray-400">
+
+        <div v-if="recruitersList?.length">
+          <div
+            v-for="r in recruitersList"
+            :key="r.id"
+            class="flex items-center justify-between border-b last:border-0 border-gray-100 dark:border-gray-700"
+          >
+            <RecruiterCard :recruiter="r" />
+            <UButton
+              variant="ghost"
+              icon="i-lucide-trash-2"
+              size="xs"
+              color="error"
+              class="shrink-0"
+              @click="deleteRecruiter(r.id)"
+            />
+          </div>
+        </div>
+        <p v-else-if="!showAddRecruiter" class="text-sm text-gray-400">
           Рекрутери не додані
         </p>
       </UCard>
