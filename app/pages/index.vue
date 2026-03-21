@@ -170,9 +170,11 @@ async function submitQuickAdd() {
         />
 
         <!-- Show more button -->
-        <button
+        <UButton
           v-if="vacanciesForStage(stage.id).length > COLUMN_LIMIT"
-          class="text-xs text-center py-1.5 text-gray-500 hover:text-primary-500 transition-colors"
+          variant="ghost"
+          size="xs"
+          block
           @click="toggleExpand(stage.id)"
         >
           <template v-if="!expandedColumns.has(stage.id)">
@@ -181,7 +183,7 @@ async function submitQuickAdd() {
           <template v-else>
             Згорнути
           </template>
-        </button>
+        </UButton>
 
         <!-- Empty state -->
         <p

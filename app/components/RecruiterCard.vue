@@ -79,32 +79,36 @@ async function syncEmail() {
         {{ recruiter.name }}
       </p>
       <div class="flex flex-wrap gap-2 mt-1">
-        <a
+        <UButton
           v-if="recruiter.telegram"
           :href="`tg://resolve?domain=${encodeURIComponent(recruiter.telegram.replace('@', ''))}`"
-          class="inline-flex items-center gap-1 text-xs text-blue-500 hover:underline"
+          variant="link"
+          size="xs"
+          icon="i-simple-icons-telegram"
         >
-          <UIcon name="i-simple-icons-telegram" class="w-3 h-3" />
           {{ recruiter.telegram }}
-        </a>
-        <a
+        </UButton>
+        <UButton
           v-if="recruiter.email"
           :href="`mailto:${recruiter.email}`"
-          class="inline-flex items-center gap-1 text-xs text-gray-500 hover:underline"
+          variant="link"
+          size="xs"
+          icon="i-lucide-mail"
+          color="neutral"
         >
-          <UIcon name="i-lucide-mail" class="w-3 h-3" />
           {{ recruiter.email }}
-        </a>
-        <a
+        </UButton>
+        <UButton
           v-if="recruiter.linkedin"
           :href="recruiter.linkedin"
           target="_blank"
           rel="noopener noreferrer"
-          class="inline-flex items-center gap-1 text-xs text-blue-700 hover:underline"
+          variant="link"
+          size="xs"
+          icon="i-simple-icons-linkedin"
         >
-          <UIcon name="i-simple-icons-linkedin" class="w-3 h-3" />
           LinkedIn
-        </a>
+        </UButton>
       </div>
     </div>
 

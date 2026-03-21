@@ -54,10 +54,7 @@ const columns = [
 
 <template>
   <UContainer class="py-6 max-w-3xl">
-    <div class="flex items-center justify-between mb-6">
-      <h1 class="text-2xl font-bold">
-        CV версії
-      </h1>
+    <PageHeader title="CV версії">
       <div class="flex gap-2">
         <UButton
           variant="soft"
@@ -85,7 +82,7 @@ const columns = [
           @change="handleFileUpload"
         >
       </div>
-    </div>
+    </PageHeader>
 
     <UCard>
       <UTable :data="cvList ?? []" :columns="columns">

@@ -169,15 +169,15 @@ async function saveNotes() {
           </div>
           <div v-if="vacancy.urlDou">
             <span class="text-gray-500">DOU</span>
-            <p><a :href="vacancy.urlDou" target="_blank" class="text-primary hover:underline">Відкрити</a></p>
+            <p><UButton :href="vacancy.urlDou" target="_blank" variant="link" size="xs" icon="i-lucide-external-link">Відкрити</UButton></p>
           </div>
           <div v-if="vacancy.urlLinkedin">
             <span class="text-gray-500">LinkedIn</span>
-            <p><a :href="vacancy.urlLinkedin" target="_blank" class="text-primary hover:underline">Відкрити</a></p>
+            <p><UButton :href="vacancy.urlLinkedin" target="_blank" variant="link" size="xs" icon="i-lucide-external-link">Відкрити</UButton></p>
           </div>
           <div v-if="vacancy.urlSite">
             <span class="text-gray-500">Сайт</span>
-            <p><a :href="vacancy.urlSite" target="_blank" class="text-primary hover:underline">Відкрити</a></p>
+            <p><UButton :href="vacancy.urlSite" target="_blank" variant="link" size="xs" icon="i-lucide-external-link">Відкрити</UButton></p>
           </div>
           <div>
             <span class="text-gray-500">Додано</span>

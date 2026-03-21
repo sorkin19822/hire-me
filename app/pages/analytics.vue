@@ -15,41 +15,13 @@ const [{ data: stats }, { data: ganttRows }] = await Promise.all([
 
     <!-- Stat cards -->
     <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
-      <UCard>
-        <p class="text-xs text-gray-500">
-          Всього вакансій
-        </p>
-        <p class="text-3xl font-bold mt-1">
-          {{ stats?.total ?? '—' }}
-        </p>
-      </UCard>
-      <UCard>
-        <p class="text-xs text-gray-500">
-          Співбесіди
-        </p>
-        <p class="text-3xl font-bold mt-1 text-blue-600 dark:text-blue-400">
-          {{ stats?.interviews ?? '—' }}
-        </p>
-      </UCard>
-      <UCard>
-        <p class="text-xs text-gray-500">
-          Відмови
-        </p>
-        <p class="text-3xl font-bold mt-1 text-red-600 dark:text-red-400">
-          {{ stats?.rejections ?? '—' }}
-        </p>
-      </UCard>
-      <UCard>
-        <p class="text-xs text-gray-500">
-          Офери
-        </p>
-        <p class="text-3xl font-bold mt-1 text-green-600 dark:text-green-400">
-          {{ stats?.offers ?? '—' }}
-          <span class="text-sm font-normal text-gray-400 ml-1">
-            ({{ stats?.conversionRate ?? 0 }}%)
-          </span>
-        </p>
-      </UCard>
+      <StatCard label="Всього вакансій" :value="stats?.total" />
+      <StatCard label="Співбесіди" :value="stats?.interviews" color-class="text-blue-600 dark:text-blue-400" />
+      <StatCard label="Відмови" :value="stats?.rejections" color-class="text-red-600 dark:text-red-400" />
+      <StatCard label="Офери" :value="stats?.offers" color-class="text-green-600 dark:text-green-400">
+        {{ stats?.offers ?? '—' }}
+        <span class="text-sm font-normal text-gray-400 ml-1">({{ stats?.conversionRate ?? 0 }}%)</span>
+      </StatCard>
     </div>
 
     <!-- Funnel -->

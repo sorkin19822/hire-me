@@ -1,8 +1,10 @@
 <script setup lang="ts">
+import { z } from 'zod'
+
 definePageMeta({ layout: false })
 
 const route = useRoute()
-const { loggedIn } = useUserSession()
+const { loggedIn, fetch: fetchSession } = useUserSession()
 
 if (loggedIn.value) {
   await navigateTo('/')
@@ -14,18 +16,24 @@ const errorMsg = computed(() => {
   return null
 })
 
-const form = reactive({ email: '', password: '' })
+const schema = z.object({
+  email: z.string().email('Невірний формат email'),
+  password: z.string().min(8, 'Мінімум 8 символів'),
+})
+
+const state = reactive({ email: '', password: '' })
 const submitting = ref(false)
 const credError = ref<string | null>(null)
 
-async function submitCredentials() {
+async function onSubmit() {
   credError.value = null
   submitting.value = true
   try {
     await $fetch('/auth/credentials', {
       method: 'POST',
-      body: { email: form.email, password: form.password },
+      body: { email: state.email, password: state.password },
     })
+    await fetchSession()
     await navigateTo('/')
   }
   catch (err: unknown) {
@@ -67,20 +75,26 @@ async function submitCredentials() {
         </div>
 
         <!-- Google button -->
-        <a
+        <UButton
           href="/auth/google"
-          class="flex items-center justify-center gap-3 w-full py-3.5 px-6 bg-indigo-50 hover:bg-indigo-100 text-gray-800 font-medium rounded-xl transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-indigo-300 mb-6"
+          variant="soft"
+          color="neutral"
+          block
+          size="xl"
+          class="mb-6 rounded-xl"
         >
-          <span class="flex items-center justify-center w-7 h-7 bg-white rounded-full shadow-sm">
-            <svg class="w-4 h-4" viewBox="0 0 48 48">
-              <path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20 20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z" />
-              <path fill="#FF3D00" d="M6.306 14.691l6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 16.318 4 9.656 8.337 6.306 14.691z" />
-              <path fill="#4CAF50" d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238A11.91 11.91 0 0124 36c-5.202 0-9.619-3.317-11.283-7.946l-6.522 5.025C9.505 39.556 16.227 44 24 44z" />
-              <path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303a12.04 12.04 0 01-4.087 5.571l.003-.002 6.19 5.238C36.971 39.205 44 34 44 24c0-1.341-.138-2.65-.389-3.917z" />
-            </svg>
-          </span>
+          <template #leading>
+            <span class="flex items-center justify-center w-6 h-6 bg-white rounded-full shadow-sm">
+              <svg class="w-4 h-4" viewBox="0 0 48 48">
+                <path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20 20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z" />
+                <path fill="#FF3D00" d="M6.306 14.691l6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 16.318 4 9.656 8.337 6.306 14.691z" />
+                <path fill="#4CAF50" d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238A11.91 11.91 0 0124 36c-5.202 0-9.619-3.317-11.283-7.946l-6.522 5.025C9.505 39.556 16.227 44 24 44z" />
+                <path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303a12.04 12.04 0 01-4.087 5.571l.003-.002 6.19 5.238C36.971 39.205 44 34 44 24c0-1.341-.138-2.65-.389-3.917z" />
+              </svg>
+            </span>
+          </template>
           Увійти через Google
-        </a>
+        </UButton>
 
         <!-- Divider -->
         <div class="relative mb-6">
@@ -93,39 +107,43 @@ async function submitCredentials() {
         </div>
 
         <!-- Credentials form -->
-        <form class="space-y-4" @submit.prevent="submitCredentials">
-          <input
-            v-model="form.email"
-            type="email"
-            placeholder="Email"
-            autocomplete="email"
-            required
-            class="w-full px-5 py-4 rounded-xl bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm font-medium focus:outline-none focus:border-gray-400 focus:bg-white transition-colors"
-          >
-          <input
-            v-model="form.password"
-            type="password"
-            placeholder="Пароль (мін. 8 символів)"
-            autocomplete="current-password"
-            required
-            class="w-full px-5 py-4 rounded-xl bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm font-medium focus:outline-none focus:border-gray-400 focus:bg-white transition-colors"
-          >
+        <UForm :schema="schema" :state="state" class="space-y-4" @submit="onSubmit">
+          <UFormField name="email">
+            <UInput
+              v-model="state.email"
+              type="email"
+              placeholder="Email"
+              autocomplete="email"
+              icon="i-lucide-mail"
+              size="xl"
+              class="w-full"
+            />
+          </UFormField>
 
-          <button
+          <UFormField name="password">
+            <UInput
+              v-model="state.password"
+              type="password"
+              placeholder="Пароль (мін. 8 символів)"
+              autocomplete="current-password"
+              icon="i-lucide-lock"
+              size="xl"
+              class="w-full"
+            />
+          </UFormField>
+
+          <UButton
             type="submit"
+            :loading="submitting"
             :disabled="submitting"
-            class="w-full flex items-center justify-center gap-2 py-4 px-6 bg-indigo-500 hover:bg-indigo-600 disabled:opacity-60 text-white font-semibold text-sm tracking-wide rounded-xl transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:ring-offset-2 mt-2"
+            icon="i-lucide-log-in"
+            block
+            size="xl"
+            class="mt-2 rounded-xl"
           >
-            <svg v-if="submitting" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
-            </svg>
-            <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M11 16l-4-4m0 0l4-4m-4 4h14" />
-            </svg>
             {{ submitting ? 'Вхід...' : 'Увійти' }}
-          </button>
-        </form>
+          </UButton>
+        </UForm>
 
         <p class="text-xs text-gray-400 text-center mt-6">
           Перший вхід — автоматична реєстрація

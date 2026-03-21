@@ -79,12 +79,14 @@ function formatDate(iso: string) {
           <span class="text-xs text-gray-400">{{ formatDate(msg.sentAt) }}</span>
 
           <!-- Delete -->
-          <button
-            class="opacity-0 group-hover:opacity-100 transition-opacity text-gray-400 hover:text-red-500 ml-1"
+          <UButton
+            variant="ghost"
+            icon="i-lucide-x"
+            size="xs"
+            color="error"
+            class="opacity-0 group-hover:opacity-100 transition-opacity ml-1"
             @click="deleteMessage(msg.id)"
-          >
-            <UIcon name="i-lucide-x" class="w-3 h-3" />
-          </button>
+          />
         </div>
       </div>
     </div>

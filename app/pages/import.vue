@@ -2,6 +2,7 @@
 useSeoMeta({ title: 'Імпорт CSV — hire-me' })
 
 const file = ref<File | null>(null)
+const fileInput = ref<HTMLInputElement | null>(null)
 const loading = ref(false)
 const result = ref<{ total: number, imported: number } | null>(null)
 const errorMsg = ref<string | null>(null)
@@ -51,14 +52,20 @@ async function doImport() {
 
       <div class="space-y-4">
         <input
+          ref="fileInput"
           type="file"
           accept=".csv"
-          class="block w-full text-sm text-gray-700 dark:text-gray-300
-                 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0
-                 file:text-sm file:font-medium file:bg-primary-50 file:text-primary-700
-                 hover:file:bg-primary-100 dark:file:bg-primary-900 dark:file:text-primary-300"
+          class="hidden"
           @change="onFileChange"
         >
+        <UButton
+          variant="outline"
+          icon="i-lucide-file-spreadsheet"
+          block
+          @click="fileInput?.click()"
+        >
+          {{ file ? file.name : 'Обрати CSV файл…' }}
+        </UButton>
 
         <UButton
           :loading="loading"

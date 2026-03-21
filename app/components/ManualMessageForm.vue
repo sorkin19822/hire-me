@@ -86,12 +86,12 @@ async function submit() {
         size="sm"
         class="flex-1"
       />
-      <input
+      <UInput
         v-model="sentAt"
         type="datetime-local"
-        class="text-sm border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-1.5
-               bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
-      >
+        size="sm"
+        class="flex-1"
+      />
     </div>
 
     <!-- Text -->

@@ -10,7 +10,12 @@ useSeoMeta({
   description: 'Personal CRM for tracking vacancies, interviews and recruiter conversations'
 })
 
-const { loggedIn, user } = useUserSession()
+const { loggedIn, user, clear } = useUserSession()
+
+async function logout() {
+  await clear()
+  await navigateTo('/login')
+}
 </script>
 
 <template>
@@ -51,11 +56,11 @@ const { loggedIn, user } = useUserSession()
               size="xs"
             />
             <UButton
-              to="/auth/logout"
               variant="ghost"
               icon="i-lucide-log-out"
               size="sm"
               title="Вийти"
+              @click="logout"
             />
           </template>
         </nav>

@@ -28,11 +28,7 @@ const columns = [
 
 <template>
   <UContainer class="py-6">
-    <div class="flex items-center justify-between mb-6">
-      <h1 class="text-2xl font-bold">
-        Рекрутери
-      </h1>
-    </div>
+    <PageHeader title="Рекрутери" />
 
     <UInput
       v-model="search"
@@ -47,20 +43,29 @@ const columns = [
       </template>
 
       <template #telegram-cell="{ row }">
-        <a
+        <UButton
           v-if="row.original.telegram"
           :href="`tg://resolve?domain=${encodeURIComponent(row.original.telegram.replace('@', ''))}`"
-          class="text-sm text-blue-500 hover:underline"
-        >{{ row.original.telegram }}</a>
+          variant="link"
+          size="xs"
+          icon="i-simple-icons-telegram"
+        >
+          {{ row.original.telegram }}
+        </UButton>
         <span v-else class="text-gray-400">—</span>
       </template>
 
       <template #email-cell="{ row }">
-        <a
+        <UButton
           v-if="row.original.email"
           :href="`mailto:${row.original.email}`"
-          class="text-sm hover:underline"
-        >{{ row.original.email }}</a>
+          variant="link"
+          size="xs"
+          icon="i-lucide-mail"
+          color="neutral"
+        >
+          {{ row.original.email }}
+        </UButton>
         <span v-else class="text-gray-400">—</span>
       </template>
 

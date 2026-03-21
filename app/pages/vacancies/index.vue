@@ -49,14 +49,11 @@ const columns = [
 
 <template>
   <UContainer class="py-6">
-    <div class="flex items-center justify-between mb-6">
-      <h1 class="text-2xl font-bold">
-        Вакансії
-      </h1>
+    <PageHeader title="Вакансії">
       <UButton icon="i-lucide-plus" @click="showModal = true">
         Нова вакансія
       </UButton>
-    </div>
+    </PageHeader>
 
     <!-- Filters -->
     <div class="flex gap-3 mb-4">

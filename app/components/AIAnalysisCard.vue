@@ -83,12 +83,6 @@ async function saveResult() {
   }
 }
 
-function scoreColor(score: number | null): string {
-  if (score === null) return 'text-gray-400'
-  if (score >= 7) return 'text-green-600 dark:text-green-400'
-  if (score >= 4) return 'text-yellow-600 dark:text-yellow-400'
-  return 'text-red-600 dark:text-red-400'
-}
 
 onMounted(fetchStoredAnalysis)
 </script>
@@ -102,55 +96,16 @@ onMounted(fetchStoredAnalysis)
 
     <div v-else-if="analysisData" class="space-y-4">
       <div class="grid grid-cols-2 gap-4">
-        <div class="text-center p-3 rounded-lg bg-gray-50 dark:bg-gray-800">
-          <p class="text-xs text-gray-500 mb-1">
-            Оцінка компанії
-          </p>
-          <p :class="['text-3xl font-bold', scoreColor(analysisData.companyScore)]">
-            {{ analysisData.companyScore?.toFixed(1) ?? '—' }}
-          </p>
-          <p class="text-xs text-gray-400">
-            / 10
-          </p>
-        </div>
-        <div class="text-center p-3 rounded-lg bg-gray-50 dark:bg-gray-800">
-          <p class="text-xs text-gray-500 mb-1">
-            Оцінка рекрутера
-          </p>
-          <p :class="['text-3xl font-bold', scoreColor(analysisData.recruiterScore)]">
-            {{ analysisData.recruiterScore?.toFixed(1) ?? '—' }}
-          </p>
-          <p class="text-xs text-gray-400">
-            / 10
-          </p>
-        </div>
+        <ScoreDisplay label="Оцінка компанії" :score="analysisData.companyScore" />
+        <ScoreDisplay label="Оцінка рекрутера" :score="analysisData.recruiterScore" />
       </div>
 
       <p v-if="analysisData.summary" class="text-sm text-gray-700 dark:text-gray-300">
         {{ analysisData.summary }}
       </p>
 
-      <div v-if="analysisData.greenFlags?.length" class="space-y-1">
-        <p class="text-xs font-semibold text-green-600 dark:text-green-400">
-          Позитивне
-        </p>
-        <ul class="space-y-0.5">
-          <li v-for="flag in analysisData.greenFlags" :key="flag" class="text-sm flex items-start gap-1">
-            <span class="mt-0.5 shrink-0">✅</span><span>{{ flag }}</span>
-          </li>
-        </ul>
-      </div>
-
-      <div v-if="analysisData.redFlags?.length" class="space-y-1">
-        <p class="text-xs font-semibold text-red-600 dark:text-red-400">
-          Тривожні сигнали
-        </p>
-        <ul class="space-y-0.5">
-          <li v-for="flag in analysisData.redFlags" :key="flag" class="text-sm flex items-start gap-1">
-            <span class="mt-0.5 shrink-0">🚩</span><span>{{ flag }}</span>
-          </li>
-        </ul>
-      </div>
+      <FlagList v-if="analysisData.greenFlags?.length" :flags="analysisData.greenFlags" label="Позитивне" type="success" />
+      <FlagList v-if="analysisData.redFlags?.length" :flags="analysisData.redFlags" label="Тривожні сигнали" type="error" />
 
       <p v-if="analysisData.createdAt" class="text-xs text-gray-400">
         Оновлено: {{ analysisData.createdAt?.slice(0, 16).replace('T', ' ') }}
@@ -160,20 +115,20 @@ onMounted(fetchStoredAnalysis)
     <!-- Action buttons -->
     <div class="flex flex-wrap items-center gap-2">
       <!-- Language toggle -->
-      <div class="flex rounded-md border border-gray-200 dark:border-gray-700 overflow-hidden text-xs">
-        <button
-          :class="['px-3 py-1.5 transition-colors', lang === 'uk' ? 'bg-primary text-white' : 'hover:bg-gray-50 dark:hover:bg-gray-800']"
+      <UButtonGroup size="xs">
+        <UButton
+          :variant="lang === 'uk' ? 'solid' : 'ghost'"
           @click="lang = 'uk'"
         >
           UA
-        </button>
-        <button
-          :class="['px-3 py-1.5 transition-colors', lang === 'en' ? 'bg-primary text-white' : 'hover:bg-gray-50 dark:hover:bg-gray-800']"
+        </UButton>
+        <UButton
+          :variant="lang === 'en' ? 'solid' : 'ghost'"
           @click="lang = 'en'"
         >
           EN
-        </button>
-      </div>
+        </UButton>
+      </UButtonGroup>
 
       <UButton
         variant="soft"
