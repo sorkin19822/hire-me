@@ -1,9 +1,11 @@
 import { z } from 'zod'
 import { useDatabase } from '../../database/index'
-import { vacancies, recruiters, messages, analysis } from '../../database/schema'
-import { eq, and } from 'drizzle-orm'
-import { useClaudeClient } from '../../utils/claude-client'
-import { buildAnalysisPrompt, ANALYSIS_SYSTEM_PROMPT } from '../../utils/analysis-prompt'
+import { vacancies, analysis } from '../../database/schema'
+import { eq } from 'drizzle-orm'
+
+const bodySchema = z.object({
+  result: z.string().min(1).max(10000),
+})
 
 const responseSchema = z.object({
   company_score: z.number().min(0).max(10),
@@ -21,18 +23,16 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'Invalid vacancy ID' })
   }
 
-  const config = useRuntimeConfig(event)
-  const apiKey = config.anthropicApiKey as string
-
-  if (!apiKey) {
-    throw createError({ statusCode: 503, statusMessage: 'AI analysis is not available' })
+  const body = await readBody(event)
+  const parsed = bodySchema.safeParse(body)
+  if (!parsed.success) {
+    throw createError({ statusCode: 400, statusMessage: parsed.error.errors[0]?.message ?? 'Invalid input' })
   }
 
   const db = useDatabase()
 
-  // Fetch vacancy
   const [vacancy] = db
-    .select({ company: vacancies.company, position: vacancies.position, notes: vacancies.notes })
+    .select({ id: vacancies.id })
     .from(vacancies)
     .where(eq(vacancies.id, vacancyId))
     .all()
@@ -41,51 +41,19 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 404, statusMessage: 'Vacancy not found' })
   }
 
-  // Fetch recruiters for this vacancy
-  const recruiterList = db
-    .select({ name: recruiters.name, telegram: recruiters.telegram, email: recruiters.email })
-    .from(recruiters)
-    .where(eq(recruiters.vacancyId, vacancyId))
-    .all()
+  // Extract JSON from the pasted text (Claude may add extra text around the JSON)
+  let jsonText = parsed.data.result.trim()
+  const jsonMatch = jsonText.match(/\{[\s\S]*\}/)
+  if (jsonMatch) jsonText = jsonMatch[0]
 
-  // Fetch messages for this vacancy
-  const messageList = db
-    .select({ direction: messages.direction, content: messages.content, sentAt: messages.sentAt, source: messages.source })
-    .from(messages)
-    .where(eq(messages.vacancyId, vacancyId))
-    .all()
-
-  const prompt = buildAnalysisPrompt({ vacancy, recruiters: recruiterList, messages: messageList })
-
-  const claude = useClaudeClient(apiKey)
-
-  let responseText: string
+  let claudeResult: z.infer<typeof responseSchema>
   try {
-    const response = await claude.messages.create({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 1024,
-      system: ANALYSIS_SYSTEM_PROMPT,
-      messages: [{ role: 'user', content: prompt }],
-    })
-    const block = response.content[0]
-    responseText = block.type === 'text' ? block.text : ''
+    claudeResult = responseSchema.parse(JSON.parse(jsonText))
   }
   catch {
-    throw createError({ statusCode: 503, statusMessage: 'AI analysis request failed' })
+    throw createError({ statusCode: 422, statusMessage: 'Could not parse JSON — check the pasted text' })
   }
 
-  let parsed: z.infer<typeof responseSchema>
-  try {
-    const json = JSON.parse(responseText)
-    const result = responseSchema.parse(json)
-    parsed = result
-  }
-  catch {
-    console.error('[analysis] Failed to parse Claude response:', responseText)
-    throw createError({ statusCode: 502, statusMessage: 'AI returned an unexpected response' })
-  }
-
-  // Upsert — one analysis record per vacancy
   const [existing] = db
     .select({ id: analysis.id })
     .from(analysis)
@@ -95,11 +63,11 @@ export default defineEventHandler(async (event) => {
   if (existing) {
     db.update(analysis)
       .set({
-        companyScore: parsed.company_score,
-        recruiterScore: parsed.recruiter_score,
-        redFlags: JSON.stringify(parsed.red_flags),
-        greenFlags: JSON.stringify(parsed.green_flags),
-        summary: parsed.summary,
+        companyScore: claudeResult.company_score,
+        recruiterScore: claudeResult.recruiter_score,
+        redFlags: JSON.stringify(claudeResult.red_flags),
+        greenFlags: JSON.stringify(claudeResult.green_flags),
+        summary: claudeResult.summary,
         createdAt: new Date().toISOString(),
       })
       .where(eq(analysis.id, existing.id))
@@ -108,19 +76,19 @@ export default defineEventHandler(async (event) => {
   else {
     db.insert(analysis).values({
       vacancyId,
-      companyScore: parsed.company_score,
-      recruiterScore: parsed.recruiter_score,
-      redFlags: JSON.stringify(parsed.red_flags),
-      greenFlags: JSON.stringify(parsed.green_flags),
-      summary: parsed.summary,
+      companyScore: claudeResult.company_score,
+      recruiterScore: claudeResult.recruiter_score,
+      redFlags: JSON.stringify(claudeResult.red_flags),
+      greenFlags: JSON.stringify(claudeResult.green_flags),
+      summary: claudeResult.summary,
     }).run()
   }
 
   return {
-    companyScore: parsed.company_score,
-    recruiterScore: parsed.recruiter_score,
-    redFlags: parsed.red_flags,
-    greenFlags: parsed.green_flags,
-    summary: parsed.summary,
+    companyScore: claudeResult.company_score,
+    recruiterScore: claudeResult.recruiter_score,
+    redFlags: claudeResult.red_flags,
+    greenFlags: claudeResult.green_flags,
+    summary: claudeResult.summary,
   }
 })
