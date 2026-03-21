@@ -36,7 +36,6 @@ function buildConfig(host: string, port: number, user: string, password: string)
       user,
       password,
       tls: true,
-      tlsOptions: { rejectUnauthorized: false },
       authTimeout: 10000,
     },
   }
@@ -121,8 +120,8 @@ export async function fetchEmailsByAddress(
     connection = await imapSimple.connect(buildConfig(config.host, config.port, config.user, config.password))
   }
   catch (err) {
-    const msg = err instanceof Error ? err.message : String(err)
-    throw new Error(`IMAP connection failed: ${msg}`)
+    console.error('[imap] connection failed:', err)
+    throw new Error('IMAP connection failed')
   }
 
   try {

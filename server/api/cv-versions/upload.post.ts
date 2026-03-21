@@ -17,10 +17,14 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'Field "file" is required' })
   }
 
-  const filename = filePart.filename ?? 'cv.docx'
-  if (!filename.toLowerCase().endsWith('.docx')) {
+  const rawFilename = (filePart.filename ?? 'cv.docx')
+    .replace(/[/\\?%*:|"<>\x00-\x1f]/g, '_')
+    .slice(0, 255)
+
+  if (!rawFilename.toLowerCase().endsWith('.docx')) {
     throw createError({ statusCode: 400, statusMessage: 'Only .docx files are accepted' })
   }
+  const filename = rawFilename
 
   if (filePart.data.length > MAX_SIZE) {
     throw createError({ statusCode: 413, statusMessage: 'File too large (max 5 MB)' })
