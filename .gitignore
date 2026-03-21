@@ -1,0 +1,71 @@
+# Node / Nuxt build artifacts
+node_modules/
+.nuxt/
+.output/
+.nitro/
+.turbo/
+dist/
+.cache/
+.nuxt-devtools/
+.data/
+.fleet/
+
+# Logs
+yarn-debug.log*
+yarn-error.log*
+npm-debug.log*
+pnpm-debug.log*
+logs/
+*.log
+
+# Environment (secrets)
+.env
+.env.local
+.env.*
+.env.*.local
+!.env.example
+
+# Database (local only, keep out of repo)
+*.db
+*.db-shm
+*.db-wal
+data/
+
+# Coverage & reports
+coverage/
+reports/
+
+# Claude Code — all config files (private)
+CLAUDE.md
+.claude/skills/
+.claude/agents/
+.claude/iterations/
+!.claude/.gitkeep
+
+# Editors & OS
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+ehthumbs.db
+Desktop.ini
+
+# Drizzle studio
+drizzle/
+
+# Test artifacts
+test-results/
+playwright-report/
+playwright/.cache/
+
+# Package manager locks (keep only npm)
+yarn.lock
+pnpm-lock.yaml
+pnpm-workspace.yaml
+
+# Local temporary specs
+temp/

@@ -1,0 +1,49 @@
+<script setup lang="ts">
+useHead({
+  meta: [{ name: 'viewport', content: 'width=device-width, initial-scale=1' }],
+  link: [{ rel: 'icon', href: '/favicon.ico' }],
+  htmlAttrs: { lang: 'uk' }
+})
+
+useSeoMeta({
+  title: 'hire-me — Job Search CRM',
+  description: 'Personal CRM for tracking vacancies, interviews and recruiter conversations'
+})
+</script>
+
+<template>
+  <UApp>
+    <UHeader>
+      <template #left>
+        <NuxtLink to="/" class="text-xl font-bold text-primary">
+          hire-me
+        </NuxtLink>
+      </template>
+
+      <template #right>
+        <nav class="flex items-center gap-1">
+          <UButton to="/" variant="ghost" icon="i-lucide-kanban" size="sm">
+            Kanban
+          </UButton>
+          <UButton to="/vacancies" variant="ghost" icon="i-lucide-briefcase" size="sm">
+            Вакансії
+          </UButton>
+          <UButton to="/recruiters" variant="ghost" icon="i-lucide-users" size="sm">
+            Рекрутери
+          </UButton>
+          <UButton to="/analytics" variant="ghost" icon="i-lucide-chart-bar" size="sm">
+            Аналітика
+          </UButton>
+          <UButton to="/import" variant="ghost" icon="i-lucide-upload" size="sm">
+            Імпорт
+          </UButton>
+          <UColorModeButton size="sm" />
+        </nav>
+      </template>
+    </UHeader>
+
+    <UMain>
+      <NuxtPage />
+    </UMain>
+  </UApp>
+</template>

@@ -1,0 +1,30 @@
+services:
+  app:
+    build:
+      context: .
+      target: runner
+    ports:
+      - "3000:3000"
+    volumes:
+      # Persist SQLite database outside container
+      - ./data:/app/data
+    env_file:
+      - .env
+    restart: unless-stopped
+
+  # Dev-only: run without building image
+  dev:
+    build:
+      context: .
+      target: deps
+    command: npm run dev
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - ./data:/app/data
+    env_file:
+      - .env
+    profiles:
+      - dev
