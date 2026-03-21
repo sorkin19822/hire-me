@@ -4,10 +4,7 @@ import { pipelineStages, vacancies, recruiters } from '../../database/schema'
 
 export default defineEventHandler(async (event) => {
   // Auth check
-  const session = await getUserSession(event)
-  if (!session?.user) {
-    throw createError({ statusCode: 401, statusMessage: 'Unauthorized' })
-  }
+  await requireAuth(event)
 
   const form = await readFormData(event)
   const file = form.get('file')

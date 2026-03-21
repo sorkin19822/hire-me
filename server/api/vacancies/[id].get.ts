@@ -3,10 +3,7 @@ import { vacancies, pipelineStages, recruiters, messages, analysis } from '../..
 import { eq, sql, desc } from 'drizzle-orm'
 
 export default defineEventHandler(async (event) => {
-  const session = await getUserSession(event)
-  if (!session?.user) {
-    throw createError({ statusCode: 401, statusMessage: 'Unauthorized' })
-  }
+  await requireAuth(event)
 
   const id = Number(getRouterParam(event, 'id'))
   if (!Number.isInteger(id) || id < 1) {

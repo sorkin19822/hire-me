@@ -9,6 +9,8 @@ useSeoMeta({
   title: 'hire-me — Job Search CRM',
   description: 'Personal CRM for tracking vacancies, interviews and recruiter conversations'
 })
+
+const { loggedIn, user } = useUserSession()
 </script>
 
 <template>
@@ -38,6 +40,21 @@ useSeoMeta({
             Імпорт
           </UButton>
           <UColorModeButton size="sm" />
+          <template v-if="loggedIn">
+            <UAvatar
+              v-if="user?.avatar"
+              :src="user.avatar"
+              :alt="user.name ?? user.email"
+              size="xs"
+            />
+            <UButton
+              to="/auth/logout"
+              variant="ghost"
+              icon="i-lucide-log-out"
+              size="sm"
+              title="Вийти"
+            />
+          </template>
         </nav>
       </template>
     </UHeader>

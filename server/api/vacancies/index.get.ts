@@ -10,10 +10,7 @@ const querySchema = z.object({
 })
 
 export default defineEventHandler(async (event) => {
-  const session = await getUserSession(event)
-  if (!session?.user) {
-    throw createError({ statusCode: 401, statusMessage: 'Unauthorized' })
-  }
+  await requireAuth(event)
 
   const parsed = querySchema.safeParse(getQuery(event))
   if (!parsed.success) {
