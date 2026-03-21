@@ -61,12 +61,13 @@ async function submitCredentials() {
         />
 
         <!-- Credentials form -->
-        <form class="space-y-3" @submit.prevent="submitCredentials">
+        <form class="space-y-3 flex flex-col items-center" @submit.prevent="submitCredentials">
           <UInput
             v-model="form.email"
             type="email"
             placeholder="Email"
             autocomplete="email"
+            class="w-72"
             required
           />
           <UInput
@@ -74,11 +75,12 @@ async function submitCredentials() {
             type="password"
             placeholder="Пароль (мін. 8 символів)"
             autocomplete="current-password"
+            class="w-72"
             required
           />
           <UButton
             type="submit"
-            block
+            class="w-72"
             size="lg"
             :loading="submitting"
             icon="i-lucide-log-in"
