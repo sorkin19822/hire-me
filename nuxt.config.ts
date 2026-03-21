@@ -31,7 +31,7 @@ export default defineNuxtConfig({
   nitro: {
     // Required for better-sqlite3 native module
     externals: {
-      inline: ['better-sqlite3']
+      inline: ['better-sqlite3', 'imap-simple', 'imap', 'utf8', 'uuencode', 'quoted-printable', 'iconv-lite']
     }
   },
 

@@ -1,5 +1,7 @@
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const imapSimple = require('imap-simple') as {
+// @ts-expect-error — imap-simple has no type declarations
+import imapSimpleLib from 'imap-simple'
+
+const imapSimple = imapSimpleLib as {
   connect: (config: object) => Promise<ImapConnection>
 }
 
