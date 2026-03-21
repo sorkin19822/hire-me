@@ -16,22 +16,23 @@ export default defineNuxtConfig({
 
   // All server-side only — never exposed to client bundle
   runtimeConfig: {
-    databaseUrl: process.env.DATABASE_URL || './data/hire-me.db',
-    allowedEmails: process.env.ALLOWED_EMAILS || '',
-    anthropicApiKey: process.env.ANTHROPIC_API_KEY || '',
-    imapHost: process.env.IMAP_HOST || 'imap.ukr.net',
-    imapPort: parseInt(process.env.IMAP_PORT || '993', 10),
-    imapUser: process.env.IMAP_USER || '',
-    imapPassword: process.env.IMAP_PASSWORD || '',
-    googleDriveMcpUrl: process.env.GOOGLE_DRIVE_MCP_URL || '',
-    telegramMcpUrl: process.env.TELEGRAM_MCP_URL || '',
+    // Defaults — all overridable at runtime via NUXT_<KEY_UPPERCASE> env vars
+    databaseUrl: './data/hire-me.db',
+    allowedEmails: '',
+    anthropicApiKey: '',
+    imapHost: 'imap.ukr.net',
+    imapPort: 993,
+    imapUser: '',
+    imapPassword: '',
+    googleDriveMcpUrl: '',
+    telegramMcpUrl: '',
     public: {}
   },
 
   nitro: {
     // Required for better-sqlite3 native module
     externals: {
-      inline: ['better-sqlite3', 'imap-simple', 'imap', 'utf8', 'uuencode', 'quoted-printable', 'iconv-lite']
+      inline: ['imap-simple', 'imap', 'utf8', 'uuencode', 'quoted-printable', 'iconv-lite']
     }
   },
 
