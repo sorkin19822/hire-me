@@ -8,6 +8,13 @@
       "when": 1774096073310,
       "tag": "0000_silky_shiver_man",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1774105704774,
+      "tag": "0001_brief_arclight",
+      "breakpoints": true
     }
   ]
 }
