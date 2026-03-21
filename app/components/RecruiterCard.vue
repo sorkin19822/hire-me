@@ -14,6 +14,7 @@ const emit = defineEmits<{ synced: [] }>()
 
 const toast = useToast()
 const syncing = ref(false)
+const syncingEmail = ref(false)
 
 async function syncTelegram() {
   if (!props.recruiter.telegram || !props.vacancyId) return
@@ -39,6 +40,33 @@ async function syncTelegram() {
   }
   finally {
     syncing.value = false
+  }
+}
+
+async function syncEmail() {
+  if (!props.recruiter.email || !props.vacancyId) return
+  syncingEmail.value = true
+  try {
+    const result = await $fetch<{ imported: number, total: number }>('/api/integrations/imap', {
+      method: 'POST',
+      body: {
+        recruiterId: props.recruiter.id,
+        vacancyId: props.vacancyId,
+        email: props.recruiter.email,
+      },
+    })
+    toast.add({
+      title: `Email: завантажено ${result.imported} нових повідомлень`,
+      color: 'success',
+      icon: 'i-lucide-mail',
+    })
+    emit('synced')
+  }
+  catch {
+    toast.add({ title: 'Помилка синхронізації Email', color: 'error', icon: 'i-lucide-alert-circle' })
+  }
+  finally {
+    syncingEmail.value = false
   }
 }
 </script>
@@ -89,6 +117,17 @@ async function syncTelegram() {
       :loading="syncing"
       title="Завантажити з Telegram"
       @click.prevent="syncTelegram"
+    />
+
+    <!-- Email sync button — only when email is set and vacancyId provided -->
+    <UButton
+      v-if="recruiter.email && vacancyId"
+      variant="ghost"
+      icon="i-lucide-mail"
+      size="xs"
+      :loading="syncingEmail"
+      title="Завантажити Email"
+      @click.prevent="syncEmail"
     />
   </div>
 </template>
