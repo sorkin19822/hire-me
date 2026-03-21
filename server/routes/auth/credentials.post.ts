@@ -58,7 +58,7 @@ export default defineEventHandler(async (event) => {
     }).run()
 
     await setUserSession(event, { user: { email: emailLower, name: emailLower } })
-    return sendRedirect(event, '/')
+    return { ok: true }
   }
 
   if (!user.passwordHash) {
@@ -68,7 +68,7 @@ export default defineEventHandler(async (event) => {
     db.update(users).set({ passwordHash: `${salt}:${hash}` }).where(eq(users.email, emailLower)).run()
 
     await setUserSession(event, { user: { email: emailLower, name: user.name ?? emailLower, avatar: user.avatar ?? undefined } })
-    return sendRedirect(event, '/')
+    return { ok: true }
   }
 
   if (!verifyPassword(password, user.passwordHash)) {
@@ -76,5 +76,5 @@ export default defineEventHandler(async (event) => {
   }
 
   await setUserSession(event, { user: { email: emailLower, name: user.name ?? emailLower, avatar: user.avatar ?? undefined } })
-  return sendRedirect(event, '/')
+  return { ok: true }
 })
