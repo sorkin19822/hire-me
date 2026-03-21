@@ -264,24 +264,12 @@ async function saveNotes() {
         />
       </UCard>
 
-      <!-- AI analysis placeholder -->
+      <!-- AI analysis -->
       <UCard>
         <template #header>
           <span class="font-semibold">AI Аналіз</span>
         </template>
-        <div v-if="vacancy.lastAnalysis">
-          <p class="text-sm">
-            {{ vacancy.lastAnalysis.summary }}
-          </p>
-        </div>
-        <div v-else class="flex items-center justify-between">
-          <p class="text-sm text-gray-400">
-            Аналіз не виконано
-          </p>
-          <UButton variant="soft" icon="i-lucide-sparkles" size="sm" disabled>
-            Аналізувати
-          </UButton>
-        </div>
+        <AIAnalysisCard :vacancy-id="Number(id)" />
       </UCard>
     </template>
   </UContainer>
