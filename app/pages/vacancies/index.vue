@@ -39,11 +39,11 @@ async function createVacancy() {
 }
 
 const columns = [
-  { key: 'company', label: 'Компанія' },
-  { key: 'position', label: 'Позиція' },
-  { key: 'stage', label: 'Стадія' },
-  { key: 'applyDate', label: 'Дата' },
-  { key: 'actions', label: '' },
+  { accessorKey: 'company', header: 'Компанія' },
+  { accessorKey: 'position', header: 'Позиція' },
+  { accessorKey: 'stage', header: 'Стадія' },
+  { accessorKey: 'applyDate', header: 'Дата' },
+  { id: 'actions', header: '' },
 ]
 </script>
 
@@ -82,29 +82,29 @@ const columns = [
       :loading="!vacancies"
     >
       <template #company-cell="{ row }">
-        <NuxtLink :to="`/vacancies/${row.id}`" class="font-medium hover:underline">
-          {{ row.company }}
+        <NuxtLink :to="`/vacancies/${row.original.id}`" class="font-medium hover:underline">
+          {{ row.original.company }}
         </NuxtLink>
       </template>
 
       <template #stage-cell="{ row }">
         <UBadge
-          v-if="row.stageName"
-          :style="{ backgroundColor: row.stageColor + '22', color: row.stageColor, borderColor: row.stageColor + '44' }"
+          v-if="row.original.stageName"
+          :style="{ backgroundColor: row.original.stageColor + '22', color: row.original.stageColor, borderColor: row.original.stageColor + '44' }"
           variant="outline"
           size="sm"
         >
-          {{ row.stageName }}
+          {{ row.original.stageName }}
         </UBadge>
       </template>
 
       <template #applyDate-cell="{ row }">
-        {{ row.applyDate ?? '—' }}
+        {{ row.original.applyDate ?? '—' }}
       </template>
 
       <template #actions-cell="{ row }">
         <UButton
-          :to="`/vacancies/${row.id}`"
+          :to="`/vacancies/${row.original.id}`"
           variant="ghost"
           icon="i-lucide-arrow-right"
           size="xs"

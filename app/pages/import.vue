@@ -3,7 +3,7 @@ useSeoMeta({ title: 'Імпорт CSV — hire-me' })
 
 const file = ref<File | null>(null)
 const loading = ref(false)
-const result = ref<{ total: number, imported: number, skipped: number, errors: string[] } | null>(null)
+const result = ref<{ total: number, imported: number } | null>(null)
 const errorMsg = ref<string | null>(null)
 
 function onFileChange(e: Event) {
@@ -22,7 +22,7 @@ async function doImport() {
   try {
     const form = new FormData()
     form.append('file', file.value)
-    const data = await $fetch<{ total: number, imported: number, skipped: number, errors: string[] }>(
+    const data = await $fetch<{ total: number, imported: number }>(
       '/api/import/csv',
       { method: 'POST', body: form },
     )
@@ -83,7 +83,7 @@ async function doImport() {
 
       <!-- Result -->
       <template v-if="result">
-        <div class="grid grid-cols-3 gap-4 mt-6 text-center">
+        <div class="grid grid-cols-2 gap-4 mt-6 text-center">
           <div class="p-4 rounded-lg bg-gray-100 dark:bg-gray-800">
             <div class="text-2xl font-bold">
               {{ result.total }}
@@ -100,25 +100,6 @@ async function doImport() {
               Імпортовано
             </div>
           </div>
-          <div class="p-4 rounded-lg bg-yellow-50 dark:bg-yellow-900/30">
-            <div class="text-2xl font-bold text-yellow-600 dark:text-yellow-400">
-              {{ result.skipped }}
-            </div>
-            <div class="text-sm text-gray-500">
-              Пропущено
-            </div>
-          </div>
-        </div>
-
-        <div v-if="result.errors.length" class="mt-4">
-          <p class="text-sm font-medium text-red-600 mb-2">
-            Помилки:
-          </p>
-          <ul class="text-xs text-red-500 space-y-1 max-h-40 overflow-y-auto">
-            <li v-for="(e, i) in result.errors" :key="i">
-              {{ e }}
-            </li>
-          </ul>
         </div>
 
         <UButton

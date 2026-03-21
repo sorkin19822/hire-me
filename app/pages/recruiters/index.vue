@@ -18,11 +18,11 @@ async function deleteRecruiter(id: number) {
 }
 
 const columns = [
-  { key: 'name', label: 'Ім\'я' },
-  { key: 'telegram', label: 'Telegram' },
-  { key: 'email', label: 'Email' },
-  { key: 'vacancy', label: 'Вакансія' },
-  { key: 'actions', label: '' },
+  { accessorKey: 'name', header: 'Ім\'я' },
+  { accessorKey: 'telegram', header: 'Telegram' },
+  { accessorKey: 'email', header: 'Email' },
+  { accessorKey: 'vacancy', header: 'Вакансія' },
+  { id: 'actions', header: '' },
 ]
 </script>
 
@@ -43,34 +43,34 @@ const columns = [
 
     <UTable :data="filtered" :columns="columns" :loading="!recruiters">
       <template #name-cell="{ row }">
-        <RecruiterCard :recruiter="row" />
+        <RecruiterCard :recruiter="row.original" />
       </template>
 
       <template #telegram-cell="{ row }">
         <a
-          v-if="row.telegram"
-          :href="`tg://resolve?domain=${encodeURIComponent(row.telegram.replace('@', ''))}`"
+          v-if="row.original.telegram"
+          :href="`tg://resolve?domain=${encodeURIComponent(row.original.telegram.replace('@', ''))}`"
           class="text-sm text-blue-500 hover:underline"
-        >{{ row.telegram }}</a>
+        >{{ row.original.telegram }}</a>
         <span v-else class="text-gray-400">—</span>
       </template>
 
       <template #email-cell="{ row }">
         <a
-          v-if="row.email"
-          :href="`mailto:${row.email}`"
+          v-if="row.original.email"
+          :href="`mailto:${row.original.email}`"
           class="text-sm hover:underline"
-        >{{ row.email }}</a>
+        >{{ row.original.email }}</a>
         <span v-else class="text-gray-400">—</span>
       </template>
 
       <template #vacancy-cell="{ row }">
         <NuxtLink
-          v-if="row.vacancyId"
-          :to="`/vacancies/${row.vacancyId}`"
+          v-if="row.original.vacancyId"
+          :to="`/vacancies/${row.original.vacancyId}`"
           class="text-sm text-primary hover:underline"
         >
-          {{ row.vacancyCompany }}
+          {{ row.original.vacancyCompany }}
         </NuxtLink>
         <span v-else class="text-gray-400">—</span>
       </template>
@@ -81,7 +81,7 @@ const columns = [
           icon="i-lucide-trash-2"
           size="xs"
           color="error"
-          @click="deleteRecruiter(row.id)"
+          @click="deleteRecruiter(row.original.id)"
         />
       </template>
     </UTable>

@@ -46,9 +46,9 @@ async function handleFileUpload(event: Event) {
 }
 
 const columns = [
-  { key: 'filename', label: 'Файл' },
-  { key: 'importedAt', label: 'Імпортовано' },
-  { key: 'status', label: 'Статус' },
+  { accessorKey: 'filename', header: 'Файл' },
+  { accessorKey: 'importedAt', header: 'Імпортовано' },
+  { accessorKey: 'status', header: 'Статус' },
 ]
 </script>
 
@@ -90,17 +90,17 @@ const columns = [
     <UCard>
       <UTable :data="cvList ?? []" :columns="columns">
         <template #filename-cell="{ row }">
-          <span class="font-medium text-sm">{{ row.filename }}</span>
-          <span v-if="row.gdriveId" class="ml-2 text-xs text-gray-400">Drive</span>
+          <span class="font-medium text-sm">{{ row.original.filename }}</span>
+          <span v-if="row.original.gdriveId" class="ml-2 text-xs text-gray-400">Drive</span>
         </template>
         <template #importedAt-cell="{ row }">
           <span class="text-sm text-gray-600 dark:text-gray-400">
-            {{ row.importedAt?.slice(0, 16).replace('T', ' ') }}
+            {{ row.original.importedAt?.slice(0, 16).replace('T', ' ') }}
           </span>
         </template>
         <template #status-cell="{ row }">
           <UBadge
-            v-if="row.isActive"
+            v-if="row.original.isActive"
             color="success"
             variant="soft"
             size="xs"

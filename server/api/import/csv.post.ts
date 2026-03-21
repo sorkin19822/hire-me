@@ -32,16 +32,13 @@ export default defineEventHandler(async (event) => {
   const parsed = parseVacanciesCSV(content)
 
   let imported = 0
-  let skipped = 0
-  const errors: string[] = []
 
-  // Wrap all inserts in a single transaction
-  const insertAll = db.transaction(() => {
-    for (const v of parsed) {
-      try {
+  try {
+    db.transaction((tx) => {
+      for (const v of parsed) {
         const stageId = stageMap.get(v.stageName) ?? stageMap.get('Відгук') ?? null
 
-        const [inserted] = db.insert(vacancies).values({
+        const [inserted] = tx.insert(vacancies).values({
           company: v.company,
           position: v.position,
           applyDate: v.applyDate ?? undefined,
@@ -50,7 +47,7 @@ export default defineEventHandler(async (event) => {
         }).returning({ id: vacancies.id }).all()
 
         if (v.recruiterTelegram) {
-          db.insert(recruiters).values({
+          tx.insert(recruiters).values({
             vacancyId: inserted.id,
             name: v.recruiterTelegram,
             telegram: v.recruiterTelegram,
@@ -59,29 +56,17 @@ export default defineEventHandler(async (event) => {
 
         imported++
       }
-      catch (err) {
-        skipped++
-        console.error(`[csv-import] row error [${v.company}]:`, err)
-        errors.push(`${v.company} — не вдалося імпортувати`)
-      }
-    }
-  })
-
-  try {
-    insertAll()
+    })
   }
   catch (err) {
-    throw createError({
-      statusCode: 500,
-      statusMessage: 'Import transaction failed',
-    })
+    console.error('[csv-import] transaction failed:', err)
+    const msg = err instanceof Error ? err.message : String(err)
+    throw createError({ statusCode: 500, statusMessage: `Import failed: ${msg}` })
   }
 
   return {
     success: true,
     total: parsed.length,
     imported,
-    skipped,
-    errors,
   }
 })
