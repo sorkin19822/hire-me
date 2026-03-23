@@ -10,6 +10,8 @@ useSeoMeta({
   description: 'Personal CRM for tracking vacancies, interviews and recruiter conversations'
 })
 
+import { uk } from '@nuxt/ui/locale'
+
 const { loggedIn, user, clear } = useUserSession()
 
 const showLogoutConfirm = ref(false)
@@ -29,7 +31,7 @@ async function logout() {
 </script>
 
 <template>
-  <UApp>
+  <UApp :locale="uk">
     <UHeader>
       <template #left>
         <NuxtLink to="/" class="text-xl font-bold text-primary">

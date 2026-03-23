@@ -186,6 +186,13 @@ async function confirmDelete() {
           <!-- Actions -->
           <div class="flex items-center gap-1 shrink-0">
             <UButton
+              :href="`/api/cv-versions/${cv.id}/file`"
+              target="_blank"
+              variant="ghost"
+              icon="i-lucide-eye"
+              size="xs"
+            />
+            <UButton
               variant="ghost"
               icon="i-lucide-pencil"
               size="xs"
@@ -208,7 +215,7 @@ async function confirmDelete() {
     </UCard>
 
     <ConfirmModal
-      v-model:open="!!confirmDeleteId"
+      :open="confirmDeleteId !== null"
       title="Видалити CV?"
       :description="`Файл «${confirmDeleteName}» буде видалено. Цю дію неможливо скасувати.`"
       :loading="deleting"

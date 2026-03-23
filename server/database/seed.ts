@@ -9,6 +9,7 @@ const STAGES = [
   { name: 'Тест', order: 4, color: '#ec4899', isTerminal: false },
   { name: 'Оффер', order: 5, color: '#10b981', isTerminal: false },
   { name: 'Відмова', order: 6, color: '#ef4444', isTerminal: true },
+  { name: 'Без відповіді', order: 7, color: '#94a3b8', isTerminal: true },
 ]
 
 async function seed() {

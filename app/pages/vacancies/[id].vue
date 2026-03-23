@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { CalendarDate, parseDate } from '@internationalized/date'
+
 const route = useRoute()
 const id = route.params.id as string
 
@@ -37,11 +39,27 @@ watch(selectedStageId, (val) => {
   if (val !== vacancy.value?.stageId) changeStage(val)
 })
 
+// Apply date picker
+const applyDateOpen = ref(false)
+const applyDateValue = computed({
+  get() {
+    if (!vacancy.value?.applyDate) return undefined
+    try { return parseDate(vacancy.value.applyDate) } catch { return undefined }
+  },
+  set(val: CalendarDate | undefined) {
+    if (!val) return
+    const str = val.toString()
+    if (str === vacancy.value?.applyDate) return
+    $fetch(`/api/vacancies/${id}`, { method: 'PATCH', body: { applyDate: str } })
+      .then(() => { refresh(); applyDateOpen.value = false })
+  },
+})
+
 // CV version selector
 const cvOptions = computed(() =>
   [{ label: '— без CV —', value: null as number | null }].concat(
-    (cvList.value ?? []).map((cv: { id: number, filename: string }) => ({
-      label: cv.filename,
+    (cvList.value ?? []).map((cv: { id: number, filename: string, comment: string | null }) => ({
+      label: cv.comment ? `${cv.filename} — ${cv.comment}` : cv.filename,
       value: cv.id as number | null,
     })),
   ),
@@ -183,9 +201,19 @@ async function saveNotes() {
         <div class="grid grid-cols-2 gap-6 text-sm">
           <div class="flex flex-col gap-1.5">
             <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Дата відгуку</span>
-            <p class="font-medium text-dark dark:text-white">
-              {{ vacancy.applyDate ?? '—' }}
-            </p>
+            <UPopover v-model:open="applyDateOpen">
+              <UButton
+                variant="ghost"
+                icon="i-lucide-calendar"
+                size="xs"
+                class="justify-start px-0 font-medium text-dark dark:text-white"
+              >
+                {{ vacancy.applyDate ?? 'Вибрати дату' }}
+              </UButton>
+              <template #content>
+                <UCalendar v-model="applyDateValue" />
+              </template>
+            </UPopover>
           </div>
           <div class="flex flex-col gap-1.5">
             <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Повідомлень</span>
@@ -201,15 +229,25 @@ async function saveNotes() {
           </div>
           <div class="col-span-2 flex flex-col gap-1.5">
             <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Версія CV</span>
-            <USelect
-              v-model="selectedCvId"
-              :items="cvOptions"
-              value-key="value"
-              label-key="label"
-              :loading="cvSaving"
-              class="mt-1 w-full"
-              size="sm"
-            />
+            <div class="flex items-center gap-2 mt-1">
+              <USelect
+                v-model="selectedCvId"
+                :items="cvOptions"
+                value-key="value"
+                label-key="label"
+                :loading="cvSaving"
+                class="flex-1"
+                size="sm"
+              />
+              <UButton
+                v-if="selectedCvId"
+                :href="`/api/cv-versions/${selectedCvId}/file`"
+                target="_blank"
+                variant="ghost"
+                icon="i-lucide-eye"
+                size="sm"
+              />
+            </div>
           </div>
         </div>
       </UCard>
