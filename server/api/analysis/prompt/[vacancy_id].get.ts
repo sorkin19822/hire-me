@@ -25,7 +25,15 @@ export default defineEventHandler(async (event) => {
   const db = useDatabase()
 
   const [vacancy] = db
-    .select({ company: vacancies.company, position: vacancies.position, notes: vacancies.notes })
+    .select({
+      company: vacancies.company,
+      position: vacancies.position,
+      applyDate: vacancies.applyDate,
+      urlDou: vacancies.urlDou,
+      urlSite: vacancies.urlSite,
+      description: vacancies.description,
+      notes: vacancies.notes,
+    })
     .from(vacancies)
     .where(eq(vacancies.id, vacancyId))
     .all()
@@ -35,7 +43,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const recruiterList = db
-    .select({ name: recruiters.name, telegram: recruiters.telegram, email: recruiters.email })
+    .select({ name: recruiters.name, telegram: recruiters.telegram, email: recruiters.email, linkedin: recruiters.linkedin })
     .from(recruiters)
     .where(eq(recruiters.vacancyId, vacancyId))
     .all()
