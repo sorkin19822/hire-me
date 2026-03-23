@@ -135,11 +135,11 @@ export function parseVacanciesCSV(content: string): ParsedVacancy[] {
     // Skip rows with insufficient columns
     if (row.length < 4) continue
 
-    const company = row[0].trim().replace(/;+$/, '')
+    const company = row[0]!.trim().replace(/;+$/, '')
     if (!company) continue
 
     // col[1]: take only the first line of position
-    const position = (row[1] ?? '').split('\n')[0].trim()
+    const position = (row[1]!.split('\n')[0] ?? '').trim()
     if (!position) continue
 
     const rawDate = row[3] ?? ''

@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import type { CalendarDate } from '@internationalized/date'
+import type { CalendarDate, DateValue } from '@internationalized/date'
 import { today, getLocalTimeZone } from '@internationalized/date'
+import type { DateRange } from 'reka-ui'
 
 const props = defineProps<{
   vacancyId: number
@@ -24,15 +25,19 @@ onMounted(() => {
   timeValue.value = new Date().toTimeString().slice(0, 5)
 })
 
+// reka-ui and @internationalized/date ship separate DateValue copies — cast needed
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const calendarModelValue = computed(() => selectedDate.value as any)
+
 const dateLabel = computed(() => {
   const t = today(getLocalTimeZone())
   if (selectedDate.value.toString() === t.toString()) return `Сьогодні, ${timeValue.value}`
   return `${selectedDate.value.toString()}, ${timeValue.value}`
 })
 
-function onDateSelect(val: CalendarDate | undefined) {
-  if (val) {
-    selectedDate.value = val
+function onDateSelect(val: DateValue | DateRange | DateValue[] | null | undefined) {
+  if (val && !Array.isArray(val) && 'calendar' in val) {
+    selectedDate.value = val as CalendarDate
     datePickerOpen.value = false
   }
 }
@@ -114,7 +119,7 @@ async function submit() {
           </UButton>
           <template #content>
             <UCalendar
-              :model-value="selectedDate"
+              :model-value="calendarModelValue"
               @update:model-value="onDateSelect"
             />
           </template>

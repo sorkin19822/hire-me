@@ -11,7 +11,7 @@ const { data: messages, refresh } = useFetch(
 
 defineExpose({ refresh })
 
-const sourceColor: Record<string, string> = {
+const sourceColor: Record<string, 'error' | 'primary' | 'secondary' | 'success' | 'info' | 'warning' | 'neutral'> = {
   telegram: 'info',
   email: 'warning',
   manual: 'neutral'

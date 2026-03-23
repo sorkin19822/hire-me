@@ -16,7 +16,7 @@ export default defineEventHandler(async (event) => {
   const body = await readBody(event)
   const parsed = schema.safeParse(body)
   if (!parsed.success) {
-    throw createError({ statusCode: 400, statusMessage: parsed.error.errors[0]?.message ?? 'Invalid input' })
+    throw createError({ statusCode: 400, statusMessage: parsed.error.issues[0]?.message ?? 'Invalid input' })
   }
 
   const { recruiterId, vacancyId, email } = parsed.data

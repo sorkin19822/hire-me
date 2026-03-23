@@ -23,7 +23,7 @@ const stageOptions = computed(() =>
   }))
 )
 
-const selectedStageId = ref(vacancy.value?.stageId ?? null)
+const selectedStageId = ref<number | undefined>(vacancy.value?.stageId ?? undefined)
 const stageSaving = ref(false)
 
 async function changeStage(newId: number | null) {
@@ -37,7 +37,7 @@ async function changeStage(newId: number | null) {
 }
 
 watch(selectedStageId, (val) => {
-  if (val !== vacancy.value?.stageId) changeStage(val)
+  if (val !== vacancy.value?.stageId) changeStage(val ?? null)
 })
 
 // Edit company/position

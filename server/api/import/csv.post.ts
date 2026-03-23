@@ -46,7 +46,7 @@ export default defineEventHandler(async (event) => {
           notes: v.notes ?? undefined
         }).returning({ id: vacancies.id }).all()
 
-        if (v.recruiterTelegram) {
+        if (v.recruiterTelegram && inserted != null) {
           tx.insert(recruiters).values({
             vacancyId: inserted.id,
             name: v.recruiterTelegram,

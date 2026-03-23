@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
 
   const parsed = querySchema.safeParse(getQuery(event))
   if (!parsed.success) {
-    throw createError({ statusCode: 400, statusMessage: parsed.error.errors[0]?.message ?? 'Invalid query' })
+    throw createError({ statusCode: 400, statusMessage: parsed.error.issues[0]?.message ?? 'Invalid query' })
   }
 
   const { vacancy_id: vacancyId, search } = parsed.data

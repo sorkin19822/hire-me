@@ -1,16 +1,24 @@
 <script setup lang="ts">
 import { h, resolveComponent } from 'vue'
 import type { Row, Table } from '@tanstack/vue-table'
+import type { TableColumn } from '@nuxt/ui'
 import { getFaviconUrl } from '~/composables/useFavicon'
 
 type VacancyRow = {
   id: number
   company: string
   position: string
+  applyDate: string | null
+  stageId: number | null
   stageName: string | null
   stageColor: string | null
-  applyDate: string | null
+  notes: string | null
+  urlDou: string | null
+  urlLinkedin: string | null
   urlSite: string | null
+  createdAt: string | null
+  updatedAt: string | null
+  messagesCount: number
 }
 
 useSeoMeta({ title: 'Вакансії — hire-me' })
@@ -104,7 +112,7 @@ const UCheckbox = resolveComponent('UCheckbox')
 const UButton = resolveComponent('UButton')
 const UBadge = resolveComponent('UBadge')
 
-const columns = [
+const columns: TableColumn<VacancyRow>[] = [
   {
     id: 'select',
     header: ({ table }: { table: Table<VacancyRow> }) => h(UCheckbox, {
