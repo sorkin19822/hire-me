@@ -25,20 +25,18 @@ async function syncTelegram() {
       body: {
         recruiterId: props.recruiter.id,
         vacancyId: props.vacancyId,
-        telegramUsername: props.recruiter.telegram,
-      },
+        telegramUsername: props.recruiter.telegram
+      }
     })
     toast.add({
       title: `Telegram: завантажено ${result.imported} нових повідомлень`,
       color: 'success',
-      icon: 'i-simple-icons-telegram',
+      icon: 'i-simple-icons-telegram'
     })
     emit('synced')
-  }
-  catch {
+  } catch {
     toast.add({ title: 'Помилка синхронізації Telegram', color: 'error', icon: 'i-lucide-alert-circle' })
-  }
-  finally {
+  } finally {
     syncing.value = false
   }
 }
@@ -52,20 +50,18 @@ async function syncEmail() {
       body: {
         recruiterId: props.recruiter.id,
         vacancyId: props.vacancyId,
-        email: props.recruiter.email,
-      },
+        email: props.recruiter.email
+      }
     })
     toast.add({
       title: `Email: завантажено ${result.imported} нових повідомлень`,
       color: 'success',
-      icon: 'i-lucide-mail',
+      icon: 'i-lucide-mail'
     })
     emit('synced')
-  }
-  catch {
+  } catch {
     toast.add({ title: 'Помилка синхронізації Email', color: 'error', icon: 'i-lucide-alert-circle' })
-  }
-  finally {
+  } finally {
     syncingEmail.value = false
   }
 }
@@ -73,7 +69,11 @@ async function syncEmail() {
 
 <template>
   <div class="flex items-center gap-3 py-2">
-    <UAvatar :alt="recruiter.name" size="sm" icon="i-lucide-user" />
+    <UAvatar
+      :alt="recruiter.name"
+      size="sm"
+      icon="i-lucide-user"
+    />
     <div class="flex-1 min-w-0">
       <p class="text-sm font-medium truncate">
         {{ recruiter.name }}

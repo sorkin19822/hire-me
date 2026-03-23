@@ -4,12 +4,12 @@ import { pipelineStages, vacancies } from './schema'
 const STAGES = [
   { name: 'Відгук', order: 0, color: '#6366f1', isTerminal: false },
   { name: 'HR', order: 1, color: '#8b5cf6', isTerminal: false },
-  { name: "Тех. інтерв'ю", order: 2, color: '#a855f7', isTerminal: false },
+  { name: 'Тех. інтерв\'ю', order: 2, color: '#a855f7', isTerminal: false },
   { name: 'CTO', order: 3, color: '#d946ef', isTerminal: false },
   { name: 'Тест', order: 4, color: '#ec4899', isTerminal: false },
   { name: 'Оффер', order: 5, color: '#10b981', isTerminal: false },
   { name: 'Відмова', order: 6, color: '#ef4444', isTerminal: true },
-  { name: 'Без відповіді', order: 7, color: '#94a3b8', isTerminal: true },
+  { name: 'Без відповіді', order: 7, color: '#94a3b8', isTerminal: true }
 ]
 
 const VACANCIES = [
@@ -32,7 +32,7 @@ const VACANCIES = [
   { company: 'Nova Poshta Digital', position: 'PHP Developer (Symfony/API)', applyDate: '2026-03-09', urlSite: 'https://novaposhta.ua', urlDou: 'https://djinni.co/jobs/1017', stageIdx: 2 },
   { company: 'Depositphotos', position: 'Middle/Senior PHP Developer', applyDate: '2026-03-12', urlSite: 'https://depositphotos.com', urlDou: 'https://djinni.co/jobs/1018', stageIdx: 3 },
   { company: 'Boosters', position: 'PHP Developer', applyDate: '2026-03-15', urlSite: 'https://boosters.pro', urlDou: 'https://djinni.co/jobs/1019', stageIdx: 0 },
-  { company: 'Jooble', position: 'PHP Backend Developer', applyDate: '2026-03-18', urlSite: 'https://jooble.org', urlDou: 'https://djinni.co/jobs/1020', stageIdx: 1 },
+  { company: 'Jooble', position: 'PHP Backend Developer', applyDate: '2026-03-18', urlSite: 'https://jooble.org', urlDou: 'https://djinni.co/jobs/1020', stageIdx: 1 }
 ]
 
 async function seed() {
@@ -42,8 +42,7 @@ async function seed() {
   const existingStages = db.select().from(pipelineStages).all()
   if (existingStages.length > 0) {
     console.log(`ℹ️  pipeline_stages: вже містить ${existingStages.length} записів, пропускаємо.`)
-  }
-  else {
+  } else {
     db.insert(pipelineStages).values(STAGES).run()
     console.log(`✅ pipeline_stages: додано ${STAGES.length} стадій`)
   }
@@ -52,8 +51,7 @@ async function seed() {
   const existingVacancies = db.select().from(vacancies).all()
   if (existingVacancies.length > 0) {
     console.log(`ℹ️  vacancies: вже містить ${existingVacancies.length} записів, пропускаємо.`)
-  }
-  else {
+  } else {
     const stages = db.select().from(pipelineStages).all()
     const rows = VACANCIES.map(v => ({
       company: v.company,
@@ -61,7 +59,7 @@ async function seed() {
       applyDate: v.applyDate,
       urlSite: v.urlSite,
       urlDou: v.urlDou,
-      stageId: stages[v.stageIdx]?.id ?? stages[0]!.id,
+      stageId: stages[v.stageIdx]?.id ?? stages[0]!.id
     }))
     db.insert(vacancies).values(rows).run()
     console.log(`✅ vacancies: додано ${rows.length} тестових вакансій`)

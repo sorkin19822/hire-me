@@ -5,8 +5,8 @@ const props = defineProps<{
 
 const emit = defineEmits<{ refresh: [] }>()
 
-const { data: messages, refresh } = await useFetch(
-  () => `/api/messages?vacancy_id=${props.vacancyId}`,
+const { data: messages, refresh } = useFetch(
+  () => `/api/messages?vacancy_id=${props.vacancyId}`
 )
 
 defineExpose({ refresh })
@@ -14,13 +14,13 @@ defineExpose({ refresh })
 const sourceColor: Record<string, string> = {
   telegram: 'info',
   email: 'warning',
-  manual: 'neutral',
+  manual: 'neutral'
 }
 
 const sourceLabel: Record<string, string> = {
   telegram: 'Telegram',
   email: 'Email',
-  manual: 'Вручну',
+  manual: 'Вручну'
 }
 
 async function deleteMessage(id: number) {
@@ -32,14 +32,17 @@ async function deleteMessage(id: number) {
 function formatDate(iso: string) {
   return new Date(iso).toLocaleString('uk-UA', {
     day: '2-digit', month: '2-digit', year: 'numeric',
-    hour: '2-digit', minute: '2-digit',
+    hour: '2-digit', minute: '2-digit'
   })
 }
 </script>
 
 <template>
   <div class="space-y-3">
-    <p v-if="!messages?.length" class="text-sm text-gray-400 text-center py-4">
+    <p
+      v-if="!messages?.length"
+      class="text-sm text-gray-400 text-center py-4"
+    >
       Повідомлень ще немає
     </p>
 
@@ -60,7 +63,9 @@ function formatDate(iso: string) {
             ? 'bg-primary-500 text-white rounded-br-sm'
             : 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-bl-sm'"
         >
-          <p class="whitespace-pre-wrap break-words">{{ msg.content }}</p>
+          <p class="whitespace-pre-wrap break-words">
+            {{ msg.content }}
+          </p>
         </div>
 
         <!-- Meta -->
@@ -75,7 +80,10 @@ function formatDate(iso: string) {
           >
             {{ sourceLabel[msg.source] ?? msg.source }}
           </UBadge>
-          <span v-if="msg.recruiterName" class="text-xs text-gray-400">{{ msg.recruiterName }}</span>
+          <span
+            v-if="msg.recruiterName"
+            class="text-xs text-gray-400"
+          >{{ msg.recruiterName }}</span>
           <span class="text-xs text-gray-400">{{ formatDate(msg.sentAt) }}</span>
 
           <!-- Delete -->

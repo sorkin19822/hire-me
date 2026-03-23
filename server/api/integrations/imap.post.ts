@@ -7,7 +7,7 @@ import { fetchEmailsByAddress } from '../../utils/imap-client'
 const schema = z.object({
   recruiterId: z.number().int().positive(),
   vacancyId: z.number().int().positive(),
-  email: z.string().email(),
+  email: z.string().email()
 })
 
 export default defineEventHandler(async (event) => {
@@ -26,7 +26,7 @@ export default defineEventHandler(async (event) => {
     host: config.imapHost as string,
     port: Number(config.imapPort) || 993,
     user: config.imapUser as string,
-    password: config.imapPassword as string,
+    password: config.imapPassword as string
   }
 
   if (!imapConfig.host || !imapConfig.user || !imapConfig.password) {
@@ -49,8 +49,7 @@ export default defineEventHandler(async (event) => {
   let emails: Awaited<ReturnType<typeof fetchEmailsByAddress>>
   try {
     emails = await fetchEmailsByAddress(email, imapConfig)
-  }
-  catch {
+  } catch {
     throw createError({ statusCode: 502, statusMessage: 'Failed to fetch emails' })
   }
 
@@ -81,7 +80,7 @@ export default defineEventHandler(async (event) => {
       source: 'email',
       direction: msg.direction,
       content,
-      sentAt: msg.date,
+      sentAt: msg.date
     })
     existingKeys.add(key)
   }

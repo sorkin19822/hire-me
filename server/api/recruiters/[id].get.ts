@@ -22,7 +22,7 @@ export default defineEventHandler(async (event) => {
       linkedin: recruiters.linkedin,
       createdAt: recruiters.createdAt,
       vacancyCompany: vacancies.company,
-      vacancyPosition: vacancies.position,
+      vacancyPosition: vacancies.position
     })
     .from(recruiters)
     .leftJoin(vacancies, eq(recruiters.vacancyId, vacancies.id))

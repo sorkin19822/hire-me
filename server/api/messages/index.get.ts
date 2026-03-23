@@ -1,10 +1,10 @@
 import { z } from 'zod'
 import { useDatabase } from '../../database/index'
 import { messages, recruiters } from '../../database/schema'
-import { eq, and, asc } from 'drizzle-orm'
+import { eq, asc } from 'drizzle-orm'
 
 const querySchema = z.object({
-  vacancy_id: z.coerce.number().int().positive(),
+  vacancy_id: z.coerce.number().int().positive()
 })
 
 export default defineEventHandler(async (event) => {
@@ -27,7 +27,7 @@ export default defineEventHandler(async (event) => {
       direction: messages.direction,
       content: messages.content,
       sentAt: messages.sentAt,
-      importedAt: messages.importedAt,
+      importedAt: messages.importedAt
     })
     .from(messages)
     .leftJoin(recruiters, eq(messages.recruiterId, recruiters.id))

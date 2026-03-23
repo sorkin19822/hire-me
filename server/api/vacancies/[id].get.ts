@@ -1,5 +1,5 @@
 import { useDatabase } from '../../database/index'
-import { vacancies, pipelineStages, recruiters, messages, analysis } from '../../database/schema'
+import { vacancies, pipelineStages, recruiters, analysis } from '../../database/schema'
 import { eq, sql, desc } from 'drizzle-orm'
 
 export default defineEventHandler(async (event) => {
@@ -29,7 +29,7 @@ export default defineEventHandler(async (event) => {
       description: vacancies.description,
       createdAt: vacancies.createdAt,
       updatedAt: vacancies.updatedAt,
-      messagesCount: sql<number>`(select count(*) from messages where messages.vacancy_id = ${vacancies.id})`,
+      messagesCount: sql<number>`(select count(*) from messages where messages.vacancy_id = ${vacancies.id})`
     })
     .from(vacancies)
     .leftJoin(pipelineStages, eq(vacancies.stageId, pipelineStages.id))
@@ -54,14 +54,16 @@ export default defineEventHandler(async (event) => {
     .limit(1)
     .all()[0] ?? null
 
-  const lastAnalysis = rawAnalysis ? {
-    companyScore: rawAnalysis.companyScore,
-    recruiterScore: rawAnalysis.recruiterScore,
-    redFlags: rawAnalysis.redFlags ? JSON.parse(rawAnalysis.redFlags) as string[] : [],
-    greenFlags: rawAnalysis.greenFlags ? JSON.parse(rawAnalysis.greenFlags) as string[] : [],
-    summary: rawAnalysis.summary,
-    createdAt: rawAnalysis.createdAt,
-  } : null
+  const lastAnalysis = rawAnalysis
+    ? {
+        companyScore: rawAnalysis.companyScore,
+        recruiterScore: rawAnalysis.recruiterScore,
+        redFlags: rawAnalysis.redFlags ? JSON.parse(rawAnalysis.redFlags) as string[] : [],
+        greenFlags: rawAnalysis.greenFlags ? JSON.parse(rawAnalysis.greenFlags) as string[] : [],
+        summary: rawAnalysis.summary,
+        createdAt: rawAnalysis.createdAt
+      }
+    : null
 
   return { ...vacancy, recruiters: vacancyRecruiters, lastAnalysis }
 })

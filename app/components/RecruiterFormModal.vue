@@ -10,7 +10,7 @@ const props = defineProps<{
   }
 }>()
 
-const emit = defineEmits<{ 'update:open': [value: boolean]; saved: [] }>()
+const emit = defineEmits<{ 'update:open': [value: boolean], 'saved': [] }>()
 
 const form = reactive({ name: '', telegram: '', email: '', linkedin: '' })
 const saving = ref(false)
@@ -22,7 +22,7 @@ watch(() => props.open, (val) => {
       name: props.recruiter.name,
       telegram: props.recruiter.telegram ?? '',
       email: props.recruiter.email ?? '',
-      linkedin: props.recruiter.linkedin ?? '',
+      linkedin: props.recruiter.linkedin ?? ''
     })
     error.value = null
   }
@@ -39,16 +39,14 @@ async function save() {
         name: form.name,
         telegram: form.telegram || null,
         email: form.email || null,
-        linkedin: form.linkedin || null,
-      },
+        linkedin: form.linkedin || null
+      }
     })
     emit('update:open', false)
     emit('saved')
-  }
-  catch {
+  } catch {
     error.value = 'Помилка збереження'
-  }
-  finally {
+  } finally {
     saving.value = false
   }
 }
@@ -64,17 +62,41 @@ async function save() {
   >
     <template #body>
       <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 p-4">
-        <UFormField label="Ім'я" required class="sm:col-span-2">
-          <UInput v-model="form.name" placeholder="Ім'я рекрутера" class="w-full" />
+        <UFormField
+          label="Ім'я"
+          required
+          class="sm:col-span-2"
+        >
+          <UInput
+            v-model="form.name"
+            placeholder="Ім'я рекрутера"
+            class="w-full"
+          />
         </UFormField>
         <UFormField label="Telegram">
-          <UInput v-model="form.telegram" placeholder="@username" class="w-full" />
+          <UInput
+            v-model="form.telegram"
+            placeholder="@username"
+            class="w-full"
+          />
         </UFormField>
         <UFormField label="Email">
-          <UInput v-model="form.email" type="email" placeholder="email@example.com" class="w-full" />
+          <UInput
+            v-model="form.email"
+            type="email"
+            placeholder="email@example.com"
+            class="w-full"
+          />
         </UFormField>
-        <UFormField label="LinkedIn" class="sm:col-span-2">
-          <UInput v-model="form.linkedin" placeholder="https://linkedin.com/in/..." class="w-full" />
+        <UFormField
+          label="LinkedIn"
+          class="sm:col-span-2"
+        >
+          <UInput
+            v-model="form.linkedin"
+            placeholder="https://linkedin.com/in/..."
+            class="w-full"
+          />
         </UFormField>
         <UAlert
           v-if="error"
@@ -88,10 +110,17 @@ async function save() {
     </template>
     <template #footer>
       <div class="flex justify-end gap-2 p-4">
-        <UButton variant="ghost" @click="emit('update:open', false)">
+        <UButton
+          variant="ghost"
+          @click="emit('update:open', false)"
+        >
           Скасувати
         </UButton>
-        <UButton :loading="saving" :disabled="!form.name" @click="save">
+        <UButton
+          :loading="saving"
+          :disabled="!form.name"
+          @click="save"
+        >
           Зберегти
         </UButton>
       </div>

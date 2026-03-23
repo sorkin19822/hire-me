@@ -15,7 +15,7 @@ export default defineEventHandler(async (event) => {
       applyDate: vacancies.applyDate,
       updatedAt: vacancies.updatedAt,
       stageColor: pipelineStages.color,
-      stageName: pipelineStages.name,
+      stageName: pipelineStages.name
     })
     .from(vacancies)
     .leftJoin(pipelineStages, eq(vacancies.stageId, pipelineStages.id))

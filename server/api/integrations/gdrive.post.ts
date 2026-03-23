@@ -22,15 +22,14 @@ export default defineEventHandler(async (event) => {
   if (!mcpUrl) {
     throw createError({
       statusCode: 503,
-      statusMessage: 'Google Drive integration is not available. Upload your CV manually instead.',
+      statusMessage: 'Google Drive integration is not available. Upload your CV manually instead.'
     })
   }
 
   let cv: GDriveCV
   try {
     cv = await $fetch<GDriveCV>(`${mcpUrl}/latest-cv`, { timeout: 30000 })
-  }
-  catch {
+  } catch {
     throw createError({ statusCode: 502, statusMessage: 'Failed to fetch CV from Google Drive' })
   }
 
@@ -46,7 +45,7 @@ export default defineEventHandler(async (event) => {
       filename: cv.name,
       gdriveId: cv.id,
       content: cv.content ?? null,
-      isActive: true,
+      isActive: true
     }).run()
   })
 

@@ -1,9 +1,4 @@
 import { loadSetting } from '../../../utils/telegram-client'
-import { createRequire } from 'node:module'
-
-const _require = createRequire(import.meta.url)
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const { TelegramClient } = _require('telegram') as { TelegramClient: any }
 
 export default defineEventHandler(async (event) => {
   await requireAuth(event)
@@ -21,8 +16,7 @@ export default defineEventHandler(async (event) => {
     const { getTelegramClient } = await import('../../../utils/telegram-client')
     const { client } = await getTelegramClient()
     connected = !!client?.connected
-  }
-  catch {
+  } catch {
     connected = false
   }
 

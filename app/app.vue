@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { uk } from '@nuxt/ui/locale'
+
 useHead({
   meta: [{ name: 'viewport', content: 'width=device-width, initial-scale=1' }],
   link: [{ rel: 'icon', href: '/favicon.ico' }],
@@ -10,8 +12,6 @@ useSeoMeta({
   description: 'Personal CRM for tracking vacancies, interviews and recruiter conversations'
 })
 
-import { uk } from '@nuxt/ui/locale'
-
 const { loggedIn, user, clear } = useUserSession()
 
 const showLogoutConfirm = ref(false)
@@ -22,8 +22,7 @@ async function logout() {
   try {
     await clear()
     await navigateTo('/login')
-  }
-  finally {
+  } finally {
     loggingOut.value = false
     showLogoutConfirm.value = false
   }
@@ -34,29 +33,62 @@ async function logout() {
   <UApp :locale="uk">
     <UHeader>
       <template #left>
-        <NuxtLink to="/" class="text-xl font-bold text-primary">
+        <NuxtLink
+          to="/"
+          class="text-xl font-bold text-primary"
+        >
           hire-me
         </NuxtLink>
       </template>
 
       <template #right>
         <nav class="flex items-center gap-1">
-          <UButton to="/" variant="ghost" icon="i-lucide-kanban" size="sm">
+          <UButton
+            to="/"
+            variant="ghost"
+            icon="i-lucide-kanban"
+            size="sm"
+          >
             Kanban
           </UButton>
-          <UButton to="/vacancies" variant="ghost" icon="i-lucide-briefcase" size="sm">
+          <UButton
+            to="/vacancies"
+            variant="ghost"
+            icon="i-lucide-briefcase"
+            size="sm"
+          >
             Вакансії
           </UButton>
-          <UButton to="/recruiters" variant="ghost" icon="i-lucide-users" size="sm">
+          <UButton
+            to="/recruiters"
+            variant="ghost"
+            icon="i-lucide-users"
+            size="sm"
+          >
             Рекрутери
           </UButton>
-          <UButton to="/analytics" variant="ghost" icon="i-lucide-chart-bar" size="sm">
+          <UButton
+            to="/analytics"
+            variant="ghost"
+            icon="i-lucide-chart-bar"
+            size="sm"
+          >
             Аналітика
           </UButton>
-          <UButton to="/cv-versions" variant="ghost" icon="i-lucide-file-text" size="sm">
+          <UButton
+            to="/cv-versions"
+            variant="ghost"
+            icon="i-lucide-file-text"
+            size="sm"
+          >
             CV
           </UButton>
-          <UButton to="/import" variant="ghost" icon="i-lucide-upload" size="sm">
+          <UButton
+            to="/import"
+            variant="ghost"
+            icon="i-lucide-upload"
+            size="sm"
+          >
             Імпорт
           </UButton>
           <UColorModeButton size="sm" />

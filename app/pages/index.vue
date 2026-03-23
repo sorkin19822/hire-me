@@ -82,8 +82,7 @@ async function onDrop(e: DragEvent, stageId: number) {
 
   try {
     await $fetch(`/api/vacancies/${id}`, { method: 'PATCH', body: { stageId } })
-  }
-  catch {
+  } catch {
     // Rollback on failure
     vacancy.stageId = prevStageId
   }
@@ -94,7 +93,7 @@ async function onDrop(e: DragEvent, stageId: number) {
 const quickAdd = reactive<{ stageId: number | null, company: string, position: string }>({
   stageId: null,
   company: '',
-  position: '',
+  position: ''
 })
 const quickAddSaving = ref(false)
 const quickAddError = ref<string | null>(null)
@@ -117,15 +116,13 @@ async function submitQuickAdd() {
   try {
     await $fetch('/api/vacancies', {
       method: 'POST',
-      body: { company: quickAdd.company, position: quickAdd.position, stageId: quickAdd.stageId },
+      body: { company: quickAdd.company, position: quickAdd.position, stageId: quickAdd.stageId }
     })
     closeQuickAdd()
     await refresh()
-  }
-  catch {
+  } catch {
     quickAddError.value = 'Помилка збереження'
-  }
-  finally {
+  } finally {
     quickAddSaving.value = false
   }
 }
@@ -161,7 +158,10 @@ async function submitQuickAdd() {
       </div>
 
       <!-- Thin color accent bar -->
-      <div class="mx-3 mb-2 h-0.5 rounded-full opacity-60" :style="{ backgroundColor: stage.color }" />
+      <div
+        class="mx-3 mb-2 h-0.5 rounded-full opacity-60"
+        :style="{ backgroundColor: stage.color }"
+      />
 
       <!-- Cards -->
       <div class="flex-1 flex flex-col gap-2 px-2 pb-2 overflow-y-auto max-h-[calc(100vh-210px)]">
@@ -196,8 +196,13 @@ async function submitQuickAdd() {
           v-if="vacanciesForStage(stage.id).length === 0"
           class="flex flex-col items-center justify-center py-6 text-gray-300 dark:text-gray-600"
         >
-          <UIcon name="i-lucide-inbox" class="w-6 h-6 mb-1.5" />
-          <p class="text-xs">Немає вакансій</p>
+          <UIcon
+            name="i-lucide-inbox"
+            class="w-6 h-6 mb-1.5"
+          />
+          <p class="text-xs">
+            Немає вакансій
+          </p>
         </div>
       </div>
 
@@ -229,9 +234,17 @@ async function submitQuickAdd() {
               >
                 Додати
               </UButton>
-              <UButton size="xs" variant="ghost" icon="i-lucide-x" @click="closeQuickAdd" />
+              <UButton
+                size="xs"
+                variant="ghost"
+                icon="i-lucide-x"
+                @click="closeQuickAdd"
+              />
             </div>
-            <p v-if="quickAddError" class="text-xs text-red-500">
+            <p
+              v-if="quickAddError"
+              class="text-xs text-red-500"
+            >
               {{ quickAddError }}
             </p>
           </div>

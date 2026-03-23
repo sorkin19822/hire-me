@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { CalendarDate, parseDate, today, getLocalTimeZone } from '@internationalized/date'
+import type { CalendarDate } from '@internationalized/date'
+import { today, getLocalTimeZone } from '@internationalized/date'
 
 const props = defineProps<{
   vacancyId: number
@@ -38,7 +39,7 @@ function onDateSelect(val: CalendarDate | undefined) {
 
 const recruiterOptions = computed(() => [
   { label: 'Без рекрутера', value: null },
-  ...props.recruiters.map(r => ({ label: r.name, value: r.id })),
+  ...props.recruiters.map(r => ({ label: r.name, value: r.id }))
 ])
 
 async function submit() {
@@ -58,16 +59,14 @@ async function submit() {
         source: 'manual',
         direction: direction.value,
         content: content.value.trim(),
-        sentAt: sentAtIso,
-      },
+        sentAt: sentAtIso
+      }
     })
     content.value = ''
     emit('saved')
-  }
-  catch {
+  } catch {
     error.value = 'Помилка збереження'
-  }
-  finally {
+  } finally {
     saving.value = false
   }
 }
@@ -114,7 +113,10 @@ async function submit() {
             {{ dateLabel }}
           </UButton>
           <template #content>
-            <UCalendar :model-value="selectedDate" @update:model-value="onDateSelect" />
+            <UCalendar
+              :model-value="selectedDate"
+              @update:model-value="onDateSelect"
+            />
           </template>
         </UPopover>
         <UInput

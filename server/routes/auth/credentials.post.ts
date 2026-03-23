@@ -6,7 +6,7 @@ import { eq } from 'drizzle-orm'
 
 const schema = z.object({
   email: z.string().email(),
-  password: z.string().min(8).max(128),
+  password: z.string().min(8).max(128)
 })
 
 function hashPassword(password: string, salt: string): string {
@@ -19,8 +19,7 @@ function verifyPassword(password: string, stored: string): boolean {
   const candidate = hashPassword(password, salt)
   try {
     return timingSafeEqual(Buffer.from(hash, 'hex'), Buffer.from(candidate, 'hex'))
-  }
-  catch {
+  } catch {
     return false
   }
 }
@@ -54,7 +53,7 @@ export default defineEventHandler(async (event) => {
     const hash = hashPassword(password, salt)
     db.insert(users).values({
       email: emailLower,
-      passwordHash: `${salt}:${hash}`,
+      passwordHash: `${salt}:${hash}`
     }).run()
 
     await setUserSession(event, { user: { email: emailLower, name: emailLower } })

@@ -1,6 +1,10 @@
 import { sqliteTable, text, integer, real } from 'drizzle-orm/sqlite-core'
 import { sql } from 'drizzle-orm'
 
+// ─── TypeScript types ────────────────────────────────────────────────────────
+
+import type { InferSelectModel, InferInsertModel } from 'drizzle-orm'
+
 // ─── pipeline_stages ────────────────────────────────────────────────────────
 
 export const pipelineStages = sqliteTable('pipeline_stages', {
@@ -9,7 +13,7 @@ export const pipelineStages = sqliteTable('pipeline_stages', {
   order: integer('order').notNull(),
   color: text('color').notNull().default('#6366f1'),
   isTerminal: integer('is_terminal', { mode: 'boolean' }).notNull().default(false),
-  createdAt: text('created_at').notNull().default(sql`(datetime('now'))`),
+  createdAt: text('created_at').notNull().default(sql`(datetime('now'))`)
 })
 
 // ─── cv_versions ────────────────────────────────────────────────────────────
@@ -21,7 +25,7 @@ export const cvVersions = sqliteTable('cv_versions', {
   content: text('content'),
   importedAt: text('imported_at').notNull().default(sql`(datetime('now'))`),
   isActive: integer('is_active', { mode: 'boolean' }).notNull().default(false),
-  comment: text('comment'),
+  comment: text('comment')
 })
 
 // ─── vacancies ───────────────────────────────────────────────────────────────
@@ -39,7 +43,7 @@ export const vacancies = sqliteTable('vacancies', {
   cvVersionId: integer('cv_version_id').references(() => cvVersions.id),
   description: text('description'),
   createdAt: text('created_at').notNull().default(sql`(datetime('now'))`),
-  updatedAt: text('updated_at').notNull().default(sql`(datetime('now'))`),
+  updatedAt: text('updated_at').notNull().default(sql`(datetime('now'))`)
 })
 
 // ─── recruiters ──────────────────────────────────────────────────────────────
@@ -52,14 +56,14 @@ export const recruiters = sqliteTable('recruiters', {
   email: text('email'),
   linkedin: text('linkedin'),
   tgSyncedAt: text('tg_synced_at'),
-  createdAt: text('created_at').notNull().default(sql`(datetime('now'))`),
+  createdAt: text('created_at').notNull().default(sql`(datetime('now'))`)
 })
 
 // ─── settings ────────────────────────────────────────────────────────────────
 
 export const settings = sqliteTable('settings', {
   key: text('key').primaryKey(),
-  value: text('value').notNull(),
+  value: text('value').notNull()
 })
 
 // ─── messages ────────────────────────────────────────────────────────────────
@@ -72,7 +76,7 @@ export const messages = sqliteTable('messages', {
   direction: text('direction', { enum: ['in', 'out'] }).notNull(),
   content: text('content').notNull(),
   sentAt: text('sent_at').notNull(),
-  importedAt: text('imported_at').notNull().default(sql`(datetime('now'))`),
+  importedAt: text('imported_at').notNull().default(sql`(datetime('now'))`)
 })
 
 // ─── analysis ────────────────────────────────────────────────────────────────
@@ -85,7 +89,7 @@ export const analysis = sqliteTable('analysis', {
   redFlags: text('red_flags'),
   greenFlags: text('green_flags'),
   summary: text('summary'),
-  createdAt: text('created_at').notNull().default(sql`(datetime('now'))`),
+  createdAt: text('created_at').notNull().default(sql`(datetime('now'))`)
 })
 
 // ─── users ───────────────────────────────────────────────────────────────────
@@ -96,12 +100,8 @@ export const users = sqliteTable('users', {
   name: text('name'),
   avatar: text('avatar'),
   passwordHash: text('password_hash'),
-  createdAt: text('created_at').notNull().default(sql`(datetime('now'))`),
+  createdAt: text('created_at').notNull().default(sql`(datetime('now'))`)
 })
-
-// ─── TypeScript types ────────────────────────────────────────────────────────
-
-import type { InferSelectModel, InferInsertModel } from 'drizzle-orm'
 
 export type PipelineStage = InferSelectModel<typeof pipelineStages>
 export type NewPipelineStage = InferInsertModel<typeof pipelineStages>

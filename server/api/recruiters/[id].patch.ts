@@ -9,7 +9,7 @@ const schema = z.object({
   telegram: z.string().regex(/^@?[A-Za-z0-9_]{5,32}$/, 'Invalid Telegram username').nullable().optional().or(z.literal('')),
   email: z.string().email().nullable().optional().or(z.literal('')),
   linkedin: z.string().url().refine(v => /^https?:\/\//i.test(v), 'URL must use http(s)').nullable().optional().or(z.literal('')),
-  vacancyId: z.number().int().positive().nullable().optional(),
+  vacancyId: z.number().int().positive().nullable().optional()
 }).strict()
 
 export default defineEventHandler(async (event) => {

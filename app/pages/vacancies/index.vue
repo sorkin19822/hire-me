@@ -1,6 +1,17 @@
 <script setup lang="ts">
 import { h, resolveComponent } from 'vue'
+import type { Row, Table } from '@tanstack/vue-table'
 import { getFaviconUrl } from '~/composables/useFavicon'
+
+type VacancyRow = {
+  id: number
+  company: string
+  position: string
+  stageName: string | null
+  stageColor: string | null
+  applyDate: string | null
+  urlSite: string | null
+}
 
 useSeoMeta({ title: 'Вакансії — hire-me' })
 
@@ -12,13 +23,13 @@ const { data: stages } = await useFetch('/api/pipeline-stages')
 const { data: vacancies, refresh } = await useFetch('/api/vacancies', {
   query: computed(() => ({
     search: search.value || undefined,
-    stage_id: stageFilter.value ?? undefined,
-  })),
+    stage_id: stageFilter.value ?? undefined
+  }))
 })
 
 const stageOptions = computed(() => [
   { label: 'Всі стадії', value: null },
-  ...(stages.value ?? []).map((s: { id: number, name: string }) => ({ label: s.name, value: s.id })),
+  ...(stages.value ?? []).map((s: { id: number, name: string }) => ({ label: s.name, value: s.id }))
 ])
 
 // Row selection
@@ -49,8 +60,7 @@ async function confirmDeleteOne() {
     await $fetch(`/api/vacancies/${pendingDeleteId.value}`, { method: 'DELETE' })
     confirmSingle.value = false
     await refresh()
-  }
-  finally {
+  } finally {
     deleting.value = false
   }
 }
@@ -66,8 +76,7 @@ async function confirmDeleteSelected() {
     rowSelection.value = {}
     confirmBulk.value = false
     await refresh()
-  }
-  finally {
+  } finally {
     deleting.value = false
   }
 }
@@ -86,8 +95,7 @@ async function createVacancy() {
     form.company = ''
     form.position = ''
     await refresh()
-  }
-  finally {
+  } finally {
     saving.value = false
   }
 }
@@ -99,17 +107,17 @@ const UBadge = resolveComponent('UBadge')
 const columns = [
   {
     id: 'select',
-    header: ({ table }: any) => h(UCheckbox, {
-      modelValue: table.getIsAllRowsSelected() ? true : table.getIsSomeRowsSelected() ? 'indeterminate' : false,
+    header: ({ table }: { table: Table<VacancyRow> }) => h(UCheckbox, {
+      'modelValue': table.getIsAllRowsSelected() ? true : table.getIsSomeRowsSelected() ? 'indeterminate' : false,
       'onUpdate:modelValue': (v: boolean) => table.toggleAllRowsSelected(v),
-      'aria-label': 'Select all',
+      'aria-label': 'Select all'
     }),
-    cell: ({ row }: any) => h(UCheckbox, {
-      modelValue: row.getIsSelected(),
+    cell: ({ row }: { row: Row<VacancyRow> }) => h(UCheckbox, {
+      'modelValue': row.getIsSelected(),
       'onUpdate:modelValue': (v: boolean) => row.toggleSelected(v),
-      'aria-label': 'Select row',
+      'aria-label': 'Select row'
     }),
-    meta: { class: { th: 'w-10', td: 'w-10' } },
+    meta: { class: { th: 'w-10', td: 'w-10' } }
   },
   { accessorKey: 'company', header: 'Компанія' },
   { accessorKey: 'position', header: 'Позиція' },
@@ -119,22 +127,22 @@ const columns = [
     id: 'actions',
     header: '',
     meta: { class: { th: 'w-20', td: 'w-20' } },
-    cell: ({ row }: any) => h('div', { class: 'flex items-center gap-1 justify-end' }, [
+    cell: ({ row }: { row: Row<VacancyRow> }) => h('div', { class: 'flex items-center gap-1 justify-end' }, [
       h(UButton, {
         to: `/vacancies/${row.original.id}`,
         variant: 'ghost',
         icon: 'i-lucide-arrow-right',
-        size: 'xs',
+        size: 'xs'
       }),
       h(UButton, {
         variant: 'ghost',
         icon: 'i-lucide-trash-2',
         size: 'xs',
         color: 'error',
-        onClick: () => requestDeleteOne(row.original.id, row.original.company),
-      }),
-    ]),
-  },
+        onClick: () => requestDeleteOne(row.original.id, row.original.company)
+      })
+    ])
+  }
 ]
 </script>
 
@@ -151,7 +159,10 @@ const columns = [
         >
           Видалити ({{ selectedIds.length }})
         </UButton>
-        <UButton icon="i-lucide-plus" @click="showModal = true">
+        <UButton
+          icon="i-lucide-plus"
+          @click="showModal = true"
+        >
           Нова вакансія
         </UButton>
       </div>
@@ -182,7 +193,10 @@ const columns = [
       :loading="!vacancies"
     >
       <template #company-cell="{ row }">
-        <NuxtLink :to="`/vacancies/${row.original.id}`" class="flex items-center gap-2 font-medium hover:underline">
+        <NuxtLink
+          :to="`/vacancies/${row.original.id}`"
+          class="flex items-center gap-2 font-medium hover:underline"
+        >
           <img
             v-if="getFaviconUrl(row.original.urlSite)"
             :src="getFaviconUrl(row.original.urlSite)!"
@@ -229,23 +243,46 @@ const columns = [
     />
 
     <!-- New vacancy modal -->
-    <UModal v-model:open="showModal" title="Нова вакансія">
+    <UModal
+      v-model:open="showModal"
+      title="Нова вакансія"
+    >
       <template #body>
         <div class="space-y-4 p-4">
-          <UFormField label="Компанія" required>
-            <UInput v-model="form.company" placeholder="Назва компанії" autofocus />
+          <UFormField
+            label="Компанія"
+            required
+          >
+            <UInput
+              v-model="form.company"
+              placeholder="Назва компанії"
+              autofocus
+            />
           </UFormField>
-          <UFormField label="Позиція" required>
-            <UInput v-model="form.position" placeholder="PHP Developer" />
+          <UFormField
+            label="Позиція"
+            required
+          >
+            <UInput
+              v-model="form.position"
+              placeholder="PHP Developer"
+            />
           </UFormField>
         </div>
       </template>
       <template #footer>
         <div class="flex justify-end gap-2 p-4">
-          <UButton variant="ghost" @click="showModal = false">
+          <UButton
+            variant="ghost"
+            @click="showModal = false"
+          >
             Скасувати
           </UButton>
-          <UButton :loading="saving" :disabled="!form.company || !form.position" @click="createVacancy">
+          <UButton
+            :loading="saving"
+            :disabled="!form.company || !form.position"
+            @click="createVacancy"
+          >
             Створити
           </UButton>
         </div>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const props = defineProps<{ label: string, score: number | null | undefined }>()
+defineProps<{ label: string, score: number | null | undefined }>()
 
 function scoreColor(score: number | null | undefined): string {
   if (score == null) return 'text-gray-400'

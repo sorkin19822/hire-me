@@ -3,8 +3,7 @@ export function getFaviconUrl(siteUrl: string | null | undefined): string | null
   try {
     const { hostname } = new URL(siteUrl)
     return `https://www.google.com/s2/favicons?domain=${hostname}&sz=32`
-  }
-  catch {
+  } catch {
     return null
   }
 }

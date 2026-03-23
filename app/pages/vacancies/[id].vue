@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { CalendarDate, parseDate } from '@internationalized/date'
+import type { CalendarDate } from '@internationalized/date'
+import { parseDate } from '@internationalized/date'
 import { getFaviconUrl } from '~/composables/useFavicon'
 
 const route = useRoute()
@@ -18,8 +19,8 @@ useSeoMeta({ title: `${vacancy.value?.company} — hire-me` })
 const stageOptions = computed(() =>
   (stages.value ?? []).map((s: { id: number, name: string, color: string }) => ({
     label: s.name,
-    value: s.id,
-  })),
+    value: s.id
+  }))
 )
 
 const selectedStageId = ref(vacancy.value?.stageId ?? null)
@@ -30,8 +31,7 @@ async function changeStage(newId: number | null) {
   try {
     await $fetch(`/api/vacancies/${id}`, { method: 'PATCH', body: { stageId: newId } })
     await refresh()
-  }
-  finally {
+  } finally {
     stageSaving.value = false
   }
 }
@@ -51,12 +51,11 @@ async function saveTitle() {
   try {
     await $fetch(`/api/vacancies/${id}`, {
       method: 'PATCH',
-      body: { company: titleForm.company, position: titleForm.position || null },
+      body: { company: titleForm.company, position: titleForm.position || null }
     })
     editingTitle.value = false
     await refresh()
-  }
-  finally {
+  } finally {
     titleSaving.value = false
   }
 }
@@ -66,23 +65,28 @@ const applyDateOpen = ref(false)
 const applyDateValue = computed({
   get() {
     if (!vacancy.value?.applyDate) return undefined
-    try { return parseDate(vacancy.value.applyDate) } catch { return undefined }
+    try {
+      return parseDate(vacancy.value.applyDate)
+    } catch { return undefined }
   },
   set(val: CalendarDate | undefined) {
     if (!val) return
     const str = val.toString()
     if (str === vacancy.value?.applyDate) return
     $fetch(`/api/vacancies/${id}`, { method: 'PATCH', body: { applyDate: str } })
-      .then(() => { refresh(); applyDateOpen.value = false })
-  },
+      .then(() => {
+        refresh()
+        applyDateOpen.value = false
+      })
+  }
 })
 
 // CV version selector (0 = no CV, USelect doesn't support null as value)
 const cvOptions = computed(() =>
   [{ label: '— без CV —', value: 0 }, ...(cvList.value ?? []).map((cv: { id: number, filename: string, comment: string | null }) => ({
     label: cv.comment ? `${cv.filename} — ${cv.comment}` : cv.filename,
-    value: cv.id,
-  }))],
+    value: cv.id
+  }))]
 )
 
 const selectedCvId = ref<number>(vacancy.value?.cvVersionId ?? 0)
@@ -93,8 +97,7 @@ watch(selectedCvId, async (val) => {
   try {
     await $fetch(`/api/vacancies/${id}`, { method: 'PATCH', body: { cvVersionId: val || null } })
     await refresh()
-  }
-  finally {
+  } finally {
     cvSaving.value = false
   }
 })
@@ -103,7 +106,7 @@ watch(selectedCvId, async (val) => {
 const editingLinks = ref(false)
 const linksValue = reactive({
   urlDou: vacancy.value?.urlDou ?? '',
-  urlSite: vacancy.value?.urlSite ?? '',
+  urlSite: vacancy.value?.urlSite ?? ''
 })
 const linksSaving = ref(false)
 
@@ -114,13 +117,12 @@ async function saveLinks() {
       method: 'PATCH',
       body: {
         urlDou: linksValue.urlDou || null,
-        urlSite: linksValue.urlSite || null,
-      },
+        urlSite: linksValue.urlSite || null
+      }
     })
     editingLinks.value = false
     await refresh()
-  }
-  finally {
+  } finally {
     linksSaving.value = false
   }
 }
@@ -136,8 +138,7 @@ async function saveDescription() {
     await $fetch(`/api/vacancies/${id}`, { method: 'PATCH', body: { description: descriptionValue.value || null } })
     editingDescription.value = false
     await refresh()
-  }
-  finally {
+  } finally {
     descriptionSaving.value = false
   }
 }
@@ -170,14 +171,13 @@ async function addRecruiter() {
         name: recruiterForm.name,
         telegram: recruiterForm.telegram || undefined,
         email: recruiterForm.email || undefined,
-        linkedin: recruiterForm.linkedin || undefined,
-      },
+        linkedin: recruiterForm.linkedin || undefined
+      }
     })
     showAddRecruiter.value = false
     Object.assign(recruiterForm, { name: '', telegram: '', email: '', linkedin: '' })
     await refreshRecruiters()
-  }
-  finally {
+  } finally {
     recruiterSaving.value = false
   }
 }
@@ -193,8 +193,7 @@ async function saveNotes() {
     await $fetch(`/api/vacancies/${id}`, { method: 'PATCH', body: { notes: notesValue.value || null } })
     editingNotes.value = false
     await refresh()
-  }
-  finally {
+  } finally {
     notesSaving.value = false
   }
 }
@@ -203,7 +202,12 @@ async function saveNotes() {
 <template>
   <UContainer class="py-6 max-w-3xl">
     <div class="flex items-center gap-2 mb-6">
-      <UButton to="/vacancies" variant="ghost" icon="i-lucide-arrow-left" size="sm">
+      <UButton
+        to="/vacancies"
+        variant="ghost"
+        icon="i-lucide-arrow-left"
+        size="sm"
+      >
         Вакансії
       </UButton>
     </div>
@@ -211,7 +215,10 @@ async function saveNotes() {
     <template v-if="vacancy">
       <div class="flex items-start justify-between mb-6">
         <div class="flex-1 min-w-0 mr-4">
-          <div v-if="!editingTitle" class="group flex items-start gap-2">
+          <div
+            v-if="!editingTitle"
+            class="group flex items-start gap-2"
+          >
             <img
               v-if="getFaviconUrl(vacancy.urlSite)"
               :src="getFaviconUrl(vacancy.urlSite)!"
@@ -235,14 +242,34 @@ async function saveNotes() {
               @click="editingTitle = true; Object.assign(titleForm, { company: vacancy.company ?? '', position: vacancy.position ?? '' })"
             />
           </div>
-          <div v-else class="flex flex-col gap-2">
-            <UInput v-model="titleForm.company" placeholder="Назва компанії" autofocus class="text-xl font-bold" />
-            <UInput v-model="titleForm.position" placeholder="Посада" />
+          <div
+            v-else
+            class="flex flex-col gap-2"
+          >
+            <UInput
+              v-model="titleForm.company"
+              placeholder="Назва компанії"
+              autofocus
+              class="text-xl font-bold"
+            />
+            <UInput
+              v-model="titleForm.position"
+              placeholder="Посада"
+            />
             <div class="flex gap-2">
-              <UButton variant="ghost" size="sm" @click="editingTitle = false">
+              <UButton
+                variant="ghost"
+                size="sm"
+                @click="editingTitle = false"
+              >
                 Скасувати
               </UButton>
-              <UButton size="sm" :loading="titleSaving" :disabled="!titleForm.company" @click="saveTitle">
+              <UButton
+                size="sm"
+                :loading="titleSaving"
+                :disabled="!titleForm.company"
+                @click="saveTitle"
+              >
                 Зберегти
               </UButton>
             </div>
@@ -250,8 +277,14 @@ async function saveNotes() {
         </div>
 
         <div class="flex items-center gap-2">
-          <UTooltip text="Поточний етап розгляду вашої кандидатури" :delay-duration="400">
-            <UIcon name="i-lucide-help-circle" class="w-4 h-4 text-gray-400 dark:text-gray-500 shrink-0" />
+          <UTooltip
+            text="Поточний етап розгляду вашої кандидатури"
+            :delay-duration="400"
+          >
+            <UIcon
+              name="i-lucide-help-circle"
+              class="w-4 h-4 text-gray-400 dark:text-gray-500 shrink-0"
+            />
           </UTooltip>
           <USelect
             v-model="selectedStageId"
@@ -270,8 +303,14 @@ async function saveNotes() {
           <div class="flex flex-col gap-1.5">
             <div class="flex items-center gap-1">
               <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Дата відгуку</span>
-              <UTooltip text="Дата, коли ви подали заявку на цю вакансію" :delay-duration="400">
-                <UIcon name="i-lucide-help-circle" class="w-3.5 h-3.5 text-gray-400 dark:text-gray-500" />
+              <UTooltip
+                text="Дата, коли ви подали заявку на цю вакансію"
+                :delay-duration="400"
+              >
+                <UIcon
+                  name="i-lucide-help-circle"
+                  class="w-3.5 h-3.5 text-gray-400 dark:text-gray-500"
+                />
               </UTooltip>
             </div>
             <UPopover v-model:open="applyDateOpen">
@@ -291,8 +330,14 @@ async function saveNotes() {
           <div class="flex flex-col gap-1.5">
             <div class="flex items-center gap-1">
               <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Повідомлень</span>
-              <UTooltip text="Кількість повідомлень у листуванні з рекрутером" :delay-duration="400">
-                <UIcon name="i-lucide-help-circle" class="w-3.5 h-3.5 text-gray-400 dark:text-gray-500" />
+              <UTooltip
+                text="Кількість повідомлень у листуванні з рекрутером"
+                :delay-duration="400"
+              >
+                <UIcon
+                  name="i-lucide-help-circle"
+                  class="w-3.5 h-3.5 text-gray-400 dark:text-gray-500"
+                />
               </UTooltip>
             </div>
             <p class="font-medium text-dark dark:text-white">
@@ -302,8 +347,14 @@ async function saveNotes() {
           <div class="flex flex-col gap-1.5">
             <div class="flex items-center gap-1">
               <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Додано</span>
-              <UTooltip text="Дата додавання вакансії до системи" :delay-duration="400">
-                <UIcon name="i-lucide-help-circle" class="w-3.5 h-3.5 text-gray-400 dark:text-gray-500" />
+              <UTooltip
+                text="Дата додавання вакансії до системи"
+                :delay-duration="400"
+              >
+                <UIcon
+                  name="i-lucide-help-circle"
+                  class="w-3.5 h-3.5 text-gray-400 dark:text-gray-500"
+                />
               </UTooltip>
             </div>
             <p class="font-medium text-dark dark:text-white">
@@ -313,8 +364,14 @@ async function saveNotes() {
           <div class="col-span-2 flex flex-col gap-1.5">
             <div class="flex items-center gap-1">
               <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Версія CV</span>
-              <UTooltip text="Резюме, яке ви надіслали на цю вакансію" :delay-duration="400">
-                <UIcon name="i-lucide-help-circle" class="w-3.5 h-3.5 text-gray-400 dark:text-gray-500" />
+              <UTooltip
+                text="Резюме, яке ви надіслали на цю вакансію"
+                :delay-duration="400"
+              >
+                <UIcon
+                  name="i-lucide-help-circle"
+                  class="w-3.5 h-3.5 text-gray-400 dark:text-gray-500"
+                />
               </UTooltip>
             </div>
             <div class="flex items-center gap-2 mt-1">
@@ -347,8 +404,14 @@ async function saveNotes() {
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-1.5">
               <span class="text-lg font-semibold text-dark dark:text-white">Посилання</span>
-              <UTooltip text="Посилання на оголошення вакансії та сайт компанії" :delay-duration="400">
-                <UIcon name="i-lucide-help-circle" class="w-4 h-4 text-gray-400 dark:text-gray-500" />
+              <UTooltip
+                text="Посилання на оголошення вакансії та сайт компанії"
+                :delay-duration="400"
+              >
+                <UIcon
+                  name="i-lucide-help-circle"
+                  class="w-4 h-4 text-gray-400 dark:text-gray-500"
+                />
               </UTooltip>
             </div>
             <UButton
@@ -361,37 +424,81 @@ async function saveNotes() {
           </div>
         </template>
 
-        <div v-if="!editingLinks" class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <div
+          v-if="!editingLinks"
+          class="grid grid-cols-1 gap-3 sm:grid-cols-2"
+        >
           <div class="flex flex-col gap-1">
             <span class="text-xs font-medium text-gray-500 dark:text-gray-400">Посилання на вакансію</span>
-            <UButton v-if="vacancy.urlDou" :href="vacancy.urlDou" target="_blank" variant="link" size="xs" icon="i-lucide-external-link" class="justify-start">
+            <UButton
+              v-if="vacancy.urlDou"
+              :href="vacancy.urlDou"
+              target="_blank"
+              variant="link"
+              size="xs"
+              icon="i-lucide-external-link"
+              class="justify-start"
+            >
               Відкрити
             </UButton>
-            <span v-else class="text-sm text-gray-400 dark:text-gray-500">—</span>
+            <span
+              v-else
+              class="text-sm text-gray-400 dark:text-gray-500"
+            >—</span>
           </div>
           <div class="flex flex-col gap-1">
             <span class="text-xs font-medium text-gray-500 dark:text-gray-400">Сайт компанії</span>
-            <UButton v-if="vacancy.urlSite" :href="vacancy.urlSite" target="_blank" variant="link" size="xs" icon="i-lucide-external-link" class="justify-start">
+            <UButton
+              v-if="vacancy.urlSite"
+              :href="vacancy.urlSite"
+              target="_blank"
+              variant="link"
+              size="xs"
+              icon="i-lucide-external-link"
+              class="justify-start"
+            >
               Відкрити
             </UButton>
-            <span v-else class="text-sm text-gray-400 dark:text-gray-500">—</span>
+            <span
+              v-else
+              class="text-sm text-gray-400 dark:text-gray-500"
+            >—</span>
           </div>
         </div>
 
-        <div v-else class="flex flex-col gap-4">
+        <div
+          v-else
+          class="flex flex-col gap-4"
+        >
           <div class="grid grid-cols-1 gap-3">
             <UFormField label="Посилання на вакансію">
-              <UInput v-model="linksValue.urlDou" placeholder="https://jobs.dou.ua/... або будь-яке інше" class="w-full" />
+              <UInput
+                v-model="linksValue.urlDou"
+                placeholder="https://jobs.dou.ua/... або будь-яке інше"
+                class="w-full"
+              />
             </UFormField>
             <UFormField label="Сайт компанії">
-              <UInput v-model="linksValue.urlSite" placeholder="https://company.com" class="w-full" />
+              <UInput
+                v-model="linksValue.urlSite"
+                placeholder="https://company.com"
+                class="w-full"
+              />
             </UFormField>
           </div>
           <div class="flex gap-2 justify-end">
-            <UButton variant="ghost" size="sm" @click="editingLinks = false">
+            <UButton
+              variant="ghost"
+              size="sm"
+              @click="editingLinks = false"
+            >
               Скасувати
             </UButton>
-            <UButton size="sm" :loading="linksSaving" @click="saveLinks">
+            <UButton
+              size="sm"
+              :loading="linksSaving"
+              @click="saveLinks"
+            >
               Зберегти
             </UButton>
           </div>
@@ -404,8 +511,14 @@ async function saveNotes() {
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-1.5">
               <span class="text-lg font-semibold text-dark dark:text-white">Опис вакансії</span>
-              <UTooltip text="Повний текст оголошення — використовується для AI аналізу" :delay-duration="400">
-                <UIcon name="i-lucide-help-circle" class="w-4 h-4 text-gray-400 dark:text-gray-500" />
+              <UTooltip
+                text="Повний текст оголошення — використовується для AI аналізу"
+                :delay-duration="400"
+              >
+                <UIcon
+                  name="i-lucide-help-circle"
+                  class="w-4 h-4 text-gray-400 dark:text-gray-500"
+                />
               </UTooltip>
             </div>
             <UButton
@@ -418,14 +531,23 @@ async function saveNotes() {
           </div>
         </template>
         <div v-if="!editingDescription">
-          <p v-if="vacancy.description" class="text-sm whitespace-pre-wrap text-dark dark:text-white">
+          <p
+            v-if="vacancy.description"
+            class="text-sm whitespace-pre-wrap text-dark dark:text-white"
+          >
             {{ vacancy.description }}
           </p>
-          <p v-else class="text-sm text-gray-400 dark:text-gray-500">
+          <p
+            v-else
+            class="text-sm text-gray-400 dark:text-gray-500"
+          >
             Опис відсутній
           </p>
         </div>
-        <div v-else class="flex flex-col gap-4">
+        <div
+          v-else
+          class="flex flex-col gap-4"
+        >
           <UTextarea
             v-model="descriptionValue"
             :rows="8"
@@ -434,10 +556,18 @@ async function saveNotes() {
             class="w-full"
           />
           <div class="flex gap-2 justify-end">
-            <UButton variant="ghost" size="sm" @click="editingDescription = false">
+            <UButton
+              variant="ghost"
+              size="sm"
+              @click="editingDescription = false"
+            >
               Скасувати
             </UButton>
-            <UButton size="sm" :loading="descriptionSaving" @click="saveDescription">
+            <UButton
+              size="sm"
+              :loading="descriptionSaving"
+              @click="saveDescription"
+            >
               Зберегти
             </UButton>
           </div>
@@ -450,8 +580,14 @@ async function saveNotes() {
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-1.5">
               <span class="text-lg font-semibold text-dark dark:text-white">Нотатки</span>
-              <UTooltip text="Особисті нотатки про вакансію: враження від співбесіди, умови, питання тощо" :delay-duration="400">
-                <UIcon name="i-lucide-help-circle" class="w-4 h-4 text-gray-400 dark:text-gray-500" />
+              <UTooltip
+                text="Особисті нотатки про вакансію: враження від співбесіди, умови, питання тощо"
+                :delay-duration="400"
+              >
+                <UIcon
+                  name="i-lucide-help-circle"
+                  class="w-4 h-4 text-gray-400 dark:text-gray-500"
+                />
               </UTooltip>
             </div>
             <UButton
@@ -464,14 +600,23 @@ async function saveNotes() {
           </div>
         </template>
         <div v-if="!editingNotes">
-          <p v-if="vacancy.notes" class="text-sm whitespace-pre-wrap text-dark dark:text-white">
+          <p
+            v-if="vacancy.notes"
+            class="text-sm whitespace-pre-wrap text-dark dark:text-white"
+          >
             {{ vacancy.notes }}
           </p>
-          <p v-else class="text-sm text-gray-400 dark:text-gray-500">
+          <p
+            v-else
+            class="text-sm text-gray-400 dark:text-gray-500"
+          >
             Нотатки відсутні
           </p>
         </div>
-        <div v-else class="flex flex-col gap-6">
+        <div
+          v-else
+          class="flex flex-col gap-6"
+        >
           <div class="flex flex-col gap-1.5">
             <label class="text-sm font-medium text-gray-700 dark:text-gray-300 block">
               Нотатки
@@ -485,10 +630,18 @@ async function saveNotes() {
             />
           </div>
           <div class="flex gap-2 justify-end">
-            <UButton variant="ghost" size="sm" @click="editingNotes = false">
+            <UButton
+              variant="ghost"
+              size="sm"
+              @click="editingNotes = false"
+            >
               Скасувати
             </UButton>
-            <UButton size="sm" :loading="notesSaving" @click="saveNotes">
+            <UButton
+              size="sm"
+              :loading="notesSaving"
+              @click="saveNotes"
+            >
               Зберегти
             </UButton>
           </div>
@@ -501,8 +654,14 @@ async function saveNotes() {
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-1.5">
               <span class="text-lg font-semibold text-dark dark:text-white">Рекрутери</span>
-              <UTooltip text="Контакти рекрутерів по цій вакансії. Можна синхронізувати листування з Telegram" :delay-duration="400">
-                <UIcon name="i-lucide-help-circle" class="w-4 h-4 text-gray-400 dark:text-gray-500" />
+              <UTooltip
+                text="Контакти рекрутерів по цій вакансії. Можна синхронізувати листування з Telegram"
+                :delay-duration="400"
+              >
+                <UIcon
+                  name="i-lucide-help-circle"
+                  class="w-4 h-4 text-gray-400 dark:text-gray-500"
+                />
               </UTooltip>
             </div>
             <UButton
@@ -515,26 +674,57 @@ async function saveNotes() {
         </template>
 
         <!-- Add recruiter form -->
-        <div v-if="showAddRecruiter" class="mb-4">
+        <div
+          v-if="showAddRecruiter"
+          class="mb-4"
+        >
           <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 mb-4">
-            <UFormField label="Ім'я" required>
-              <UInput v-model="recruiterForm.name" placeholder="Ім'я рекрутера" class="w-full" />
+            <UFormField
+              label="Ім'я"
+              required
+            >
+              <UInput
+                v-model="recruiterForm.name"
+                placeholder="Ім'я рекрутера"
+                class="w-full"
+              />
             </UFormField>
             <UFormField label="Telegram">
-              <UInput v-model="recruiterForm.telegram" placeholder="@username" class="w-full" />
+              <UInput
+                v-model="recruiterForm.telegram"
+                placeholder="@username"
+                class="w-full"
+              />
             </UFormField>
             <UFormField label="Email">
-              <UInput v-model="recruiterForm.email" type="email" placeholder="email@example.com" class="w-full" />
+              <UInput
+                v-model="recruiterForm.email"
+                type="email"
+                placeholder="email@example.com"
+                class="w-full"
+              />
             </UFormField>
             <UFormField label="LinkedIn">
-              <UInput v-model="recruiterForm.linkedin" placeholder="https://linkedin.com/in/..." class="w-full" />
+              <UInput
+                v-model="recruiterForm.linkedin"
+                placeholder="https://linkedin.com/in/..."
+                class="w-full"
+              />
             </UFormField>
           </div>
           <div class="flex justify-end gap-2">
-            <UButton variant="ghost" color="error" @click="showAddRecruiter = false">
+            <UButton
+              variant="ghost"
+              color="error"
+              @click="showAddRecruiter = false"
+            >
               Скасувати
             </UButton>
-            <UButton :loading="recruiterSaving" :disabled="!recruiterForm.name" @click="addRecruiter">
+            <UButton
+              :loading="recruiterSaving"
+              :disabled="!recruiterForm.name"
+              @click="addRecruiter"
+            >
               Зберегти
             </UButton>
           </div>
@@ -576,7 +766,10 @@ async function saveNotes() {
           @update:open="(v) => { if (!v) editingRecruiter = null }"
           @saved="refreshRecruiters()"
         />
-        <p v-else-if="!showAddRecruiter" class="text-sm text-gray-400 dark:text-gray-500">
+        <p
+          v-else-if="!showAddRecruiter"
+          class="text-sm text-gray-400 dark:text-gray-500"
+        >
           Рекрутери не додані
         </p>
       </UCard>
@@ -586,12 +779,21 @@ async function saveNotes() {
         <template #header>
           <div class="flex items-center gap-1.5">
             <span class="text-lg font-semibold text-dark dark:text-white">Переписка</span>
-            <UTooltip text="Хронологія повідомлень з рекрутером. Імпортується з Telegram або вводиться вручну" :delay-duration="400">
-              <UIcon name="i-lucide-help-circle" class="w-4 h-4 text-gray-400 dark:text-gray-500" />
+            <UTooltip
+              text="Хронологія повідомлень з рекрутером. Імпортується з Telegram або вводиться вручну"
+              :delay-duration="400"
+            >
+              <UIcon
+                name="i-lucide-help-circle"
+                class="w-4 h-4 text-gray-400 dark:text-gray-500"
+              />
             </UTooltip>
           </div>
         </template>
-        <MessagesTimeline ref="timeline" :vacancy-id="Number(id)" />
+        <MessagesTimeline
+          ref="timeline"
+          :vacancy-id="Number(id)"
+        />
         <ManualMessageForm
           :vacancy-id="Number(id)"
           :recruiters="(recruitersList ?? []).map((r: { id: number, name: string }) => ({ id: r.id, name: r.name }))"
@@ -605,12 +807,21 @@ async function saveNotes() {
         <template #header>
           <div class="flex items-center gap-1.5">
             <span class="text-lg font-semibold text-dark dark:text-white">AI Аналіз</span>
-            <UTooltip text="Автоматичний аналіз компанії та рекрутера на основі листування. Генерує промпт для Claude AI" :delay-duration="400">
-              <UIcon name="i-lucide-help-circle" class="w-4 h-4 text-gray-400 dark:text-gray-500" />
+            <UTooltip
+              text="Автоматичний аналіз компанії та рекрутера на основі листування. Генерує промпт для Claude AI"
+              :delay-duration="400"
+            >
+              <UIcon
+                name="i-lucide-help-circle"
+                class="w-4 h-4 text-gray-400 dark:text-gray-500"
+              />
             </UTooltip>
           </div>
         </template>
-        <AIAnalysisCard :vacancy-id="Number(id)" :initial-analysis="vacancy.lastAnalysis" />
+        <AIAnalysisCard
+          :vacancy-id="Number(id)"
+          :initial-analysis="vacancy.lastAnalysis"
+        />
       </UCard>
     </template>
   </UContainer>

@@ -12,8 +12,6 @@ export default defineNuxtConfig({
 
   css: ['~/assets/css/main.css'],
 
-  compatibilityDate: '2025-01-15',
-
   // All server-side only — never exposed to client bundle
   runtimeConfig: {
     // Defaults — all overridable at runtime via NUXT_<KEY_UPPERCASE> env vars
@@ -31,17 +29,19 @@ export default defineNuxtConfig({
     public: {}
   },
 
-  vite: {
-    optimizeDeps: {
-      include: ['reka-ui']
-    }
-  },
+  compatibilityDate: '2025-01-15',
 
   nitro: {
     // Required for better-sqlite3 and GramJS (CJS native/non-standard modules)
     externals: {
       inline: ['imap-simple', 'imap', 'utf8', 'uuencode', 'quoted-printable', 'iconv-lite'],
       external: ['telegram']
+    }
+  },
+
+  vite: {
+    optimizeDeps: {
+      include: ['reka-ui']
     }
   },
 

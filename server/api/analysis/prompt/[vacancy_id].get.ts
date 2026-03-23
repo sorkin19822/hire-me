@@ -5,7 +5,7 @@ import { eq } from 'drizzle-orm'
 import { buildAnalysisPrompt, type PromptLang } from '../../../utils/analysis-prompt'
 
 const querySchema = z.object({
-  lang: z.enum(['uk', 'en']).optional().default('uk'),
+  lang: z.enum(['uk', 'en']).optional().default('uk')
 })
 
 export default defineEventHandler(async (event) => {
@@ -32,7 +32,7 @@ export default defineEventHandler(async (event) => {
       urlDou: vacancies.urlDou,
       urlSite: vacancies.urlSite,
       description: vacancies.description,
-      notes: vacancies.notes,
+      notes: vacancies.notes
     })
     .from(vacancies)
     .where(eq(vacancies.id, vacancyId))

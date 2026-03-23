@@ -4,7 +4,7 @@ import { useDatabase } from '../../database/index'
 import { cvVersions } from '../../database/schema'
 
 const paramsSchema = z.object({
-  id: z.coerce.number().int().positive(),
+  id: z.coerce.number().int().positive()
 })
 
 export default defineEventHandler(async (event) => {

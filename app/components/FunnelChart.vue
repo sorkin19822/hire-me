@@ -41,11 +41,17 @@ function dropOff(index: number): string | null {
           class="absolute inset-y-0 left-0 rounded flex items-center px-2 transition-all"
           :style="{ width: barWidth(stage.count), backgroundColor: stage.color, opacity: stage.isTerminal ? '0.6' : '1' }"
         >
-          <span v-if="stage.count > 0" class="text-white text-xs font-medium whitespace-nowrap">
+          <span
+            v-if="stage.count > 0"
+            class="text-white text-xs font-medium whitespace-nowrap"
+          >
             {{ stage.count }}
           </span>
         </div>
-        <span v-if="stage.count === 0" class="absolute left-2 inset-y-0 flex items-center text-xs text-gray-400">
+        <span
+          v-if="stage.count === 0"
+          class="absolute left-2 inset-y-0 flex items-center text-xs text-gray-400"
+        >
           0
         </span>
       </div>

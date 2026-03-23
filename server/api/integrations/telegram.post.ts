@@ -7,7 +7,7 @@ import { getTelegramClient, loadSetting } from '../../utils/telegram-client'
 const schema = z.object({
   recruiterId: z.number().int().positive(),
   vacancyId: z.number().int().positive(),
-  telegramUsername: z.string().regex(/^@?[A-Za-z0-9_]{5,32}$/, 'Invalid Telegram username'),
+  telegramUsername: z.string().regex(/^@?[A-Za-z0-9_]{5,32}$/, 'Invalid Telegram username')
 })
 
 export default defineEventHandler(async (event) => {
@@ -26,7 +26,7 @@ export default defineEventHandler(async (event) => {
   if (!sessionStr) {
     throw createError({
       statusCode: 503,
-      statusMessage: 'Telegram is not authenticated. Complete setup via /api/integrations/telegram/auth',
+      statusMessage: 'Telegram is not authenticated. Complete setup via /api/integrations/telegram/auth'
     })
   }
 
@@ -49,8 +49,7 @@ export default defineEventHandler(async (event) => {
   let client: Awaited<ReturnType<typeof getTelegramClient>>['client']
   try {
     ;({ client } = await getTelegramClient())
-  }
-  catch (err) {
+  } catch (err) {
     console.error('[telegram/sync] client init failed:', err)
     throw createError({ statusCode: 503, statusMessage: 'Telegram client unavailable' })
   }
@@ -63,8 +62,7 @@ export default defineEventHandler(async (event) => {
   let rawMessages: any[]
   try {
     rawMessages = await client.getMessages(username, { limit: 200 })
-  }
-  catch (err) {
+  } catch (err) {
     console.error('[telegram/sync] getMessages failed:', err)
     throw createError({ statusCode: 502, statusMessage: 'Failed to fetch Telegram messages' })
   }
@@ -103,7 +101,7 @@ export default defineEventHandler(async (event) => {
       source: 'telegram',
       direction: msg.out ? 'out' : 'in',
       content: text,
-      sentAt,
+      sentAt
     }).run()
 
     existingKeys.add(key)

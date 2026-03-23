@@ -6,7 +6,7 @@ import { eq } from 'drizzle-orm'
 const schema = z.object({
   name: z.string().min(1).max(100).optional(),
   color: z.string().regex(/^#[0-9a-fA-F]{6}$/).optional(),
-  order: z.number().int().min(0).optional(),
+  order: z.number().int().min(0).optional()
 }).strict()
 
 export default defineEventHandler(async (event) => {

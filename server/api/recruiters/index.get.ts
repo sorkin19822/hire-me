@@ -6,7 +6,7 @@ import { requireAuth } from '../../utils/auth'
 
 const querySchema = z.object({
   vacancy_id: z.coerce.number().int().positive().optional(),
-  search: z.string().max(200).optional(),
+  search: z.string().max(200).optional()
 })
 
 export default defineEventHandler(async (event) => {
@@ -34,7 +34,7 @@ export default defineEventHandler(async (event) => {
       linkedin: recruiters.linkedin,
       createdAt: recruiters.createdAt,
       vacancyCompany: vacancies.company,
-      vacancyPosition: vacancies.position,
+      vacancyPosition: vacancies.position
     })
     .from(recruiters)
     .leftJoin(vacancies, eq(recruiters.vacancyId, vacancies.id))

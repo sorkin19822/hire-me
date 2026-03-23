@@ -12,7 +12,7 @@ interface MessagePart {
 }
 
 interface ImapMessage {
-  attributes: { uid: number; date: Date }
+  attributes: { uid: number, date: Date }
   parts: MessagePart[]
 }
 
@@ -26,7 +26,7 @@ export interface EmailMessage {
   messageId: string
   subject: string
   body: string
-  date: string     // ISO 8601
+  date: string // ISO 8601
   direction: 'in' | 'out'
 }
 
@@ -38,8 +38,8 @@ function buildConfig(host: string, port: number, user: string, password: string)
       user,
       password,
       tls: true,
-      authTimeout: 10000,
-    },
+      authTimeout: 10000
+    }
   }
 }
 
@@ -55,12 +55,11 @@ async function fetchFromFolder(
   connection: ImapConnection,
   folder: string,
   emailAddress: string,
-  direction: 'in' | 'out',
+  direction: 'in' | 'out'
 ): Promise<EmailMessage[]> {
   try {
     await connection.openBox(folder)
-  }
-  catch {
+  } catch {
     return []
   }
 
@@ -71,10 +70,9 @@ async function fetchFromFolder(
   try {
     messages = await connection.search(criterion, {
       bodies: ['HEADER.FIELDS (FROM TO SUBJECT DATE MESSAGE-ID)', 'TEXT'],
-      struct: false,
+      struct: false
     })
-  }
-  catch {
+  } catch {
     return []
   }
 
@@ -103,8 +101,7 @@ async function fetchFromFolder(
         : rawBody.trim()
 
       results.push({ messageId: msgId, subject, body, date, direction })
-    }
-    catch {
+    } catch {
       // Skip unparseable messages
     }
   }
@@ -114,14 +111,13 @@ async function fetchFromFolder(
 
 export async function fetchEmailsByAddress(
   emailAddress: string,
-  config: { host: string; port: number; user: string; password: string },
+  config: { host: string, port: number, user: string, password: string }
 ): Promise<EmailMessage[]> {
   let connection: ImapConnection
 
   try {
     connection = await imapSimple.connect(buildConfig(config.host, config.port, config.user, config.password))
-  }
-  catch (err) {
+  } catch (err) {
     console.error('[imap] connection failed:', err)
     throw new Error('IMAP connection failed')
   }
@@ -131,8 +127,9 @@ export async function fetchEmailsByAddress(
     const inbox = await fetchFromFolder(connection, 'INBOX', emailAddress, 'in')
     const sent = await fetchFromFolder(connection, 'Sent', emailAddress, 'out')
     return [...inbox, ...sent]
-  }
-  finally {
-    try { connection.end() } catch { /* ignore */ }
+  } finally {
+    try {
+      connection.end()
+    } catch { /* ignore */ }
   }
 }

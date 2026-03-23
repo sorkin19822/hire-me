@@ -2,7 +2,7 @@ import { z } from 'zod'
 import { getTelegramClient, saveTelegramSession, loadSetting } from '../../../utils/telegram-client'
 
 const schema = z.object({
-  code: z.string().min(4).max(10),
+  code: z.string().min(4).max(10)
 })
 
 export default defineEventHandler(async (event) => {
@@ -22,18 +22,17 @@ export default defineEventHandler(async (event) => {
   if (!phoneNumber || !phoneCodeHash) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'No pending auth session — call /auth first to request a code',
+      statusMessage: 'No pending auth session — call /auth first to request a code'
     })
   }
 
   try {
     const { client, Api } = await getTelegramClient()
     await client.invoke(
-      new Api.auth.SignIn({ phoneNumber, phoneCodeHash, phoneCode: code }),
+      new Api.auth.SignIn({ phoneNumber, phoneCodeHash, phoneCode: code })
     )
     await saveTelegramSession(client.session.save() as string)
-  }
-  catch (err: unknown) {
+  } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err)
     console.error('[telegram/verify] SignIn failed:', msg)
     // Surface Telegram-level errors (PHONE_CODE_INVALID, SESSION_PASSWORD_NEEDED, etc.)

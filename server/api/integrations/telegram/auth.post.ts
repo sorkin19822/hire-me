@@ -2,7 +2,7 @@ import { z } from 'zod'
 import { getTelegramClient, saveSetting } from '../../../utils/telegram-client'
 
 const schema = z.object({
-  phone: z.string().regex(/^\+\d{7,15}$/, 'Phone must be in international format, e.g. +380501234567'),
+  phone: z.string().regex(/^\+\d{7,15}$/, 'Phone must be in international format, e.g. +380501234567')
 })
 
 export default defineEventHandler(async (event) => {
@@ -23,8 +23,7 @@ export default defineEventHandler(async (event) => {
   try {
     const { client } = await getTelegramClient()
     result = await client.sendCode({ apiId, apiHash }, phone) as { phoneCodeHash: string }
-  }
-  catch (err) {
+  } catch (err) {
     console.error('[telegram/auth] sendCode failed:', err)
     throw createError({ statusCode: 502, statusMessage: 'Failed to send Telegram auth code' })
   }

@@ -4,7 +4,7 @@ import { vacancies, analysis } from '../../database/schema'
 import { eq } from 'drizzle-orm'
 
 const bodySchema = z.object({
-  result: z.string().min(1).max(10000),
+  result: z.string().min(1).max(10000)
 })
 
 const responseSchema = z.object({
@@ -12,7 +12,7 @@ const responseSchema = z.object({
   recruiter_score: z.number().min(0).max(10),
   red_flags: z.array(z.string()),
   green_flags: z.array(z.string()),
-  summary: z.string(),
+  summary: z.string()
 })
 
 export default defineEventHandler(async (event) => {
@@ -49,8 +49,7 @@ export default defineEventHandler(async (event) => {
   let claudeResult: z.infer<typeof responseSchema>
   try {
     claudeResult = responseSchema.parse(JSON.parse(jsonText))
-  }
-  catch {
+  } catch {
     throw createError({ statusCode: 422, statusMessage: 'Could not parse JSON — check the pasted text' })
   }
 
@@ -68,19 +67,18 @@ export default defineEventHandler(async (event) => {
         redFlags: JSON.stringify(claudeResult.red_flags),
         greenFlags: JSON.stringify(claudeResult.green_flags),
         summary: claudeResult.summary,
-        createdAt: new Date().toISOString(),
+        createdAt: new Date().toISOString()
       })
       .where(eq(analysis.id, existing.id))
       .run()
-  }
-  else {
+  } else {
     db.insert(analysis).values({
       vacancyId,
       companyScore: claudeResult.company_score,
       recruiterScore: claudeResult.recruiter_score,
       redFlags: JSON.stringify(claudeResult.red_flags),
       greenFlags: JSON.stringify(claudeResult.green_flags),
-      summary: claudeResult.summary,
+      summary: claudeResult.summary
     }).run()
   }
 
@@ -89,6 +87,6 @@ export default defineEventHandler(async (event) => {
     recruiterScore: claudeResult.recruiter_score,
     redFlags: claudeResult.red_flags,
     greenFlags: claudeResult.green_flags,
-    summary: claudeResult.summary,
+    summary: claudeResult.summary
   }
 })

@@ -17,7 +17,7 @@ export default defineEventHandler(async (event) => {
   const counts = db
     .select({
       stageId: vacancies.stageId,
-      count: sql<number>`count(*)`,
+      count: sql<number>`count(*)`
     })
     .from(vacancies)
     .groupBy(vacancies.stageId)
@@ -31,7 +31,7 @@ export default defineEventHandler(async (event) => {
     color: s.color,
     order: s.order,
     isTerminal: s.isTerminal,
-    count: countMap.get(s.id) ?? 0,
+    count: countMap.get(s.id) ?? 0
   }))
 
   const total = byStage.reduce((sum, s) => sum + s.count, 0)
@@ -66,7 +66,7 @@ export default defineEventHandler(async (event) => {
       color: '#9ca3af',
       order: -1,
       isTerminal: false,
-      count: unstaged!.count,
+      count: unstaged!.count
     })
   }
 
@@ -76,6 +76,6 @@ export default defineEventHandler(async (event) => {
     rejections,
     offers,
     conversionRate,
-    byStage,
+    byStage
   }
 })

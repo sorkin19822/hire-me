@@ -4,12 +4,12 @@ import { useDatabase } from '../../database/index'
 import { cvVersions } from '../../database/schema'
 
 const paramsSchema = z.object({
-  id: z.coerce.number().int().positive(),
+  id: z.coerce.number().int().positive()
 })
 
 const bodySchema = z
   .object({
-    comment: z.string().max(500).nullable().optional(),
+    comment: z.string().max(500).nullable().optional()
   })
   .strict()
 

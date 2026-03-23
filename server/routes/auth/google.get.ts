@@ -1,6 +1,5 @@
 import { useDatabase } from '../../database/index'
 import { users } from '../../database/schema'
-import { eq, sql } from 'drizzle-orm'
 
 export default defineOAuthGoogleEventHandler({
   async onSuccess(event, { user: googleUser }) {
@@ -23,14 +22,14 @@ export default defineOAuthGoogleEventHandler({
       .values({
         email,
         name: googleUser.name as string ?? null,
-        avatar: googleUser.picture as string ?? null,
+        avatar: googleUser.picture as string ?? null
       })
       .onConflictDoUpdate({
         target: users.email,
         set: {
           name: googleUser.name as string ?? null,
-          avatar: googleUser.picture as string ?? null,
-        },
+          avatar: googleUser.picture as string ?? null
+        }
       })
       .run()
 
@@ -38,8 +37,8 @@ export default defineOAuthGoogleEventHandler({
       user: {
         email,
         name: googleUser.name as string ?? null,
-        avatar: googleUser.picture as string ?? null,
-      },
+        avatar: googleUser.picture as string ?? null
+      }
     })
 
     return sendRedirect(event, '/')
@@ -48,5 +47,5 @@ export default defineOAuthGoogleEventHandler({
   onError(event, error) {
     console.error('[auth/google] OAuth error:', error)
     return sendRedirect(event, '/login?error=oauth')
-  },
+  }
 })

@@ -14,11 +14,9 @@ async function importFromDrive() {
     await $fetch('/api/integrations/gdrive', { method: 'POST' })
     toast.add({ title: 'CV імпортовано з Google Drive', color: 'success', icon: 'i-simple-icons-googledrive' })
     await refresh()
-  }
-  catch {
+  } catch {
     toast.add({ title: 'Помилка імпорту з Google Drive', color: 'error', icon: 'i-lucide-alert-circle' })
-  }
-  finally {
+  } finally {
     importing.value = false
   }
 }
@@ -35,11 +33,9 @@ async function handleFileUpload(event: Event) {
     await $fetch('/api/cv-versions/upload', { method: 'POST', body: form })
     toast.add({ title: `CV завантажено: ${file.name}`, color: 'success', icon: 'i-lucide-file-text' })
     await refresh()
-  }
-  catch {
+  } catch {
     toast.add({ title: 'Помилка завантаження CV', color: 'error', icon: 'i-lucide-alert-circle' })
-  }
-  finally {
+  } finally {
     uploading.value = false
     if (fileInput.value) fileInput.value.value = ''
   }
@@ -60,12 +56,11 @@ async function saveComment(id: number) {
   try {
     await $fetch(`/api/cv-versions/${id}`, {
       method: 'PATCH',
-      body: { comment: commentValue.value || null },
+      body: { comment: commentValue.value || null }
     })
     editingCommentId.value = null
     await refresh()
-  }
-  finally {
+  } finally {
     commentSaving.value = false
   }
 }
@@ -87,8 +82,7 @@ async function confirmDelete() {
     await $fetch(`/api/cv-versions/${confirmDeleteId.value}`, { method: 'DELETE' })
     confirmDeleteId.value = null
     await refresh()
-  }
-  finally {
+  } finally {
     deleting.value = false
   }
 }
@@ -127,7 +121,10 @@ async function confirmDelete() {
     </PageHeader>
 
     <UCard>
-      <div v-if="cvList?.length" class="divide-y divide-gray-100 dark:divide-gray-800">
+      <div
+        v-if="cvList?.length"
+        class="divide-y divide-gray-100 dark:divide-gray-800"
+      >
         <div
           v-for="cv in cvList"
           :key="cv.id"
@@ -143,17 +140,36 @@ async function confirmDelete() {
           <div class="flex-1 min-w-0">
             <div class="flex items-center gap-2 flex-wrap">
               <span class="font-medium text-sm text-gray-900 dark:text-white truncate">{{ cv.filename }}</span>
-              <UBadge v-if="cv.isActive" color="success" variant="soft" size="xs">Активне</UBadge>
-              <span v-if="cv.gdriveId" class="text-xs text-gray-400">Drive</span>
+              <UBadge
+                v-if="cv.isActive"
+                color="success"
+                variant="soft"
+                size="xs"
+              >
+                Активне
+              </UBadge>
+              <span
+                v-if="cv.gdriveId"
+                class="text-xs text-gray-400"
+              >Drive</span>
             </div>
             <p class="text-xs text-gray-400 mt-0.5">
               {{ cv.importedAt?.slice(0, 16).replace('T', ' ') }}
             </p>
 
             <!-- Comment view -->
-            <div v-if="editingCommentId !== cv.id" class="mt-1.5 flex items-center gap-1">
-              <span v-if="cv.comment" class="text-sm text-gray-600 dark:text-gray-400">{{ cv.comment }}</span>
-              <span v-else class="text-xs text-gray-400 italic">Коментар відсутній</span>
+            <div
+              v-if="editingCommentId !== cv.id"
+              class="mt-1.5 flex items-center gap-1"
+            >
+              <span
+                v-if="cv.comment"
+                class="text-sm text-gray-600 dark:text-gray-400"
+              >{{ cv.comment }}</span>
+              <span
+                v-else
+                class="text-xs text-gray-400 italic"
+              >Коментар відсутній</span>
               <UButton
                 variant="ghost"
                 icon="i-lucide-pencil"
@@ -164,7 +180,10 @@ async function confirmDelete() {
             </div>
 
             <!-- Comment edit -->
-            <div v-else class="mt-1.5 flex items-center gap-2">
+            <div
+              v-else
+              class="mt-1.5 flex items-center gap-2"
+            >
               <UInput
                 v-model="commentValue"
                 placeholder="Додайте коментар…"
@@ -174,10 +193,18 @@ async function confirmDelete() {
                 @keydown.enter="saveComment(cv.id)"
                 @keydown.escape="editingCommentId = null"
               />
-              <UButton size="xs" :loading="commentSaving" @click="saveComment(cv.id)">
+              <UButton
+                size="xs"
+                :loading="commentSaving"
+                @click="saveComment(cv.id)"
+              >
                 Зберегти
               </UButton>
-              <UButton size="xs" variant="ghost" @click="editingCommentId = null">
+              <UButton
+                size="xs"
+                variant="ghost"
+                @click="editingCommentId = null"
+              >
                 Скасувати
               </UButton>
             </div>
@@ -210,7 +237,10 @@ async function confirmDelete() {
         </div>
       </div>
 
-      <p v-else class="text-sm text-gray-400 text-center py-4">
+      <p
+        v-else
+        class="text-sm text-gray-400 text-center py-4"
+      >
         Немає завантажених CV
       </p>
     </UCard>

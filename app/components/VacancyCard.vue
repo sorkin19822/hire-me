@@ -37,14 +37,23 @@ defineProps<{
         size="xs"
         class="shrink-0 mt-0.5"
       >
-        <UIcon name="i-lucide-message-circle" class="w-3 h-3 mr-0.5" />
+        <UIcon
+          name="i-lucide-message-circle"
+          class="w-3 h-3 mr-0.5"
+        />
         {{ vacancy.messagesCount }}
       </UBadge>
     </div>
 
     <!-- Date -->
-    <div v-if="vacancy.applyDate" class="flex items-center gap-1 mt-2.5">
-      <UIcon name="i-lucide-calendar" class="w-3 h-3 text-gray-400 dark:text-gray-500 shrink-0" />
+    <div
+      v-if="vacancy.applyDate"
+      class="flex items-center gap-1 mt-2.5"
+    >
+      <UIcon
+        name="i-lucide-calendar"
+        class="w-3 h-3 text-gray-400 dark:text-gray-500 shrink-0"
+      />
       <p class="text-xs text-gray-400 dark:text-gray-500">
         {{ vacancy.applyDate }}
       </p>

@@ -32,11 +32,9 @@ async function generatePrompt() {
     promptText.value = data.prompt
     showPromptPanel.value = true
     showPastePanel.value = false
-  }
-  catch {
+  } catch {
     toast.add({ title: 'Не вдалося згенерувати промпт', color: 'error', icon: 'i-lucide-alert-circle' })
-  }
-  finally {
+  } finally {
     loadingPrompt.value = false
   }
 }
@@ -52,41 +50,62 @@ async function saveResult() {
   try {
     analysisData.value = await $fetch<AnalysisResult>(`/api/analysis/${props.vacancyId}`, {
       method: 'POST',
-      body: { result: pasteText.value },
+      body: { result: pasteText.value }
     })
     showPastePanel.value = false
     showPromptPanel.value = false
     pasteText.value = ''
     toast.add({ title: 'Аналіз збережено', color: 'success', icon: 'i-lucide-check' })
-  }
-  catch (err: unknown) {
+  } catch (err: unknown) {
     const msg = (err as { data?: { statusMessage?: string } })?.data?.statusMessage ?? 'Помилка збереження'
     toast.add({ title: msg, color: 'error', icon: 'i-lucide-alert-circle' })
-  }
-  finally {
+  } finally {
     saving.value = false
   }
 }
-
-
 </script>
 
 <template>
   <div class="space-y-4">
-    <div v-if="analysisData" class="space-y-4">
+    <div
+      v-if="analysisData"
+      class="space-y-4"
+    >
       <div class="grid grid-cols-2 gap-4">
-        <ScoreDisplay label="Оцінка компанії" :score="analysisData.companyScore" />
-        <ScoreDisplay label="Оцінка рекрутера" :score="analysisData.recruiterScore" />
+        <ScoreDisplay
+          label="Оцінка компанії"
+          :score="analysisData.companyScore"
+        />
+        <ScoreDisplay
+          label="Оцінка рекрутера"
+          :score="analysisData.recruiterScore"
+        />
       </div>
 
-      <p v-if="analysisData.summary" class="text-sm text-gray-700 dark:text-gray-300">
+      <p
+        v-if="analysisData.summary"
+        class="text-sm text-gray-700 dark:text-gray-300"
+      >
         {{ analysisData.summary }}
       </p>
 
-      <FlagList v-if="analysisData.greenFlags?.length" :flags="analysisData.greenFlags" label="Позитивне" type="success" />
-      <FlagList v-if="analysisData.redFlags?.length" :flags="analysisData.redFlags" label="Тривожні сигнали" type="error" />
+      <FlagList
+        v-if="analysisData.greenFlags?.length"
+        :flags="analysisData.greenFlags"
+        label="Позитивне"
+        type="success"
+      />
+      <FlagList
+        v-if="analysisData.redFlags?.length"
+        :flags="analysisData.redFlags"
+        label="Тривожні сигнали"
+        type="error"
+      />
 
-      <p v-if="analysisData.createdAt" class="text-xs text-gray-400">
+      <p
+        v-if="analysisData.createdAt"
+        class="text-xs text-gray-400"
+      >
         Оновлено: {{ analysisData.createdAt?.slice(0, 16).replace('T', ' ') }}
       </p>
     </div>
@@ -94,8 +113,20 @@ async function saveResult() {
     <!-- Action buttons -->
     <div class="flex flex-wrap items-center gap-2">
       <!-- Language toggle -->
-      <UButton size="xs" :variant="lang === 'uk' ? 'solid' : 'ghost'" @click="lang = 'uk'">UA</UButton>
-      <UButton size="xs" :variant="lang === 'en' ? 'solid' : 'ghost'" @click="lang = 'en'">EN</UButton>
+      <UButton
+        size="xs"
+        :variant="lang === 'uk' ? 'solid' : 'ghost'"
+        @click="lang = 'uk'"
+      >
+        UA
+      </UButton>
+      <UButton
+        size="xs"
+        :variant="lang === 'en' ? 'solid' : 'ghost'"
+        @click="lang = 'en'"
+      >
+        EN
+      </UButton>
 
       <UButton
         variant="soft"
@@ -119,12 +150,20 @@ async function saveResult() {
     </div>
 
     <!-- Prompt editor -->
-    <div v-if="showPromptPanel" class="space-y-2">
+    <div
+      v-if="showPromptPanel"
+      class="space-y-2"
+    >
       <div class="flex items-center justify-between">
         <p class="text-xs font-semibold text-gray-500">
           Промпт — скопіюй і встав у claude.ai
         </p>
-        <UButton variant="ghost" icon="i-lucide-copy" size="xs" @click="copyPrompt">
+        <UButton
+          variant="ghost"
+          icon="i-lucide-copy"
+          size="xs"
+          @click="copyPrompt"
+        >
           Копіювати
         </UButton>
       </div>
@@ -136,19 +175,26 @@ async function saveResult() {
     </div>
 
     <!-- Paste response -->
-    <div v-if="showPastePanel" class="space-y-2">
+    <div
+      v-if="showPastePanel"
+      class="space-y-2"
+    >
       <p class="text-xs font-semibold text-gray-500">
         Встав JSON-відповідь від Claude:
       </p>
       <UTextarea
         v-model="pasteText"
         :rows="8"
-        placeholder='{ "company_score": 8, "recruiter_score": 7, ... }'
+        placeholder="{ &quot;company_score&quot;: 8, &quot;recruiter_score&quot;: 7, ... }"
         class="font-mono text-xs w-full"
         autofocus
       />
       <div class="flex gap-2 justify-end">
-        <UButton variant="ghost" size="sm" @click="showPastePanel = false; pasteText = ''">
+        <UButton
+          variant="ghost"
+          size="sm"
+          @click="showPastePanel = false; pasteText = ''"
+        >
           Скасувати
         </UButton>
         <UButton

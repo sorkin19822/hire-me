@@ -25,14 +25,12 @@ async function doImport() {
     form.append('file', file.value)
     const data = await $fetch<{ total: number, imported: number }>(
       '/api/import/csv',
-      { method: 'POST', body: form },
+      { method: 'POST', body: form }
     )
     result.value = data
-  }
-  catch (err: unknown) {
+  } catch (err: unknown) {
     errorMsg.value = err instanceof Error ? err.message : 'Помилка імпорту'
-  }
-  finally {
+  } finally {
     loading.value = false
   }
 }

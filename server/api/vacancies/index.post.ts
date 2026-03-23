@@ -10,7 +10,7 @@ const schema = z.object({
   notes: z.string().max(5000).optional(),
   urlDou: z.string().url().optional().or(z.literal('')),
   urlLinkedin: z.string().url().optional().or(z.literal('')),
-  urlSite: z.string().url().optional().or(z.literal('')),
+  urlSite: z.string().url().optional().or(z.literal(''))
 })
 
 export default defineEventHandler(async (event) => {
@@ -33,7 +33,7 @@ export default defineEventHandler(async (event) => {
       notes: parsed.data.notes,
       urlDou: parsed.data.urlDou || null,
       urlLinkedin: parsed.data.urlLinkedin || null,
-      urlSite: parsed.data.urlSite || null,
+      urlSite: parsed.data.urlSite || null
     })
     .returning()
     .all()

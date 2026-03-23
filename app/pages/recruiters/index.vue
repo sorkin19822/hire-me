@@ -8,7 +8,7 @@ const { data: recruiters, refresh } = await useFetch('/api/recruiters')
 const filtered = computed(() => {
   const s = search.value.toLowerCase()
   return (recruiters.value ?? []).filter((r: { name: string }) =>
-    !s || r.name.toLowerCase().includes(s),
+    !s || r.name.toLowerCase().includes(s)
   )
 })
 
@@ -23,8 +23,7 @@ async function confirmDelete() {
     await $fetch(`/api/recruiters/${confirmDeleteId.value}`, { method: 'DELETE' })
     confirmDeleteId.value = null
     await refresh()
-  }
-  finally {
+  } finally {
     deleting.value = false
   }
 }
@@ -38,7 +37,7 @@ const columns = [
   { accessorKey: 'telegram', header: 'Telegram' },
   { accessorKey: 'email', header: 'Email' },
   { accessorKey: 'vacancy', header: 'Вакансія' },
-  { id: 'actions', header: '' },
+  { id: 'actions', header: '' }
 ]
 </script>
 
@@ -53,7 +52,11 @@ const columns = [
       class="mb-4 max-w-sm"
     />
 
-    <UTable :data="filtered" :columns="columns" :loading="!recruiters">
+    <UTable
+      :data="filtered"
+      :columns="columns"
+      :loading="!recruiters"
+    >
       <template #name-cell="{ row }">
         <RecruiterCard :recruiter="row.original" />
       </template>
@@ -68,7 +71,10 @@ const columns = [
         >
           {{ row.original.telegram }}
         </UButton>
-        <span v-else class="text-gray-400">—</span>
+        <span
+          v-else
+          class="text-gray-400"
+        >—</span>
       </template>
 
       <template #email-cell="{ row }">
@@ -82,7 +88,10 @@ const columns = [
         >
           {{ row.original.email }}
         </UButton>
-        <span v-else class="text-gray-400">—</span>
+        <span
+          v-else
+          class="text-gray-400"
+        >—</span>
       </template>
 
       <template #vacancy-cell="{ row }">
@@ -93,7 +102,10 @@ const columns = [
         >
           {{ row.original.vacancyCompany }}
         </NuxtLink>
-        <span v-else class="text-gray-400">—</span>
+        <span
+          v-else
+          class="text-gray-400"
+        >—</span>
       </template>
 
       <template #actions-cell="{ row }">

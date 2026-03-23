@@ -8,7 +8,7 @@ const schema = z.object({
   name: z.string().min(1).max(255),
   telegram: z.string().regex(/^@?[A-Za-z0-9_]{5,32}$/, 'Invalid Telegram username').optional().or(z.literal('')),
   email: z.string().email().optional().or(z.literal('')),
-  linkedin: z.string().url().refine(v => /^https?:\/\//i.test(v), 'URL must use http(s)').optional().or(z.literal('')),
+  linkedin: z.string().url().refine(v => /^https?:\/\//i.test(v), 'URL must use http(s)').optional().or(z.literal(''))
 })
 
 export default defineEventHandler(async (event) => {
@@ -28,7 +28,7 @@ export default defineEventHandler(async (event) => {
       name: parsed.data.name,
       telegram: parsed.data.telegram || null,
       email: parsed.data.email || null,
-      linkedin: parsed.data.linkedin || null,
+      linkedin: parsed.data.linkedin || null
     })
     .returning()
     .all()

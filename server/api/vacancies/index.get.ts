@@ -6,7 +6,7 @@ import { eq, like, or, and, sql, desc } from 'drizzle-orm'
 const querySchema = z.object({
   stage_id: z.coerce.number().int().positive().optional(),
   search: z.string().max(200).optional(),
-  order: z.enum(['apply_date', 'created_at']).optional(),
+  order: z.enum(['apply_date', 'created_at']).optional()
 })
 
 export default defineEventHandler(async (event) => {
@@ -49,7 +49,7 @@ export default defineEventHandler(async (event) => {
       urlSite: vacancies.urlSite,
       createdAt: vacancies.createdAt,
       updatedAt: vacancies.updatedAt,
-      messagesCount: sql<number>`coalesce(${messagesCount.count}, 0)`,
+      messagesCount: sql<number>`coalesce(${messagesCount.count}, 0)`
     })
     .from(vacancies)
     .leftJoin(pipelineStages, eq(vacancies.stageId, pipelineStages.id))

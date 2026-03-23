@@ -12,7 +12,7 @@ interface GanttRow {
 const props = defineProps<{ rows: GanttRow[] }>()
 
 const validRows = computed(() =>
-  props.rows.filter(r => r.applyDate && !isNaN(new Date(r.applyDate).getTime())),
+  props.rows.filter(r => r.applyDate && !isNaN(new Date(r.applyDate).getTime()))
 )
 
 const timeRange = computed(() => {
@@ -21,7 +21,7 @@ const timeRange = computed(() => {
   const ends = validRows.value.map(r => new Date(r.updatedAt).getTime())
   return {
     min: Math.min(...starts),
-    max: Math.max(...ends, Date.now()),
+    max: Math.max(...ends, Date.now())
   }
 })
 
@@ -37,7 +37,7 @@ function barStyle(row: GanttRow): Record<string, string> {
   return {
     left: `${left.toFixed(1)}%`,
     width: `${width.toFixed(1)}%`,
-    backgroundColor: row.stageColor ?? '#6366f1',
+    backgroundColor: row.stageColor ?? '#6366f1'
   }
 }
 
@@ -45,7 +45,7 @@ function barStyle(row: GanttRow): Record<string, string> {
 const axisTicks = computed(() => {
   const { min, max } = timeRange.value
   const span = max - min || 1
-  const ticks: Array<{ label: string; pct: number }> = []
+  const ticks: Array<{ label: string, pct: number }> = []
 
   const start = new Date(min)
   start.setDate(1)
@@ -57,7 +57,7 @@ const axisTicks = computed(() => {
     if (pct >= 0 && pct <= 100) {
       ticks.push({
         label: cur.toLocaleDateString('uk-UA', { month: 'short', year: '2-digit' }),
-        pct,
+        pct
       })
     }
     cur.setMonth(cur.getMonth() + 1)
@@ -68,10 +68,16 @@ const axisTicks = computed(() => {
 
 <template>
   <div class="overflow-x-auto">
-    <div v-if="!validRows.length" class="text-sm text-gray-400 py-4 text-center">
+    <div
+      v-if="!validRows.length"
+      class="text-sm text-gray-400 py-4 text-center"
+    >
       Немає вакансій з датою відгуку
     </div>
-    <div v-else class="min-w-[600px]">
+    <div
+      v-else
+      class="min-w-[600px]"
+    >
       <!-- Axis -->
       <div class="relative h-6 mb-1 ml-40">
         <span

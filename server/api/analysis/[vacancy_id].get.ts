@@ -25,6 +25,6 @@ export default defineEventHandler(async (event) => {
     redFlags: row.redFlags ? JSON.parse(row.redFlags) as string[] : [],
     greenFlags: row.greenFlags ? JSON.parse(row.greenFlags) as string[] : [],
     summary: row.summary,
-    createdAt: row.createdAt,
+    createdAt: row.createdAt
   }
 })

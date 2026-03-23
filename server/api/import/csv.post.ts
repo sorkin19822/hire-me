@@ -43,22 +43,21 @@ export default defineEventHandler(async (event) => {
           position: v.position,
           applyDate: v.applyDate ?? undefined,
           stageId,
-          notes: v.notes ?? undefined,
+          notes: v.notes ?? undefined
         }).returning({ id: vacancies.id }).all()
 
         if (v.recruiterTelegram) {
           tx.insert(recruiters).values({
             vacancyId: inserted.id,
             name: v.recruiterTelegram,
-            telegram: v.recruiterTelegram,
+            telegram: v.recruiterTelegram
           }).run()
         }
 
         imported++
       }
     })
-  }
-  catch (err) {
+  } catch (err) {
     console.error('[csv-import] transaction failed:', err)
     const msg = err instanceof Error ? err.message : String(err)
     throw createError({ statusCode: 500, statusMessage: `Import failed: ${msg}` })
@@ -67,6 +66,6 @@ export default defineEventHandler(async (event) => {
   return {
     success: true,
     total: parsed.length,
-    imported,
+    imported
   }
 })

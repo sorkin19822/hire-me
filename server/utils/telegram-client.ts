@@ -17,7 +17,7 @@ let _client: any | null = null
 export async function getTelegramClient(): Promise<{
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   client: any
-  Api: { auth: { SignIn: new (args: { phoneNumber: string; phoneCodeHash: string; phoneCode: string }) => unknown } }
+  Api: { auth: { SignIn: new (args: { phoneNumber: string, phoneCodeHash: string, phoneCode: string }) => unknown } }
 }> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { Api } = _require('telegram') as { Api: any }
@@ -31,7 +31,7 @@ export async function getTelegramClient(): Promise<{
   if (!apiId || !apiHash) {
     throw createError({
       statusCode: 503,
-      statusMessage: 'Telegram API credentials are not configured (TELEGRAM_API_ID / TELEGRAM_API_HASH)',
+      statusMessage: 'Telegram API credentials are not configured (TELEGRAM_API_ID / TELEGRAM_API_HASH)'
     })
   }
 
@@ -41,7 +41,7 @@ export async function getTelegramClient(): Promise<{
 
   const session = new StringSession(sessionStr)
   _client = new TelegramClient(session, apiId, apiHash, {
-    connectionRetries: 3,
+    connectionRetries: 3
   })
 
   await _client.connect()

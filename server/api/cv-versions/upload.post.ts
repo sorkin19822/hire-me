@@ -18,6 +18,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const rawFilename = (filePart.filename ?? 'cv')
+    // eslint-disable-next-line no-control-regex
     .replace(/[/\\?%*:|"<>\x00-\x1f]/g, '_')
     .slice(0, 255)
 
@@ -46,7 +47,7 @@ export default defineEventHandler(async (event) => {
     tx.insert(cvVersions).values({
       filename,
       content,
-      isActive: true,
+      isActive: true
     }).run()
   })
 

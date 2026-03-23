@@ -3,7 +3,7 @@ useSeoMeta({ title: 'Аналітика — hire-me' })
 
 const [{ data: stats }, { data: ganttRows }] = await Promise.all([
   useFetch('/api/analytics/stats'),
-  useFetch('/api/analytics/gantt'),
+  useFetch('/api/analytics/gantt')
 ])
 </script>
 
@@ -15,10 +15,25 @@ const [{ data: stats }, { data: ganttRows }] = await Promise.all([
 
     <!-- Stat cards -->
     <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
-      <StatCard label="Всього вакансій" :value="stats?.total" />
-      <StatCard label="Співбесіди" :value="stats?.interviews" color-class="text-blue-600 dark:text-blue-400" />
-      <StatCard label="Відмови" :value="stats?.rejections" color-class="text-red-600 dark:text-red-400" />
-      <StatCard label="Офери" :value="stats?.offers" color-class="text-green-600 dark:text-green-400">
+      <StatCard
+        label="Всього вакансій"
+        :value="stats?.total"
+      />
+      <StatCard
+        label="Співбесіди"
+        :value="stats?.interviews"
+        color-class="text-blue-600 dark:text-blue-400"
+      />
+      <StatCard
+        label="Відмови"
+        :value="stats?.rejections"
+        color-class="text-red-600 dark:text-red-400"
+      />
+      <StatCard
+        label="Офери"
+        :value="stats?.offers"
+        color-class="text-green-600 dark:text-green-400"
+      >
         {{ stats?.offers ?? '—' }}
         <span class="text-sm font-normal text-gray-400 ml-1">({{ stats?.conversionRate ?? 0 }}%)</span>
       </StatCard>
@@ -29,8 +44,14 @@ const [{ data: stats }, { data: ganttRows }] = await Promise.all([
       <template #header>
         <span class="font-semibold">Воронка конверсії</span>
       </template>
-      <FunnelChart v-if="stats?.byStage?.length" :stages="stats.byStage" />
-      <p v-else class="text-sm text-gray-400">
+      <FunnelChart
+        v-if="stats?.byStage?.length"
+        :stages="stats.byStage"
+      />
+      <p
+        v-else
+        class="text-sm text-gray-400"
+      >
         Немає даних
       </p>
     </UCard>
@@ -40,8 +61,14 @@ const [{ data: stats }, { data: ganttRows }] = await Promise.all([
       <template #header>
         <span class="font-semibold">Таймлайн вакансій</span>
       </template>
-      <GanttChart v-if="ganttRows?.length" :rows="ganttRows" />
-      <p v-else class="text-sm text-gray-400">
+      <GanttChart
+        v-if="ganttRows?.length"
+        :rows="ganttRows"
+      />
+      <p
+        v-else
+        class="text-sm text-gray-400"
+      >
         Немає вакансій з датою відгуку
       </p>
     </UCard>

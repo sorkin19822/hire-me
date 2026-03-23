@@ -34,7 +34,7 @@ export function buildAnalysisPrompt(input: AnalysisInput, lang: PromptLang = 'uk
         `- ${r.name}`,
         r.telegram ? `Telegram: ${r.telegram}` : '',
         r.email ? `Email: ${r.email}` : '',
-        r.linkedin ? `LinkedIn: ${r.linkedin}` : '',
+        r.linkedin ? `LinkedIn: ${r.linkedin}` : ''
       ].filter(Boolean).join(', ')).join('\n')
     : lang === 'uk' ? '- (немає рекрутерів)' : '- (no recruiters)'
 

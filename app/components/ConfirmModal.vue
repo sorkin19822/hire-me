@@ -10,7 +10,7 @@ defineProps<{
 
 const emit = defineEmits<{
   'update:open': [value: boolean]
-  confirm: []
+  'confirm': []
 }>()
 </script>
 
@@ -25,7 +25,10 @@ const emit = defineEmits<{
   >
     <template #footer>
       <div class="flex justify-end gap-2 p-4">
-        <UButton variant="ghost" @click="emit('update:open', false)">
+        <UButton
+          variant="ghost"
+          @click="emit('update:open', false)"
+        >
           Скасувати
         </UButton>
         <UButton

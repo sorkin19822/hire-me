@@ -14,7 +14,7 @@ const schema = z.object({
   content: z.string().min(1).max(10000),
   sentAt: z.string().datetime({ offset: true })
     .refine(v => v >= MIN_DATE && v <= MAX_DATE, 'sentAt out of valid range')
-    .optional(),
+    .optional()
 })
 
 export default defineEventHandler(async (event) => {
@@ -48,7 +48,7 @@ export default defineEventHandler(async (event) => {
       source: parsed.data.source,
       direction: parsed.data.direction,
       content: parsed.data.content,
-      sentAt: parsed.data.sentAt ?? new Date().toISOString(),
+      sentAt: parsed.data.sentAt ?? new Date().toISOString()
     })
     .returning()
     .all()

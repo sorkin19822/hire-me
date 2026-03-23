@@ -17,11 +17,11 @@ export function mapStageName(raw: string): string {
 
   // Terminal / rejection
   if (
-    s.includes('відмов') ||
-    s.includes('отказ') ||
-    s.includes('історія') ||
-    s.includes('берут за пределами') ||
-    s.includes('b2')
+    s.includes('відмов')
+    || s.includes('отказ')
+    || s.includes('історія')
+    || s.includes('берут за пределами')
+    || s.includes('b2')
   )
     return 'Відмова'
 
@@ -79,8 +79,7 @@ export function parseCSVContent(content: string): string[][] {
           currentField += '"'
           i += 2
           continue
-        }
-        else {
+        } else {
           inQuotes = false
           i++
           continue
