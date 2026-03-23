@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { CalendarDate, parseDate } from '@internationalized/date'
+import { getFaviconUrl } from '~/composables/useFavicon'
 
 const route = useRoute()
 const id = route.params.id as string
@@ -211,6 +212,13 @@ async function saveNotes() {
       <div class="flex items-start justify-between mb-6">
         <div class="flex-1 min-w-0 mr-4">
           <div v-if="!editingTitle" class="group flex items-start gap-2">
+            <img
+              v-if="getFaviconUrl(vacancy.urlSite)"
+              :src="getFaviconUrl(vacancy.urlSite)!"
+              class="w-6 h-6 rounded-sm mt-1 shrink-0"
+              :alt="vacancy.company"
+              @error="($event.target as HTMLImageElement).style.display = 'none'"
+            >
             <div>
               <h1 class="text-2xl font-bold text-dark dark:text-white">
                 {{ vacancy.company }}

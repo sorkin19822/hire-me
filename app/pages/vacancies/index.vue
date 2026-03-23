@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { h, resolveComponent } from 'vue'
+import { getFaviconUrl } from '~/composables/useFavicon'
 
 useSeoMeta({ title: 'Вакансії — hire-me' })
 
@@ -181,7 +182,14 @@ const columns = [
       :loading="!vacancies"
     >
       <template #company-cell="{ row }">
-        <NuxtLink :to="`/vacancies/${row.original.id}`" class="font-medium hover:underline">
+        <NuxtLink :to="`/vacancies/${row.original.id}`" class="flex items-center gap-2 font-medium hover:underline">
+          <img
+            v-if="getFaviconUrl(row.original.urlSite)"
+            :src="getFaviconUrl(row.original.urlSite)!"
+            class="w-4 h-4 rounded-sm shrink-0"
+            :alt="row.original.company"
+            @error="($event.target as HTMLImageElement).style.display = 'none'"
+          >
           {{ row.original.company }}
         </NuxtLink>
       </template>
