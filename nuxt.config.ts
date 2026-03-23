@@ -26,13 +26,16 @@ export default defineNuxtConfig({
     imapPassword: '',
     googleDriveMcpUrl: '',
     telegramMcpUrl: '',
+    telegramApiId: process.env.TELEGRAM_API_ID ?? '',
+    telegramApiHash: process.env.TELEGRAM_API_HASH ?? '',
     public: {}
   },
 
   nitro: {
-    // Required for better-sqlite3 native module
+    // Required for better-sqlite3 and GramJS (CJS native/non-standard modules)
     externals: {
-      inline: ['imap-simple', 'imap', 'utf8', 'uuencode', 'quoted-printable', 'iconv-lite']
+      inline: ['imap-simple', 'imap', 'utf8', 'uuencode', 'quoted-printable', 'iconv-lite'],
+      external: ['telegram']
     }
   },
 

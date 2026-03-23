@@ -124,6 +124,8 @@ const showAddRecruiter = ref(false)
 const recruiterForm = reactive({ name: '', telegram: '', email: '', linkedin: '' })
 const recruiterSaving = ref(false)
 
+const editingRecruiter = ref<{ id: number, name: string, telegram: string | null, email: string | null, linkedin: string | null } | null>(null)
+
 async function addRecruiter() {
   if (!recruiterForm.name) return
   recruiterSaving.value = true
@@ -185,6 +187,9 @@ async function saveNotes() {
         </div>
 
         <div class="flex items-center gap-2">
+          <UTooltip text="Поточний етап розгляду вашої кандидатури" :delay-duration="400">
+            <UIcon name="i-lucide-help-circle" class="w-4 h-4 text-gray-400 dark:text-gray-500 shrink-0" />
+          </UTooltip>
           <USelect
             v-model="selectedStageId"
             :items="stageOptions"
@@ -200,7 +205,12 @@ async function saveNotes() {
       <UCard class="mb-4 rounded-lg border border-gray-200 dark:border-gray-700 shadow-none">
         <div class="grid grid-cols-2 gap-6 text-sm">
           <div class="flex flex-col gap-1.5">
-            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Дата відгуку</span>
+            <div class="flex items-center gap-1">
+              <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Дата відгуку</span>
+              <UTooltip text="Дата, коли ви подали заявку на цю вакансію" :delay-duration="400">
+                <UIcon name="i-lucide-help-circle" class="w-3.5 h-3.5 text-gray-400 dark:text-gray-500" />
+              </UTooltip>
+            </div>
             <UPopover v-model:open="applyDateOpen">
               <UButton
                 variant="ghost"
@@ -216,19 +226,34 @@ async function saveNotes() {
             </UPopover>
           </div>
           <div class="flex flex-col gap-1.5">
-            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Повідомлень</span>
+            <div class="flex items-center gap-1">
+              <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Повідомлень</span>
+              <UTooltip text="Кількість повідомлень у листуванні з рекрутером" :delay-duration="400">
+                <UIcon name="i-lucide-help-circle" class="w-3.5 h-3.5 text-gray-400 dark:text-gray-500" />
+              </UTooltip>
+            </div>
             <p class="font-medium text-dark dark:text-white">
               {{ vacancy.messagesCount }}
             </p>
           </div>
           <div class="flex flex-col gap-1.5">
-            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Додано</span>
+            <div class="flex items-center gap-1">
+              <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Додано</span>
+              <UTooltip text="Дата додавання вакансії до системи" :delay-duration="400">
+                <UIcon name="i-lucide-help-circle" class="w-3.5 h-3.5 text-gray-400 dark:text-gray-500" />
+              </UTooltip>
+            </div>
             <p class="font-medium text-dark dark:text-white">
               {{ vacancy.createdAt?.slice(0, 10) }}
             </p>
           </div>
           <div class="col-span-2 flex flex-col gap-1.5">
-            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Версія CV</span>
+            <div class="flex items-center gap-1">
+              <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Версія CV</span>
+              <UTooltip text="Резюме, яке ви надіслали на цю вакансію" :delay-duration="400">
+                <UIcon name="i-lucide-help-circle" class="w-3.5 h-3.5 text-gray-400 dark:text-gray-500" />
+              </UTooltip>
+            </div>
             <div class="flex items-center gap-2 mt-1">
               <USelect
                 v-model="selectedCvId"
@@ -256,7 +281,12 @@ async function saveNotes() {
       <UCard class="mb-4 rounded-lg border border-gray-200 dark:border-gray-700 shadow-none">
         <template #header>
           <div class="flex items-center justify-between">
-            <span class="text-lg font-semibold text-dark dark:text-white">Посилання</span>
+            <div class="flex items-center gap-1.5">
+              <span class="text-lg font-semibold text-dark dark:text-white">Посилання</span>
+              <UTooltip text="Посилання на оголошення вакансії та сайт компанії" :delay-duration="400">
+                <UIcon name="i-lucide-help-circle" class="w-4 h-4 text-gray-400 dark:text-gray-500" />
+              </UTooltip>
+            </div>
             <UButton
               v-if="!editingLinks"
               variant="ghost"
@@ -308,7 +338,12 @@ async function saveNotes() {
       <UCard class="mb-4 rounded-lg border border-gray-200 dark:border-gray-700 shadow-none">
         <template #header>
           <div class="flex items-center justify-between">
-            <span class="text-lg font-semibold text-dark dark:text-white">Нотатки</span>
+            <div class="flex items-center gap-1.5">
+              <span class="text-lg font-semibold text-dark dark:text-white">Нотатки</span>
+              <UTooltip text="Особисті нотатки про вакансію: враження від співбесіди, умови, питання тощо" :delay-duration="400">
+                <UIcon name="i-lucide-help-circle" class="w-4 h-4 text-gray-400 dark:text-gray-500" />
+              </UTooltip>
+            </div>
             <UButton
               v-if="!editingNotes"
               variant="ghost"
@@ -354,7 +389,12 @@ async function saveNotes() {
       <UCard class="mb-4 rounded-lg border border-gray-200 dark:border-gray-700 shadow-none">
         <template #header>
           <div class="flex items-center justify-between">
-            <span class="text-lg font-semibold text-dark dark:text-white">Рекрутери</span>
+            <div class="flex items-center gap-1.5">
+              <span class="text-lg font-semibold text-dark dark:text-white">Рекрутери</span>
+              <UTooltip text="Контакти рекрутерів по цій вакансії. Можна синхронізувати листування з Telegram" :delay-duration="400">
+                <UIcon name="i-lucide-help-circle" class="w-4 h-4 text-gray-400 dark:text-gray-500" />
+              </UTooltip>
+            </div>
             <UButton
               variant="ghost"
               icon="i-lucide-plus"
@@ -401,16 +441,31 @@ async function saveNotes() {
               :vacancy-id="Number(id)"
               @synced="timeline?.refresh()"
             />
-            <UButton
-              variant="ghost"
-              icon="i-lucide-trash-2"
-              size="xs"
-              color="error"
-              class="shrink-0"
-              @click="deleteRecruiter(r.id)"
-            />
+            <div class="flex items-center gap-1 shrink-0">
+              <UButton
+                variant="ghost"
+                icon="i-lucide-pencil"
+                size="xs"
+                @click="editingRecruiter = r"
+              />
+              <UButton
+                variant="ghost"
+                icon="i-lucide-trash-2"
+                size="xs"
+                color="error"
+                @click="deleteRecruiter(r.id)"
+              />
+            </div>
           </div>
         </div>
+
+        <RecruiterFormModal
+          v-if="editingRecruiter"
+          :open="!!editingRecruiter"
+          :recruiter="editingRecruiter"
+          @update:open="(v) => { if (!v) editingRecruiter = null }"
+          @saved="refreshRecruiters()"
+        />
         <p v-else-if="!showAddRecruiter" class="text-sm text-gray-400 dark:text-gray-500">
           Рекрутери не додані
         </p>
@@ -419,7 +474,12 @@ async function saveNotes() {
       <!-- Messages timeline -->
       <UCard class="mb-4 rounded-lg border border-gray-200 dark:border-gray-700 shadow-none">
         <template #header>
-          <span class="text-lg font-semibold text-dark dark:text-white">Переписка</span>
+          <div class="flex items-center gap-1.5">
+            <span class="text-lg font-semibold text-dark dark:text-white">Переписка</span>
+            <UTooltip text="Хронологія повідомлень з рекрутером. Імпортується з Telegram або вводиться вручну" :delay-duration="400">
+              <UIcon name="i-lucide-help-circle" class="w-4 h-4 text-gray-400 dark:text-gray-500" />
+            </UTooltip>
+          </div>
         </template>
         <MessagesTimeline ref="timeline" :vacancy-id="Number(id)" />
         <ManualMessageForm
@@ -433,7 +493,12 @@ async function saveNotes() {
       <!-- AI analysis -->
       <UCard class="rounded-lg border border-gray-200 dark:border-gray-700 shadow-none">
         <template #header>
-          <span class="text-lg font-semibold text-dark dark:text-white">AI Аналіз</span>
+          <div class="flex items-center gap-1.5">
+            <span class="text-lg font-semibold text-dark dark:text-white">AI Аналіз</span>
+            <UTooltip text="Автоматичний аналіз компанії та рекрутера на основі листування. Генерує промпт для Claude AI" :delay-duration="400">
+              <UIcon name="i-lucide-help-circle" class="w-4 h-4 text-gray-400 dark:text-gray-500" />
+            </UTooltip>
+          </div>
         </template>
         <AIAnalysisCard :vacancy-id="Number(id)" />
       </UCard>

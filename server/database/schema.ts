@@ -50,7 +50,15 @@ export const recruiters = sqliteTable('recruiters', {
   telegram: text('telegram'),
   email: text('email'),
   linkedin: text('linkedin'),
+  tgSyncedAt: text('tg_synced_at'),
   createdAt: text('created_at').notNull().default(sql`(datetime('now'))`),
+})
+
+// ─── settings ────────────────────────────────────────────────────────────────
+
+export const settings = sqliteTable('settings', {
+  key: text('key').primaryKey(),
+  value: text('value').notNull(),
 })
 
 // ─── messages ────────────────────────────────────────────────────────────────
@@ -114,3 +122,6 @@ export type NewAnalysis = InferInsertModel<typeof analysis>
 
 export type User = InferSelectModel<typeof users>
 export type NewUser = InferInsertModel<typeof users>
+
+export type Settings = InferSelectModel<typeof settings>
+export type NewSettings = InferInsertModel<typeof settings>

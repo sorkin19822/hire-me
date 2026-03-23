@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { CalendarDate, parseDate, today, getLocalTimeZone } from '@internationalized/date'
+
 const props = defineProps<{
   vacancyId: number
   recruiters: { id: number, name: string }[]
@@ -9,9 +11,30 @@ const emit = defineEmits<{ saved: [] }>()
 const content = ref('')
 const direction = ref<'in' | 'out'>('in')
 const recruiterId = ref<number | null>(null)
-const sentAt = ref(new Date().toISOString().slice(0, 16))
 const saving = ref(false)
 const error = ref<string | null>(null)
+
+// Date picker
+const datePickerOpen = ref(false)
+const selectedDate = ref<CalendarDate>(today(getLocalTimeZone()))
+const timeValue = ref('')
+
+onMounted(() => {
+  timeValue.value = new Date().toTimeString().slice(0, 5)
+})
+
+const dateLabel = computed(() => {
+  const t = today(getLocalTimeZone())
+  if (selectedDate.value.toString() === t.toString()) return `Сьогодні, ${timeValue.value}`
+  return `${selectedDate.value.toString()}, ${timeValue.value}`
+})
+
+function onDateSelect(val: CalendarDate | undefined) {
+  if (val) {
+    selectedDate.value = val
+    datePickerOpen.value = false
+  }
+}
 
 const recruiterOptions = computed(() => [
   { label: 'Без рекрутера', value: null },
@@ -23,12 +46,9 @@ async function submit() {
   saving.value = true
   error.value = null
   try {
-    let sentAtIso: string | undefined
-    if (sentAt.value) {
-      const d = new Date(sentAt.value)
-      if (isNaN(d.getTime())) throw new Error('Невірний формат дати')
-      sentAtIso = d.toISOString()
-    }
+    const [h, m] = timeValue.value.split(':').map(Number)
+    const d = new Date(selectedDate.value.year, selectedDate.value.month - 1, selectedDate.value.day, h, m)
+    const sentAtIso = d.toISOString()
 
     await $fetch('/api/messages', {
       method: 'POST',
@@ -83,12 +103,27 @@ async function submit() {
         class="min-w-36 flex-1"
       />
 
-      <UInput
-        v-model="sentAt"
-        type="datetime-local"
-        size="sm"
-        class="min-w-44 flex-1"
-      />
+      <!-- Date + time picker -->
+      <div class="flex items-center gap-1">
+        <UPopover v-model:open="datePickerOpen">
+          <UButton
+            variant="outline"
+            icon="i-lucide-calendar"
+            size="sm"
+          >
+            {{ dateLabel }}
+          </UButton>
+          <template #content>
+            <UCalendar :model-value="selectedDate" @update:model-value="onDateSelect" />
+          </template>
+        </UPopover>
+        <UInput
+          v-model="timeValue"
+          type="time"
+          size="sm"
+          class="w-24"
+        />
+      </div>
     </div>
 
     <!-- Row 2: textarea -->

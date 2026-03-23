@@ -115,20 +115,8 @@ onMounted(fetchStoredAnalysis)
     <!-- Action buttons -->
     <div class="flex flex-wrap items-center gap-2">
       <!-- Language toggle -->
-      <UButtonGroup size="xs">
-        <UButton
-          :variant="lang === 'uk' ? 'solid' : 'ghost'"
-          @click="lang = 'uk'"
-        >
-          UA
-        </UButton>
-        <UButton
-          :variant="lang === 'en' ? 'solid' : 'ghost'"
-          @click="lang = 'en'"
-        >
-          EN
-        </UButton>
-      </UButtonGroup>
+      <UButton size="xs" :variant="lang === 'uk' ? 'solid' : 'ghost'" @click="lang = 'uk'">UA</UButton>
+      <UButton size="xs" :variant="lang === 'en' ? 'solid' : 'ghost'" @click="lang = 'en'">EN</UButton>
 
       <UButton
         variant="soft"

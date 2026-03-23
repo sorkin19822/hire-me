@@ -12,10 +12,26 @@ const filtered = computed(() => {
   )
 })
 
-async function deleteRecruiter(id: number) {
-  await $fetch(`/api/recruiters/${id}`, { method: 'DELETE' })
-  await refresh()
+// Delete with confirmation
+const confirmDeleteId = ref<number | null>(null)
+const deleting = ref(false)
+
+async function confirmDelete() {
+  if (!confirmDeleteId.value) return
+  deleting.value = true
+  try {
+    await $fetch(`/api/recruiters/${confirmDeleteId.value}`, { method: 'DELETE' })
+    confirmDeleteId.value = null
+    await refresh()
+  }
+  finally {
+    deleting.value = false
+  }
 }
+
+// Edit modal
+type Recruiter = { id: number, name: string, telegram: string | null, email: string | null, linkedin: string | null }
+const editingRecruiter = ref<Recruiter | null>(null)
 
 const columns = [
   { accessorKey: 'name', header: 'Ім\'я' },
@@ -81,14 +97,41 @@ const columns = [
       </template>
 
       <template #actions-cell="{ row }">
-        <UButton
-          variant="ghost"
-          icon="i-lucide-trash-2"
-          size="xs"
-          color="error"
-          @click="deleteRecruiter(row.original.id)"
-        />
+        <div class="flex items-center gap-1">
+          <UButton
+            variant="ghost"
+            icon="i-lucide-pencil"
+            size="xs"
+            @click="editingRecruiter = row.original"
+          />
+          <UButton
+            variant="ghost"
+            icon="i-lucide-trash-2"
+            size="xs"
+            color="error"
+            @click="confirmDeleteId = row.original.id"
+          />
+        </div>
       </template>
     </UTable>
+
+    <!-- Edit modal -->
+    <RecruiterFormModal
+      v-if="editingRecruiter"
+      :open="!!editingRecruiter"
+      :recruiter="editingRecruiter"
+      @update:open="(v) => { if (!v) editingRecruiter = null }"
+      @saved="refresh()"
+    />
+
+    <!-- Delete confirmation -->
+    <ConfirmModal
+      :open="confirmDeleteId !== null"
+      title="Видалити рекрутера?"
+      description="Цю дію неможливо скасувати. Рекрутер буде видалений разом із усіма пов'язаними даними."
+      :loading="deleting"
+      @update:open="(v) => { if (!v) confirmDeleteId = null }"
+      @confirm="confirmDelete"
+    />
   </UContainer>
 </template>
