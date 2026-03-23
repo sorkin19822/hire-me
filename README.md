@@ -1,17 +1,58 @@
 # hire-me — Job Search CRM
 
-Personal CRM for tracking vacancies, interviews and recruiter conversations with AI analysis.
+> Personal CRM for active job seekers. Track vacancies, manage recruiter conversations, sync messages from Telegram and email, and get AI-powered analysis of companies and recruiters.
+
+Built for 1–3 users who are actively job hunting and want to stay organized across many parallel applications.
+
+---
+
+## What it does
+
+When you're applying to 20–50 companies simultaneously, things get out of hand fast: you forget which stage you're at, lose recruiter contacts, can't find that message from 2 weeks ago. **hire-me** solves this by keeping everything in one place.
+
+### Kanban pipeline
+Vacancies move through stages: New → CV Sent → Interview → Offer → Rejected, etc. Drag and drop between stages. Stages are configurable and stored in the database.
+
+### Vacancy detail page
+Each vacancy has:
+- **Company + position** — inline editable
+- **Apply date** — calendar picker
+- **Links** — vacancy URL and company site
+- **CV version** — which resume you sent (with preview)
+- **Job description** — full text of the vacancy (used for AI analysis)
+- **Notes** — personal observations
+- **Recruiters** — contacts with Telegram, email, LinkedIn
+- **Message timeline** — full conversation history
+- **AI analysis** — company and recruiter evaluation
+
+### Message sync
+- **Telegram** — connects via MTProto (GramJS), fetches full dialog with a recruiter by their username
+- **Email** — fetches from IMAP (ukr.net), matches by recruiter email
+- **Manual** — add any message with custom date/time
+
+### CV versions
+Upload multiple versions of your resume (PDF or DOCX), add comments to each ("with cover letter", "short version"), attach a specific version to each vacancy, preview in browser.
+
+### AI analysis
+Generates a detailed prompt with all available context (vacancy text, recruiter info, full message history) → copy to claude.ai → paste the JSON response back. The app shows: company score 0–10, recruiter score 0–10, green flags, red flags, summary.
+
+### Analytics
+Funnel chart showing how many vacancies are at each stage, Gantt timeline of applications over time, summary statistics.
+
+---
 
 ## Stack
 
-- **Nuxt 4** + Vue 3 + TypeScript
+- **Nuxt 3** + Vue 3 + TypeScript
 - **Nuxt UI v4** + Tailwind CSS v4
 - **SQLite** + Drizzle ORM + better-sqlite3
-- **Google OAuth** via nuxt-auth-utils
+- **Google OAuth** via nuxt-auth-utils (email whitelist)
 - **Claude API** for AI analysis
-- **Telegram MCP** + IMAP (ukr.net) for message sync
+- **Telegram MTProto** (GramJS) + IMAP for message sync
 
-## Quick Start
+---
+
+## Setup
 
 ```bash
 # 1. Install dependencies
@@ -19,9 +60,9 @@ npm install
 
 # 2. Configure environment
 cp .env.example .env
-# Fill in: NUXT_OAUTH_GOOGLE_CLIENT_ID, NUXT_SESSION_PASSWORD, ALLOWED_EMAILS, etc.
+# Fill in credentials (see below)
 
-# 3. Run DB migrations + seed
+# 3. Run DB migrations + seed pipeline stages
 npm run db:migrate
 npm run db:seed
 
@@ -31,7 +72,7 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000)
 
-## Docker
+### Docker
 
 ```bash
 # Production (port 3000)
@@ -40,11 +81,45 @@ docker compose --profile prod up -d
 # Development — live reload + HMR (port 3000)
 docker compose --profile dev up
 
-# Stop all containers
+# Stop
 docker compose down
 ```
 
-> Профілі `prod` і `dev` не можна запускати одночасно — обидва використовують порт 3000.
+> Profiles `prod` and `dev` cannot run simultaneously — both use port 3000.
+
+---
+
+## Environment Variables
+
+See [.env.example](.env.example) for all variables.
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `NUXT_DATABASE_URL` | — | SQLite file path (default: `./data/hire-me.db`) |
+| `NUXT_OAUTH_GOOGLE_CLIENT_ID` | ✓ | Google OAuth client ID |
+| `NUXT_OAUTH_GOOGLE_CLIENT_SECRET` | ✓ | Google OAuth client secret |
+| `NUXT_SESSION_PASSWORD` | ✓ | Session encryption key (min 32 chars) |
+| `NUXT_ALLOWED_EMAILS` | ✓ | Comma-separated whitelist of allowed emails |
+| `NUXT_ANTHROPIC_API_KEY` | — | Claude API key (AI analysis feature) |
+| `NUXT_IMAP_HOST` | — | IMAP host (default: `imap.ukr.net`) |
+| `NUXT_IMAP_USER` | — | IMAP email address |
+| `NUXT_IMAP_PASSWORD` | — | IMAP password |
+| `TELEGRAM_API_ID` | — | Telegram app ID from [my.telegram.org](https://my.telegram.org/apps) |
+| `TELEGRAM_API_HASH` | — | Telegram app hash from [my.telegram.org](https://my.telegram.org/apps) |
+
+**Google OAuth setup:**
+1. Go to [Google Cloud Console](https://console.cloud.google.com/) → Credentials
+2. Create OAuth 2.0 Client ID (Web application)
+3. Add authorized redirect URI: `http://localhost:3000/auth/google`
+4. Copy Client ID and Secret to `.env`
+
+**Telegram setup** (optional, for message sync):
+1. Go to [my.telegram.org/apps](https://my.telegram.org/apps)
+2. Create a new application
+3. Copy `api_id` and `api_hash` to `.env`
+4. In the app: Settings → Integrations → Connect Telegram → enter phone number → confirm code
+
+---
 
 ## Scripts
 
@@ -54,29 +129,7 @@ docker compose down
 | `npm run build` | Production build |
 | `npm run preview` | Preview production build |
 | `npm run lint` | ESLint |
-| `npm run typecheck` | TypeScript check |
-| `npm run db:generate` | Generate Drizzle migration |
-| `npm run db:migrate` | Apply migrations |
+| `npm run db:generate` | Generate Drizzle migration from schema diff |
+| `npm run db:migrate` | Apply pending migrations |
 | `npm run db:seed` | Seed default pipeline stages |
 | `npm run db:studio` | Open Drizzle Studio |
-
-## Environment Variables
-
-See [.env.example](.env.example) for all required variables.
-
-Key variables:
-- `DATABASE_URL` — SQLite file path (default: `./data/hire-me.db`)
-- `NUXT_OAUTH_GOOGLE_CLIENT_ID/SECRET` — Google OAuth credentials
-- `NUXT_SESSION_PASSWORD` — Session encryption key (min 32 chars)
-- `ALLOWED_EMAILS` — Comma-separated whitelist of allowed emails
-- `ANTHROPIC_API_KEY` — Claude API key for AI analysis
-
-## Features
-
-- **Kanban board** — drag-and-drop vacancies across pipeline stages
-- **CSV import** — bulk import from Google Sheets (89 vacancies)
-- **Recruiter CRM** — contacts with Telegram + email sync
-- **Message timeline** — unified view of all recruiter conversations
-- **AI analysis** — company + recruiter analysis via Claude API
-- **Analytics** — funnel chart, Gantt timeline, stats
-- **Google Drive** — CV version management
