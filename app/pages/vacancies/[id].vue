@@ -65,6 +65,32 @@ watch(selectedCvId, (val) => {
   if (val !== vacancy.value?.cvVersionId) changeCv(val)
 })
 
+// Edit links inline
+const editingLinks = ref(false)
+const linksValue = reactive({
+  urlDou: vacancy.value?.urlDou ?? '',
+  urlSite: vacancy.value?.urlSite ?? '',
+})
+const linksSaving = ref(false)
+
+async function saveLinks() {
+  linksSaving.value = true
+  try {
+    await $fetch(`/api/vacancies/${id}`, {
+      method: 'PATCH',
+      body: {
+        urlDou: linksValue.urlDou || null,
+        urlSite: linksValue.urlSite || null,
+      },
+    })
+    editingLinks.value = false
+    await refresh()
+  }
+  finally {
+    linksSaving.value = false
+  }
+}
+
 // Edit notes inline
 const editingNotes = ref(false)
 const notesValue = ref(vacancy.value?.notes ?? '')
@@ -132,10 +158,10 @@ async function saveNotes() {
     <template v-if="vacancy">
       <div class="flex items-start justify-between mb-6">
         <div>
-          <h1 class="text-2xl font-bold">
+          <h1 class="text-2xl font-bold text-dark dark:text-white">
             {{ vacancy.company }}
           </h1>
-          <p class="text-lg text-gray-600 dark:text-gray-400">
+          <p class="text-lg text-gray-500 dark:text-gray-400">
             {{ vacancy.position }}
           </p>
         </div>
@@ -153,40 +179,28 @@ async function saveNotes() {
       </div>
 
       <!-- Fields grid -->
-      <UCard class="mb-4">
-        <div class="grid grid-cols-2 gap-4 text-sm">
-          <div>
-            <span class="text-gray-500">Дата відгуку</span>
-            <p class="font-medium">
+      <UCard class="mb-4 rounded-lg border border-gray-200 dark:border-gray-700 shadow-none">
+        <div class="grid grid-cols-2 gap-6 text-sm">
+          <div class="flex flex-col gap-1.5">
+            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Дата відгуку</span>
+            <p class="font-medium text-dark dark:text-white">
               {{ vacancy.applyDate ?? '—' }}
             </p>
           </div>
-          <div>
-            <span class="text-gray-500">Повідомлень</span>
-            <p class="font-medium">
+          <div class="flex flex-col gap-1.5">
+            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Повідомлень</span>
+            <p class="font-medium text-dark dark:text-white">
               {{ vacancy.messagesCount }}
             </p>
           </div>
-          <div v-if="vacancy.urlDou">
-            <span class="text-gray-500">DOU</span>
-            <p><UButton :href="vacancy.urlDou" target="_blank" variant="link" size="xs" icon="i-lucide-external-link">Відкрити</UButton></p>
-          </div>
-          <div v-if="vacancy.urlLinkedin">
-            <span class="text-gray-500">LinkedIn</span>
-            <p><UButton :href="vacancy.urlLinkedin" target="_blank" variant="link" size="xs" icon="i-lucide-external-link">Відкрити</UButton></p>
-          </div>
-          <div v-if="vacancy.urlSite">
-            <span class="text-gray-500">Сайт</span>
-            <p><UButton :href="vacancy.urlSite" target="_blank" variant="link" size="xs" icon="i-lucide-external-link">Відкрити</UButton></p>
-          </div>
-          <div>
-            <span class="text-gray-500">Додано</span>
-            <p class="font-medium">
+          <div class="flex flex-col gap-1.5">
+            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Додано</span>
+            <p class="font-medium text-dark dark:text-white">
               {{ vacancy.createdAt?.slice(0, 10) }}
             </p>
           </div>
-          <div class="col-span-2">
-            <span class="text-gray-500">Версія CV</span>
+          <div class="col-span-2 flex flex-col gap-1.5">
+            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Версія CV</span>
             <USelect
               v-model="selectedCvId"
               :items="cvOptions"
@@ -200,11 +214,63 @@ async function saveNotes() {
         </div>
       </UCard>
 
-      <!-- Notes -->
-      <UCard class="mb-4">
+      <!-- Links -->
+      <UCard class="mb-4 rounded-lg border border-gray-200 dark:border-gray-700 shadow-none">
         <template #header>
           <div class="flex items-center justify-between">
-            <span class="font-semibold">Нотатки</span>
+            <span class="text-lg font-semibold text-dark dark:text-white">Посилання</span>
+            <UButton
+              v-if="!editingLinks"
+              variant="ghost"
+              icon="i-lucide-pencil"
+              size="xs"
+              @click="editingLinks = true; Object.assign(linksValue, { urlDou: vacancy.urlDou ?? '', urlSite: vacancy.urlSite ?? '' })"
+            />
+          </div>
+        </template>
+
+        <div v-if="!editingLinks" class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <div class="flex flex-col gap-1">
+            <span class="text-xs font-medium text-gray-500 dark:text-gray-400">Посилання на вакансію</span>
+            <UButton v-if="vacancy.urlDou" :href="vacancy.urlDou" target="_blank" variant="link" size="xs" icon="i-lucide-external-link" class="justify-start">
+              Відкрити
+            </UButton>
+            <span v-else class="text-sm text-gray-400 dark:text-gray-500">—</span>
+          </div>
+          <div class="flex flex-col gap-1">
+            <span class="text-xs font-medium text-gray-500 dark:text-gray-400">Сайт компанії</span>
+            <UButton v-if="vacancy.urlSite" :href="vacancy.urlSite" target="_blank" variant="link" size="xs" icon="i-lucide-external-link" class="justify-start">
+              Відкрити
+            </UButton>
+            <span v-else class="text-sm text-gray-400 dark:text-gray-500">—</span>
+          </div>
+        </div>
+
+        <div v-else class="flex flex-col gap-4">
+          <div class="grid grid-cols-1 gap-3">
+            <UFormField label="Посилання на вакансію">
+              <UInput v-model="linksValue.urlDou" placeholder="https://jobs.dou.ua/... або будь-яке інше" class="w-full" />
+            </UFormField>
+            <UFormField label="Сайт компанії">
+              <UInput v-model="linksValue.urlSite" placeholder="https://company.com" class="w-full" />
+            </UFormField>
+          </div>
+          <div class="flex gap-2 justify-end">
+            <UButton variant="ghost" size="sm" @click="editingLinks = false">
+              Скасувати
+            </UButton>
+            <UButton size="sm" :loading="linksSaving" @click="saveLinks">
+              Зберегти
+            </UButton>
+          </div>
+        </div>
+      </UCard>
+
+      <!-- Notes -->
+      <UCard class="mb-4 rounded-lg border border-gray-200 dark:border-gray-700 shadow-none">
+        <template #header>
+          <div class="flex items-center justify-between">
+            <span class="text-lg font-semibold text-dark dark:text-white">Нотатки</span>
             <UButton
               v-if="!editingNotes"
               variant="ghost"
@@ -215,15 +281,26 @@ async function saveNotes() {
           </div>
         </template>
         <div v-if="!editingNotes">
-          <p v-if="vacancy.notes" class="text-sm whitespace-pre-wrap">
+          <p v-if="vacancy.notes" class="text-sm whitespace-pre-wrap text-dark dark:text-white">
             {{ vacancy.notes }}
           </p>
-          <p v-else class="text-sm text-gray-400">
+          <p v-else class="text-sm text-gray-400 dark:text-gray-500">
             Нотатки відсутні
           </p>
         </div>
-        <div v-else class="space-y-2">
-          <UTextarea v-model="notesValue" :rows="4" autofocus />
+        <div v-else class="flex flex-col gap-6">
+          <div class="flex flex-col gap-1.5">
+            <label class="text-sm font-medium text-gray-700 dark:text-gray-300 block">
+              Нотатки
+            </label>
+            <UTextarea
+              v-model="notesValue"
+              :rows="4"
+              autofocus
+              placeholder="Додайте нотатки про вакансію..."
+              class="w-full rounded-md border border-gray-200 dark:border-gray-600 bg-transparent px-3 py-2 text-sm shadow-none transition-[color,box-shadow] placeholder:text-gray-400 focus-visible:outline-none focus-visible:border-primary focus-visible:ring-0"
+            />
+          </div>
           <div class="flex gap-2 justify-end">
             <UButton variant="ghost" size="sm" @click="editingNotes = false">
               Скасувати
@@ -236,10 +313,10 @@ async function saveNotes() {
       </UCard>
 
       <!-- Recruiters -->
-      <UCard class="mb-4">
+      <UCard class="mb-4 rounded-lg border border-gray-200 dark:border-gray-700 shadow-none">
         <template #header>
           <div class="flex items-center justify-between">
-            <span class="font-semibold">Рекрутери</span>
+            <span class="text-lg font-semibold text-dark dark:text-white">Рекрутери</span>
             <UButton
               variant="ghost"
               icon="i-lucide-plus"
@@ -250,17 +327,27 @@ async function saveNotes() {
         </template>
 
         <!-- Add recruiter form -->
-        <div v-if="showAddRecruiter" class="mb-4 p-3 rounded-lg bg-gray-50 dark:bg-gray-800 space-y-2">
-          <UInput v-model="recruiterForm.name" placeholder="Ім'я *" size="sm" />
-          <UInput v-model="recruiterForm.telegram" placeholder="@telegram" size="sm" />
-          <UInput v-model="recruiterForm.email" placeholder="email@example.com" size="sm" type="email" />
-          <UInput v-model="recruiterForm.linkedin" placeholder="LinkedIn URL" size="sm" />
-          <div class="flex gap-2 justify-end">
-            <UButton size="xs" variant="ghost" @click="showAddRecruiter = false">
+        <div v-if="showAddRecruiter" class="mb-4">
+          <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 mb-4">
+            <UFormField label="Ім'я" required>
+              <UInput v-model="recruiterForm.name" placeholder="Ім'я рекрутера" class="w-full" />
+            </UFormField>
+            <UFormField label="Telegram">
+              <UInput v-model="recruiterForm.telegram" placeholder="@username" class="w-full" />
+            </UFormField>
+            <UFormField label="Email">
+              <UInput v-model="recruiterForm.email" type="email" placeholder="email@example.com" class="w-full" />
+            </UFormField>
+            <UFormField label="LinkedIn">
+              <UInput v-model="recruiterForm.linkedin" placeholder="https://linkedin.com/in/..." class="w-full" />
+            </UFormField>
+          </div>
+          <div class="flex justify-end gap-2">
+            <UButton variant="ghost" color="error" @click="showAddRecruiter = false">
               Скасувати
             </UButton>
-            <UButton size="xs" :loading="recruiterSaving" :disabled="!recruiterForm.name" @click="addRecruiter">
-              Додати
+            <UButton :loading="recruiterSaving" :disabled="!recruiterForm.name" @click="addRecruiter">
+              Зберегти
             </UButton>
           </div>
         </div>
@@ -286,15 +373,15 @@ async function saveNotes() {
             />
           </div>
         </div>
-        <p v-else-if="!showAddRecruiter" class="text-sm text-gray-400">
+        <p v-else-if="!showAddRecruiter" class="text-sm text-gray-400 dark:text-gray-500">
           Рекрутери не додані
         </p>
       </UCard>
 
       <!-- Messages timeline -->
-      <UCard class="mb-4">
+      <UCard class="mb-4 rounded-lg border border-gray-200 dark:border-gray-700 shadow-none">
         <template #header>
-          <span class="font-semibold">Переписка</span>
+          <span class="text-lg font-semibold text-dark dark:text-white">Переписка</span>
         </template>
         <MessagesTimeline ref="timeline" :vacancy-id="Number(id)" />
         <ManualMessageForm
@@ -306,9 +393,9 @@ async function saveNotes() {
       </UCard>
 
       <!-- AI analysis -->
-      <UCard>
+      <UCard class="rounded-lg border border-gray-200 dark:border-gray-700 shadow-none">
         <template #header>
-          <span class="font-semibold">AI Аналіз</span>
+          <span class="text-lg font-semibold text-dark dark:text-white">AI Аналіз</span>
         </template>
         <AIAnalysisCard :vacancy-id="Number(id)" />
       </UCard>

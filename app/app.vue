@@ -12,9 +12,19 @@ useSeoMeta({
 
 const { loggedIn, user, clear } = useUserSession()
 
+const showLogoutConfirm = ref(false)
+const loggingOut = ref(false)
+
 async function logout() {
-  await clear()
-  await navigateTo('/login')
+  loggingOut.value = true
+  try {
+    await clear()
+    await navigateTo('/login')
+  }
+  finally {
+    loggingOut.value = false
+    showLogoutConfirm.value = false
+  }
 }
 </script>
 
@@ -60,7 +70,7 @@ async function logout() {
               icon="i-lucide-log-out"
               size="sm"
               title="Вийти"
-              @click="logout"
+              @click="showLogoutConfirm = true"
             />
           </template>
         </nav>
@@ -70,5 +80,15 @@ async function logout() {
     <UMain>
       <NuxtPage />
     </UMain>
+
+    <ConfirmModal
+      v-model:open="showLogoutConfirm"
+      title="Вийти з системи?"
+      description="Ви впевнені, що хочете завершити сеанс? Для повторного входу знадобиться авторизація."
+      confirm-label="Вийти"
+      confirm-color="warning"
+      :loading="loggingOut"
+      @confirm="logout"
+    />
   </UApp>
 </template>

@@ -34,12 +34,17 @@ Open [http://localhost:3000](http://localhost:3000)
 ## Docker
 
 ```bash
-# Production
-docker compose up
+# Production (port 3000)
+docker compose --profile prod up -d
 
-# Development (live reload)
+# Development — live reload + HMR (port 3000)
 docker compose --profile dev up
+
+# Stop all containers
+docker compose down
 ```
+
+> Профілі `prod` і `dev` не можна запускати одночасно — обидва використовують порт 3000.
 
 ## Scripts
 

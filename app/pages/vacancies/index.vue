@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { h, resolveComponent } from 'vue'
+
 useSeoMeta({ title: 'Вакансії — hire-me' })
 
 const search = ref('')
@@ -17,6 +19,57 @@ const stageOptions = computed(() => [
   { label: 'Всі стадії', value: null },
   ...(stages.value ?? []).map((s: { id: number, name: string }) => ({ label: s.name, value: s.id })),
 ])
+
+// Row selection
+const rowSelection = ref<Record<string, boolean>>({})
+const selectedIds = computed(() => {
+  return Object.entries(rowSelection.value)
+    .filter(([, v]) => v)
+    .map(([i]) => (vacancies.value ?? [])[Number(i)]?.id)
+    .filter(Boolean) as number[]
+})
+
+// Delete — single
+const confirmSingle = ref(false)
+const pendingDeleteId = ref<number | null>(null)
+const pendingDeleteCompany = ref('')
+const deleting = ref(false)
+
+function requestDeleteOne(id: number, company: string) {
+  pendingDeleteId.value = id
+  pendingDeleteCompany.value = company
+  confirmSingle.value = true
+}
+
+async function confirmDeleteOne() {
+  if (!pendingDeleteId.value) return
+  deleting.value = true
+  try {
+    await $fetch(`/api/vacancies/${pendingDeleteId.value}`, { method: 'DELETE' })
+    confirmSingle.value = false
+    await refresh()
+  }
+  finally {
+    deleting.value = false
+  }
+}
+
+// Delete — bulk
+const confirmBulk = ref(false)
+
+async function confirmDeleteSelected() {
+  if (!selectedIds.value.length) return
+  deleting.value = true
+  try {
+    await Promise.all(selectedIds.value.map(id => $fetch(`/api/vacancies/${id}`, { method: 'DELETE' })))
+    rowSelection.value = {}
+    confirmBulk.value = false
+    await refresh()
+  }
+  finally {
+    deleting.value = false
+  }
+}
 
 // New vacancy modal
 const showModal = ref(false)
@@ -38,21 +91,69 @@ async function createVacancy() {
   }
 }
 
+const UCheckbox = resolveComponent('UCheckbox')
+const UButton = resolveComponent('UButton')
+const UBadge = resolveComponent('UBadge')
+
 const columns = [
+  {
+    id: 'select',
+    header: ({ table }: any) => h(UCheckbox, {
+      modelValue: table.getIsAllRowsSelected() ? true : table.getIsSomeRowsSelected() ? 'indeterminate' : false,
+      'onUpdate:modelValue': (v: boolean) => table.toggleAllRowsSelected(v),
+      'aria-label': 'Select all',
+    }),
+    cell: ({ row }: any) => h(UCheckbox, {
+      modelValue: row.getIsSelected(),
+      'onUpdate:modelValue': (v: boolean) => row.toggleSelected(v),
+      'aria-label': 'Select row',
+    }),
+    meta: { class: { th: 'w-10', td: 'w-10' } },
+  },
   { accessorKey: 'company', header: 'Компанія' },
   { accessorKey: 'position', header: 'Позиція' },
   { accessorKey: 'stage', header: 'Стадія' },
   { accessorKey: 'applyDate', header: 'Дата' },
-  { id: 'actions', header: '' },
+  {
+    id: 'actions',
+    header: '',
+    meta: { class: { th: 'w-20', td: 'w-20' } },
+    cell: ({ row }: any) => h('div', { class: 'flex items-center gap-1 justify-end' }, [
+      h(UButton, {
+        to: `/vacancies/${row.original.id}`,
+        variant: 'ghost',
+        icon: 'i-lucide-arrow-right',
+        size: 'xs',
+      }),
+      h(UButton, {
+        variant: 'ghost',
+        icon: 'i-lucide-trash-2',
+        size: 'xs',
+        color: 'error',
+        onClick: () => requestDeleteOne(row.original.id, row.original.company),
+      }),
+    ]),
+  },
 ]
 </script>
 
 <template>
   <UContainer class="py-6">
     <PageHeader title="Вакансії">
-      <UButton icon="i-lucide-plus" @click="showModal = true">
-        Нова вакансія
-      </UButton>
+      <div class="flex items-center gap-2">
+        <UButton
+          v-if="selectedIds.length"
+          color="error"
+          variant="soft"
+          icon="i-lucide-trash-2"
+          @click="confirmBulk = true"
+        >
+          Видалити ({{ selectedIds.length }})
+        </UButton>
+        <UButton icon="i-lucide-plus" @click="showModal = true">
+          Нова вакансія
+        </UButton>
+      </div>
     </PageHeader>
 
     <!-- Filters -->
@@ -74,6 +175,7 @@ const columns = [
 
     <!-- Table -->
     <UTable
+      v-model:row-selection="rowSelection"
       :data="vacancies ?? []"
       :columns="columns"
       :loading="!vacancies"
@@ -98,16 +200,25 @@ const columns = [
       <template #applyDate-cell="{ row }">
         {{ row.original.applyDate ?? '—' }}
       </template>
-
-      <template #actions-cell="{ row }">
-        <UButton
-          :to="`/vacancies/${row.original.id}`"
-          variant="ghost"
-          icon="i-lucide-arrow-right"
-          size="xs"
-        />
-      </template>
     </UTable>
+
+    <!-- Confirm delete single -->
+    <ConfirmModal
+      v-model:open="confirmSingle"
+      title="Видалити вакансію?"
+      :description="`Вакансія «${pendingDeleteCompany}» буде видалена разом з усіма пов'язаними даними. Цю дію неможливо скасувати.`"
+      :loading="deleting"
+      @confirm="confirmDeleteOne"
+    />
+
+    <!-- Confirm delete bulk -->
+    <ConfirmModal
+      v-model:open="confirmBulk"
+      :title="`Видалити ${selectedIds.length} ${selectedIds.length === 1 ? 'вакансію' : selectedIds.length < 5 ? 'вакансії' : 'вакансій'}?`"
+      :description="`Буде видалено ${selectedIds.length} ${selectedIds.length === 1 ? 'запис' : 'записів'} разом з усіма пов'язаними даними. Цю дію неможливо скасувати.`"
+      :loading="deleting"
+      @confirm="confirmDeleteSelected"
+    />
 
     <!-- New vacancy modal -->
     <UModal v-model:open="showModal" title="Нова вакансія">

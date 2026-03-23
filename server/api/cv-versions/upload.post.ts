@@ -17,12 +17,13 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'Field "file" is required' })
   }
 
-  const rawFilename = (filePart.filename ?? 'cv.docx')
+  const rawFilename = (filePart.filename ?? 'cv')
     .replace(/[/\\?%*:|"<>\x00-\x1f]/g, '_')
     .slice(0, 255)
 
-  if (!rawFilename.toLowerCase().endsWith('.docx')) {
-    throw createError({ statusCode: 400, statusMessage: 'Only .docx files are accepted' })
+  const lower = rawFilename.toLowerCase()
+  if (!lower.endsWith('.docx') && !lower.endsWith('.pdf')) {
+    throw createError({ statusCode: 400, statusMessage: 'Only .docx and .pdf files are accepted' })
   }
   const filename = rawFilename
 

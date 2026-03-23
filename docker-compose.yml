@@ -11,6 +11,8 @@ services:
     env_file:
       - .env
     restart: unless-stopped
+    profiles:
+      - prod
 
   # Dev-only: run without building image
   dev:

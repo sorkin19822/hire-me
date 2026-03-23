@@ -45,11 +45,53 @@ async function handleFileUpload(event: Event) {
   }
 }
 
-const columns = [
-  { accessorKey: 'filename', header: 'Файл' },
-  { accessorKey: 'importedAt', header: 'Імпортовано' },
-  { accessorKey: 'status', header: 'Статус' },
-]
+// Comment editing
+const editingCommentId = ref<number | null>(null)
+const commentValue = ref('')
+const commentSaving = ref(false)
+
+function startEditComment(cv: { id: number, comment: string | null }) {
+  editingCommentId.value = cv.id
+  commentValue.value = cv.comment ?? ''
+}
+
+async function saveComment(id: number) {
+  commentSaving.value = true
+  try {
+    await $fetch(`/api/cv-versions/${id}`, {
+      method: 'PATCH',
+      body: { comment: commentValue.value || null },
+    })
+    editingCommentId.value = null
+    await refresh()
+  }
+  finally {
+    commentSaving.value = false
+  }
+}
+
+// Delete
+const confirmDeleteId = ref<number | null>(null)
+const confirmDeleteName = ref('')
+const deleting = ref(false)
+
+function requestDelete(cv: { id: number, filename: string }) {
+  confirmDeleteId.value = cv.id
+  confirmDeleteName.value = cv.filename
+}
+
+async function confirmDelete() {
+  if (!confirmDeleteId.value) return
+  deleting.value = true
+  try {
+    await $fetch(`/api/cv-versions/${confirmDeleteId.value}`, { method: 'DELETE' })
+    confirmDeleteId.value = null
+    await refresh()
+  }
+  finally {
+    deleting.value = false
+  }
+}
 </script>
 
 <template>
@@ -72,12 +114,12 @@ const columns = [
           :loading="uploading"
           @click="fileInput?.click()"
         >
-          Завантажити .docx
+          Завантажити CV
         </UButton>
         <input
           ref="fileInput"
           type="file"
-          accept=".docx"
+          accept=".docx,.pdf"
           class="hidden"
           @change="handleFileUpload"
         >
@@ -85,31 +127,93 @@ const columns = [
     </PageHeader>
 
     <UCard>
-      <UTable :data="cvList ?? []" :columns="columns">
-        <template #filename-cell="{ row }">
-          <span class="font-medium text-sm">{{ row.original.filename }}</span>
-          <span v-if="row.original.gdriveId" class="ml-2 text-xs text-gray-400">Drive</span>
-        </template>
-        <template #importedAt-cell="{ row }">
-          <span class="text-sm text-gray-600 dark:text-gray-400">
-            {{ row.original.importedAt?.slice(0, 16).replace('T', ' ') }}
-          </span>
-        </template>
-        <template #status-cell="{ row }">
-          <UBadge
-            v-if="row.original.isActive"
-            color="success"
-            variant="soft"
-            size="xs"
-          >
-            Активне
-          </UBadge>
-        </template>
-      </UTable>
+      <div v-if="cvList?.length" class="divide-y divide-gray-100 dark:divide-gray-800">
+        <div
+          v-for="cv in cvList"
+          :key="cv.id"
+          class="py-3 flex items-start gap-3"
+        >
+          <!-- Icon -->
+          <UIcon
+            :name="cv.filename?.toLowerCase().endsWith('.pdf') ? 'i-lucide-file-text' : 'i-lucide-file'"
+            class="w-5 h-5 mt-0.5 shrink-0 text-gray-400"
+          />
 
-      <p v-if="!cvList?.length" class="text-sm text-gray-400 text-center py-4">
+          <!-- Content -->
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="font-medium text-sm text-gray-900 dark:text-white truncate">{{ cv.filename }}</span>
+              <UBadge v-if="cv.isActive" color="success" variant="soft" size="xs">Активне</UBadge>
+              <span v-if="cv.gdriveId" class="text-xs text-gray-400">Drive</span>
+            </div>
+            <p class="text-xs text-gray-400 mt-0.5">
+              {{ cv.importedAt?.slice(0, 16).replace('T', ' ') }}
+            </p>
+
+            <!-- Comment view -->
+            <div v-if="editingCommentId !== cv.id" class="mt-1.5 flex items-center gap-1">
+              <span v-if="cv.comment" class="text-sm text-gray-600 dark:text-gray-400">{{ cv.comment }}</span>
+              <span v-else class="text-xs text-gray-400 italic">Коментар відсутній</span>
+              <UButton
+                variant="ghost"
+                icon="i-lucide-pencil"
+                size="xs"
+                class="opacity-0 group-hover:opacity-100 ml-1"
+                @click="startEditComment(cv)"
+              />
+            </div>
+
+            <!-- Comment edit -->
+            <div v-else class="mt-1.5 flex items-center gap-2">
+              <UInput
+                v-model="commentValue"
+                placeholder="Додайте коментар…"
+                size="xs"
+                class="flex-1"
+                autofocus
+                @keydown.enter="saveComment(cv.id)"
+                @keydown.escape="editingCommentId = null"
+              />
+              <UButton size="xs" :loading="commentSaving" @click="saveComment(cv.id)">
+                Зберегти
+              </UButton>
+              <UButton size="xs" variant="ghost" @click="editingCommentId = null">
+                Скасувати
+              </UButton>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="flex items-center gap-1 shrink-0">
+            <UButton
+              variant="ghost"
+              icon="i-lucide-pencil"
+              size="xs"
+              @click="startEditComment(cv)"
+            />
+            <UButton
+              variant="ghost"
+              icon="i-lucide-trash-2"
+              size="xs"
+              color="error"
+              @click="requestDelete(cv)"
+            />
+          </div>
+        </div>
+      </div>
+
+      <p v-else class="text-sm text-gray-400 text-center py-4">
         Немає завантажених CV
       </p>
     </UCard>
+
+    <ConfirmModal
+      v-model:open="!!confirmDeleteId"
+      title="Видалити CV?"
+      :description="`Файл «${confirmDeleteName}» буде видалено. Цю дію неможливо скасувати.`"
+      :loading="deleting"
+      @confirm="confirmDelete"
+      @update:open="(v) => { if (!v) confirmDeleteId = null }"
+    />
   </UContainer>
 </template>

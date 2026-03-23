@@ -13,6 +13,7 @@ export default defineEventHandler(async (event) => {
       gdriveId: cvVersions.gdriveId,
       isActive: cvVersions.isActive,
       importedAt: cvVersions.importedAt,
+      comment: cvVersions.comment,
     })
     .from(cvVersions)
     .orderBy(desc(cvVersions.importedAt))

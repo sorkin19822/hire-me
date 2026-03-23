@@ -132,34 +132,39 @@ async function submitQuickAdd() {
 </script>
 
 <template>
-  <div class="flex flex-row gap-4 overflow-x-auto min-h-[calc(100vh-64px)] p-4 items-start">
+  <div class="flex flex-row gap-3 overflow-x-auto min-h-[calc(100vh-64px)] p-4 pb-8 items-start bg-gray-50 dark:bg-gray-900/40">
     <div
       v-for="stage in stages"
       :key="stage.id"
-      class="flex-shrink-0 w-64 flex flex-col rounded-xl border transition-colors"
+      class="flex-shrink-0 w-[272px] flex flex-col rounded-2xl transition-all duration-200"
       :class="dragOverStageId === stage.id
-        ? 'border-primary-400 bg-primary-50 dark:bg-primary-900/20'
-        : 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50'"
+        ? 'ring-2 ring-primary-400 bg-primary-50/80 dark:bg-primary-950/30'
+        : 'bg-gray-100/80 dark:bg-gray-800/40'"
       @dragover="onDragOver($event, stage.id)"
       @dragleave="onDragLeave"
       @drop="onDrop($event, stage.id)"
     >
       <!-- Column header -->
-      <div class="flex items-center justify-between px-3 py-2 border-b border-gray-200 dark:border-gray-700">
+      <div class="flex items-center justify-between px-3 pt-3 pb-2">
         <div class="flex items-center gap-2 min-w-0">
           <span
-            class="w-2.5 h-2.5 rounded-full shrink-0"
+            class="w-2 h-2 rounded-full shrink-0"
             :style="{ backgroundColor: stage.color }"
           />
-          <span class="text-sm font-semibold truncate">{{ stage.name }}</span>
+          <span class="text-xs font-semibold uppercase tracking-wide text-gray-600 dark:text-gray-300 truncate">
+            {{ stage.name }}
+          </span>
         </div>
-        <UBadge color="neutral" variant="soft" size="xs">
+        <span class="text-xs font-semibold text-gray-400 dark:text-gray-500 tabular-nums">
           {{ vacanciesForStage(stage.id).length }}
-        </UBadge>
+        </span>
       </div>
 
+      <!-- Thin color accent bar -->
+      <div class="mx-3 mb-2 h-0.5 rounded-full opacity-60" :style="{ backgroundColor: stage.color }" />
+
       <!-- Cards -->
-      <div class="flex-1 flex flex-col gap-2 p-2 overflow-y-auto max-h-[calc(100vh-200px)]">
+      <div class="flex-1 flex flex-col gap-2 px-2 pb-2 overflow-y-auto max-h-[calc(100vh-210px)]">
         <VacancyCard
           v-for="v in visibleVacancies(stage.id)"
           :key="v.id"
@@ -169,12 +174,13 @@ async function submitQuickAdd() {
           @dragend="onDragEnd"
         />
 
-        <!-- Show more button -->
+        <!-- Show more -->
         <UButton
           v-if="vacanciesForStage(stage.id).length > COLUMN_LIMIT"
           variant="ghost"
           size="xs"
           block
+          class="text-gray-400 dark:text-gray-500 text-xs"
           @click="toggleExpand(stage.id)"
         >
           <template v-if="!expandedColumns.has(stage.id)">
@@ -186,18 +192,19 @@ async function submitQuickAdd() {
         </UButton>
 
         <!-- Empty state -->
-        <p
+        <div
           v-if="vacanciesForStage(stage.id).length === 0"
-          class="text-xs text-center text-gray-400 py-4"
+          class="flex flex-col items-center justify-center py-6 text-gray-300 dark:text-gray-600"
         >
-          Немає вакансій
-        </p>
+          <UIcon name="i-lucide-inbox" class="w-6 h-6 mb-1.5" />
+          <p class="text-xs">Немає вакансій</p>
+        </div>
       </div>
 
       <!-- Quick add area -->
-      <div class="p-2 border-t border-gray-200 dark:border-gray-700">
+      <div class="px-2 pb-2">
         <template v-if="quickAdd.stageId === stage.id">
-          <div class="space-y-1.5">
+          <div class="space-y-1.5 bg-white dark:bg-gray-800 rounded-xl p-2 shadow-sm">
             <UInput
               v-model="quickAdd.company"
               placeholder="Компанія"
@@ -224,7 +231,7 @@ async function submitQuickAdd() {
               </UButton>
               <UButton size="xs" variant="ghost" icon="i-lucide-x" @click="closeQuickAdd" />
             </div>
-            <p v-if="quickAddError" class="text-xs text-red-500 mt-1">
+            <p v-if="quickAddError" class="text-xs text-red-500">
               {{ quickAddError }}
             </p>
           </div>
@@ -235,10 +242,10 @@ async function submitQuickAdd() {
             icon="i-lucide-plus"
             size="xs"
             block
-            class="text-gray-400 hover:text-gray-700"
+            class="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 rounded-xl"
             @click="openQuickAdd(stage.id)"
           >
-            Додати
+            Додати вакансію
           </UButton>
         </template>
       </div>

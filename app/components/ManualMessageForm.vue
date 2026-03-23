@@ -55,50 +55,48 @@ async function submit() {
 
 <template>
   <div class="border-t border-gray-200 dark:border-gray-700 pt-4 space-y-3">
-    <!-- Direction toggle -->
-    <div class="flex items-center gap-2">
-      <span class="text-sm text-gray-500">Напрямок:</span>
-      <UButtonGroup size="sm">
-        <UButton
-          :variant="direction === 'in' ? 'solid' : 'outline'"
-          icon="i-lucide-arrow-down-left"
-          @click="direction = 'in'"
-        >
-          Вхідне
-        </UButton>
-        <UButton
-          :variant="direction === 'out' ? 'solid' : 'outline'"
-          icon="i-lucide-arrow-up-right"
-          @click="direction = 'out'"
-        >
-          Вихідне
-        </UButton>
-      </UButtonGroup>
-    </div>
+    <!-- Row 1: direction + recruiter + date -->
+    <div class="flex flex-wrap items-center gap-2">
+      <UButton
+        size="sm"
+        :variant="direction === 'in' ? 'solid' : 'outline'"
+        icon="i-lucide-arrow-down-left"
+        @click="direction = 'in'"
+      >
+        Вхідне
+      </UButton>
+      <UButton
+        size="sm"
+        :variant="direction === 'out' ? 'solid' : 'outline'"
+        icon="i-lucide-arrow-up-right"
+        @click="direction = 'out'"
+      >
+        Вихідне
+      </UButton>
 
-    <!-- Recruiter + date row -->
-    <div class="flex gap-2">
       <USelect
         v-model="recruiterId"
         :items="recruiterOptions"
         value-key="value"
         label-key="label"
         size="sm"
-        class="flex-1"
+        class="min-w-36 flex-1"
       />
+
       <UInput
         v-model="sentAt"
         type="datetime-local"
         size="sm"
-        class="flex-1"
+        class="min-w-44 flex-1"
       />
     </div>
 
-    <!-- Text -->
+    <!-- Row 2: textarea -->
     <UTextarea
       v-model="content"
       placeholder="Текст повідомлення…"
       :rows="3"
+      class="w-full"
       @keydown.ctrl.enter="submit"
       @keydown.meta.enter="submit"
     />
@@ -111,6 +109,7 @@ async function submit() {
       icon="i-lucide-alert-circle"
     />
 
+    <!-- Row 3: submit -->
     <div class="flex justify-end">
       <UButton
         :loading="saving"

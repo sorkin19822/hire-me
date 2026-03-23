@@ -21,6 +21,7 @@ export const cvVersions = sqliteTable('cv_versions', {
   content: text('content'),
   importedAt: text('imported_at').notNull().default(sql`(datetime('now'))`),
   isActive: integer('is_active', { mode: 'boolean' }).notNull().default(false),
+  comment: text('comment'),
 })
 
 // ─── vacancies ───────────────────────────────────────────────────────────────
