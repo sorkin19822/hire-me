@@ -39,6 +39,27 @@ watch(selectedStageId, (val) => {
   if (val !== vacancy.value?.stageId) changeStage(val)
 })
 
+// Edit company/position
+const editingTitle = ref(false)
+const titleForm = reactive({ company: '', position: '' })
+const titleSaving = ref(false)
+
+async function saveTitle() {
+  if (!titleForm.company) return
+  titleSaving.value = true
+  try {
+    await $fetch(`/api/vacancies/${id}`, {
+      method: 'PATCH',
+      body: { company: titleForm.company, position: titleForm.position || null },
+    })
+    editingTitle.value = false
+    await refresh()
+  }
+  finally {
+    titleSaving.value = false
+  }
+}
+
 // Apply date picker
 const applyDateOpen = ref(false)
 const applyDateValue = computed({
@@ -55,32 +76,26 @@ const applyDateValue = computed({
   },
 })
 
-// CV version selector
+// CV version selector (0 = no CV, USelect doesn't support null as value)
 const cvOptions = computed(() =>
-  [{ label: '— без CV —', value: null as number | null }].concat(
-    (cvList.value ?? []).map((cv: { id: number, filename: string, comment: string | null }) => ({
-      label: cv.comment ? `${cv.filename} — ${cv.comment}` : cv.filename,
-      value: cv.id as number | null,
-    })),
-  ),
+  [{ label: '— без CV —', value: 0 }, ...(cvList.value ?? []).map((cv: { id: number, filename: string, comment: string | null }) => ({
+    label: cv.comment ? `${cv.filename} — ${cv.comment}` : cv.filename,
+    value: cv.id,
+  }))],
 )
 
-const selectedCvId = ref<number | null>(vacancy.value?.cvVersionId ?? null)
+const selectedCvId = ref<number>(vacancy.value?.cvVersionId ?? 0)
 const cvSaving = ref(false)
 
-async function changeCv(newId: number | null) {
+watch(selectedCvId, async (val) => {
   cvSaving.value = true
   try {
-    await $fetch(`/api/vacancies/${id}`, { method: 'PATCH', body: { cvVersionId: newId } })
+    await $fetch(`/api/vacancies/${id}`, { method: 'PATCH', body: { cvVersionId: val || null } })
     await refresh()
   }
   finally {
     cvSaving.value = false
   }
-}
-
-watch(selectedCvId, (val) => {
-  if (val !== vacancy.value?.cvVersionId) changeCv(val)
 })
 
 // Edit links inline
@@ -106,6 +121,23 @@ async function saveLinks() {
   }
   finally {
     linksSaving.value = false
+  }
+}
+
+// Edit description inline
+const editingDescription = ref(false)
+const descriptionValue = ref(vacancy.value?.description ?? '')
+const descriptionSaving = ref(false)
+
+async function saveDescription() {
+  descriptionSaving.value = true
+  try {
+    await $fetch(`/api/vacancies/${id}`, { method: 'PATCH', body: { description: descriptionValue.value || null } })
+    editingDescription.value = false
+    await refresh()
+  }
+  finally {
+    descriptionSaving.value = false
   }
 }
 
@@ -177,13 +209,36 @@ async function saveNotes() {
 
     <template v-if="vacancy">
       <div class="flex items-start justify-between mb-6">
-        <div>
-          <h1 class="text-2xl font-bold text-dark dark:text-white">
-            {{ vacancy.company }}
-          </h1>
-          <p class="text-lg text-gray-500 dark:text-gray-400">
-            {{ vacancy.position }}
-          </p>
+        <div class="flex-1 min-w-0 mr-4">
+          <div v-if="!editingTitle" class="group flex items-start gap-2">
+            <div>
+              <h1 class="text-2xl font-bold text-dark dark:text-white">
+                {{ vacancy.company }}
+              </h1>
+              <p class="text-lg text-gray-500 dark:text-gray-400">
+                {{ vacancy.position }}
+              </p>
+            </div>
+            <UButton
+              variant="ghost"
+              icon="i-lucide-pencil"
+              size="xs"
+              class="mt-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
+              @click="editingTitle = true; Object.assign(titleForm, { company: vacancy.company ?? '', position: vacancy.position ?? '' })"
+            />
+          </div>
+          <div v-else class="flex flex-col gap-2">
+            <UInput v-model="titleForm.company" placeholder="Назва компанії" autofocus class="text-xl font-bold" />
+            <UInput v-model="titleForm.position" placeholder="Посада" />
+            <div class="flex gap-2">
+              <UButton variant="ghost" size="sm" @click="editingTitle = false">
+                Скасувати
+              </UButton>
+              <UButton size="sm" :loading="titleSaving" :disabled="!titleForm.company" @click="saveTitle">
+                Зберегти
+              </UButton>
+            </div>
+          </div>
         </div>
 
         <div class="flex items-center gap-2">
@@ -268,6 +323,7 @@ async function saveNotes() {
                 v-if="selectedCvId"
                 :href="`/api/cv-versions/${selectedCvId}/file`"
                 target="_blank"
+                external
                 variant="ghost"
                 icon="i-lucide-eye"
                 size="sm"
@@ -328,6 +384,52 @@ async function saveNotes() {
               Скасувати
             </UButton>
             <UButton size="sm" :loading="linksSaving" @click="saveLinks">
+              Зберегти
+            </UButton>
+          </div>
+        </div>
+      </UCard>
+
+      <!-- Description -->
+      <UCard class="mb-4 rounded-lg border border-gray-200 dark:border-gray-700 shadow-none">
+        <template #header>
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-1.5">
+              <span class="text-lg font-semibold text-dark dark:text-white">Опис вакансії</span>
+              <UTooltip text="Повний текст оголошення — використовується для AI аналізу" :delay-duration="400">
+                <UIcon name="i-lucide-help-circle" class="w-4 h-4 text-gray-400 dark:text-gray-500" />
+              </UTooltip>
+            </div>
+            <UButton
+              v-if="!editingDescription"
+              variant="ghost"
+              icon="i-lucide-pencil"
+              size="xs"
+              @click="editingDescription = true; descriptionValue = vacancy.description ?? ''"
+            />
+          </div>
+        </template>
+        <div v-if="!editingDescription">
+          <p v-if="vacancy.description" class="text-sm whitespace-pre-wrap text-dark dark:text-white">
+            {{ vacancy.description }}
+          </p>
+          <p v-else class="text-sm text-gray-400 dark:text-gray-500">
+            Опис відсутній
+          </p>
+        </div>
+        <div v-else class="flex flex-col gap-4">
+          <UTextarea
+            v-model="descriptionValue"
+            :rows="8"
+            autofocus
+            placeholder="Вставте текст оголошення вакансії..."
+            class="w-full"
+          />
+          <div class="flex gap-2 justify-end">
+            <UButton variant="ghost" size="sm" @click="editingDescription = false">
+              Скасувати
+            </UButton>
+            <UButton size="sm" :loading="descriptionSaving" @click="saveDescription">
               Зберегти
             </UButton>
           </div>
@@ -500,7 +602,7 @@ async function saveNotes() {
             </UTooltip>
           </div>
         </template>
-        <AIAnalysisCard :vacancy-id="Number(id)" />
+        <AIAnalysisCard :vacancy-id="Number(id)" :initial-analysis="vacancy.lastAnalysis" />
       </UCard>
     </template>
   </UContainer>

@@ -31,6 +31,12 @@ export default defineNuxtConfig({
     public: {}
   },
 
+  vite: {
+    optimizeDeps: {
+      include: ['reka-ui']
+    }
+  },
+
   nitro: {
     // Required for better-sqlite3 and GramJS (CJS native/non-standard modules)
     externals: {

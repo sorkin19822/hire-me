@@ -37,6 +37,7 @@ export const vacancies = sqliteTable('vacancies', {
   urlLinkedin: text('url_linkedin'),
   urlSite: text('url_site'),
   cvVersionId: integer('cv_version_id').references(() => cvVersions.id),
+  description: text('description'),
   createdAt: text('created_at').notNull().default(sql`(datetime('now'))`),
   updatedAt: text('updated_at').notNull().default(sql`(datetime('now'))`),
 })

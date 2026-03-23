@@ -15,6 +15,13 @@
       "when": 1774105704774,
       "tag": "0001_brief_arclight",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1774269012937,
+      "tag": "0002_short_black_crow",
+      "breakpoints": true
     }
   ]
 }

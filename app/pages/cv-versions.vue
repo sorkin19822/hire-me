@@ -188,6 +188,7 @@ async function confirmDelete() {
             <UButton
               :href="`/api/cv-versions/${cv.id}/file`"
               target="_blank"
+              external
               variant="ghost"
               icon="i-lucide-eye"
               size="xs"

@@ -17,9 +17,7 @@ export default defineEventHandler(async (event) => {
     .where(eq(analysis.vacancyId, vacancyId))
     .all()
 
-  if (!row) {
-    throw createError({ statusCode: 404, statusMessage: 'No analysis found for this vacancy' })
-  }
+  if (!row) return null
 
   return {
     companyScore: row.companyScore,

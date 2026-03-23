@@ -8,13 +8,11 @@ interface AnalysisResult {
   createdAt?: string
 }
 
-const props = defineProps<{ vacancyId: number }>()
+const props = defineProps<{ vacancyId: number, initialAnalysis?: AnalysisResult | null }>()
 
 const toast = useToast()
 
-// Stored result
-const analysisData = ref<AnalysisResult | null>(null)
-const loadingResult = ref(false)
+const analysisData = ref<AnalysisResult | null>(props.initialAnalysis ?? null)
 
 // Prompt panel
 const showPromptPanel = ref(false)
@@ -26,19 +24,6 @@ const loadingPrompt = ref(false)
 const showPastePanel = ref(false)
 const pasteText = ref('')
 const saving = ref(false)
-
-async function fetchStoredAnalysis() {
-  loadingResult.value = true
-  try {
-    analysisData.value = await $fetch<AnalysisResult>(`/api/analysis/${props.vacancyId}`)
-  }
-  catch {
-    analysisData.value = null
-  }
-  finally {
-    loadingResult.value = false
-  }
-}
 
 async function generatePrompt() {
   loadingPrompt.value = true
@@ -84,17 +69,11 @@ async function saveResult() {
 }
 
 
-onMounted(fetchStoredAnalysis)
 </script>
 
 <template>
   <div class="space-y-4">
-    <!-- Stored result -->
-    <div v-if="loadingResult" class="flex justify-center py-4">
-      <UIcon name="i-lucide-loader-circle" class="w-5 h-5 animate-spin text-gray-400" />
-    </div>
-
-    <div v-else-if="analysisData" class="space-y-4">
+    <div v-if="analysisData" class="space-y-4">
       <div class="grid grid-cols-2 gap-4">
         <ScoreDisplay label="Оцінка компанії" :score="analysisData.companyScore" />
         <ScoreDisplay label="Оцінка рекрутера" :score="analysisData.recruiterScore" />
