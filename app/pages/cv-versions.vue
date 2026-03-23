@@ -120,10 +120,13 @@ async function confirmDelete() {
       </div>
     </PageHeader>
 
-    <UCard>
+    <div
+      class="rounded-[7px] bg-white dark:bg-[oklch(27.84%_0.027_257.53)] overflow-hidden"
+      style="box-shadow: rgba(145,158,171,0.2) 0px 0px 2px 0px, rgba(145,158,171,0.12) 0px 12px 24px -4px;"
+    >
       <div
         v-if="cvList?.length"
-        class="divide-y divide-gray-100 dark:divide-gray-800"
+        class="divide-y divide-[oklch(92.03%_0.015_260.73)] dark:divide-[oklch(36.67%_0.041_262.29)] p-2"
       >
         <div
           v-for="cv in cvList"
@@ -239,11 +242,11 @@ async function confirmDelete() {
 
       <p
         v-else
-        class="text-sm text-gray-400 text-center py-4"
+        class="text-sm text-[oklch(52.16%_0.047_260.80)] dark:text-[oklch(64.54%_0.049_258.74)] text-center py-8"
       >
         Немає завантажених CV
       </p>
-    </UCard>
+    </div>
 
     <ConfirmModal
       :open="confirmDeleteId !== null"

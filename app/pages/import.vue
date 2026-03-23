@@ -38,17 +38,22 @@ async function doImport() {
 
 <template>
   <UContainer class="py-10 max-w-xl">
-    <UCard>
-      <template #header>
-        <h1 class="text-xl font-semibold">
+    <div
+      class="rounded-[7px] bg-white dark:bg-[oklch(27.84%_0.027_257.53)] overflow-hidden"
+      style="box-shadow: rgba(145,158,171,0.2) 0px 0px 2px 0px, rgba(145,158,171,0.12) 0px 12px 24px -4px;"
+    >
+      <!-- Header -->
+      <div class="px-6 py-4 border-b border-[oklch(92.03%_0.015_260.73)] dark:border-[oklch(36.67%_0.041_262.29)]">
+        <h1 class="text-[15px] font-semibold text-[oklch(32.70%_0.035_260.11)] dark:text-white">
           Імпорт вакансій з CSV
         </h1>
-        <p class="text-sm text-gray-500 mt-1">
+        <p class="text-sm text-[oklch(52.16%_0.047_260.80)] dark:text-[oklch(64.54%_0.049_258.74)] mt-1">
           Завантаж CSV-файл з Google Sheets. Формат: без заголовку, 11 колонок.
         </p>
-      </template>
+      </div>
 
-      <div class="space-y-4">
+      <!-- Body -->
+      <div class="p-6 space-y-4">
         <input
           ref="fileInput"
           type="file"
@@ -74,50 +79,54 @@ async function doImport() {
         >
           Імпортувати
         </UButton>
-      </div>
 
-      <!-- Error -->
-      <UAlert
-        v-if="errorMsg"
-        color="error"
-        variant="soft"
-        :title="errorMsg"
-        icon="i-lucide-alert-circle"
-        class="mt-4"
-      />
-
-      <!-- Result -->
-      <template v-if="result">
-        <div class="grid grid-cols-2 gap-4 mt-6 text-center">
-          <div class="p-4 rounded-lg bg-gray-100 dark:bg-gray-800">
-            <div class="text-2xl font-bold">
-              {{ result.total }}
-            </div>
-            <div class="text-sm text-gray-500">
-              Всього
-            </div>
-          </div>
-          <div class="p-4 rounded-lg bg-green-50 dark:bg-green-900/30">
-            <div class="text-2xl font-bold text-green-600 dark:text-green-400">
-              {{ result.imported }}
-            </div>
-            <div class="text-sm text-gray-500">
-              Імпортовано
-            </div>
-          </div>
-        </div>
-
-        <UButton
-          v-if="result.imported > 0"
-          to="/"
+        <!-- Error -->
+        <UAlert
+          v-if="errorMsg"
+          color="error"
           variant="soft"
-          icon="i-lucide-kanban"
-          block
-          class="mt-4"
-        >
-          Перейти до Kanban
-        </UButton>
-      </template>
-    </UCard>
+          :title="errorMsg"
+          icon="i-lucide-alert-circle"
+        />
+
+        <!-- Result -->
+        <template v-if="result">
+          <div class="grid grid-cols-2 gap-4 text-center">
+            <div
+              class="p-4 rounded-[7px]"
+              style="background: oklch(65.33% 0.184 266.79 / 8%);"
+            >
+              <div class="text-2xl font-bold text-[oklch(32.70%_0.035_260.11)] dark:text-white">
+                {{ result.total }}
+              </div>
+              <div class="text-sm text-[oklch(52.16%_0.047_260.80)] dark:text-[oklch(64.54%_0.049_258.74)]">
+                Всього
+              </div>
+            </div>
+            <div
+              class="p-4 rounded-[7px]"
+              style="background: oklch(80.48% 0.150 174.63 / 10%);"
+            >
+              <div class="text-2xl font-bold text-success">
+                {{ result.imported }}
+              </div>
+              <div class="text-sm text-[oklch(52.16%_0.047_260.80)] dark:text-[oklch(64.54%_0.049_258.74)]">
+                Імпортовано
+              </div>
+            </div>
+          </div>
+
+          <UButton
+            v-if="result.imported > 0"
+            to="/"
+            variant="soft"
+            icon="i-lucide-kanban"
+            block
+          >
+            Перейти до Kanban
+          </UButton>
+        </template>
+      </div>
+    </div>
   </UContainer>
 </template>

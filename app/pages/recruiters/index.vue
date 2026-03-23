@@ -52,80 +52,85 @@ const columns = [
       class="mb-4 max-w-sm"
     />
 
-    <UTable
-      :data="filtered"
-      :columns="columns"
-      :loading="!recruiters"
+    <div
+      class="rounded-[7px] bg-white dark:bg-[oklch(27.84%_0.027_257.53)] overflow-hidden"
+      style="box-shadow: rgba(145,158,171,0.2) 0px 0px 2px 0px, rgba(145,158,171,0.12) 0px 12px 24px -4px;"
     >
-      <template #name-cell="{ row }">
-        <RecruiterCard :recruiter="row.original" />
-      </template>
+      <UTable
+        :data="filtered"
+        :columns="columns"
+        :loading="!recruiters"
+      >
+        <template #name-cell="{ row }">
+          <RecruiterCard :recruiter="row.original" />
+        </template>
 
-      <template #telegram-cell="{ row }">
-        <UButton
-          v-if="row.original.telegram"
-          :href="`tg://resolve?domain=${encodeURIComponent(row.original.telegram.replace('@', ''))}`"
-          variant="link"
-          size="xs"
-          icon="i-simple-icons-telegram"
-        >
-          {{ row.original.telegram }}
-        </UButton>
-        <span
-          v-else
-          class="text-gray-400"
-        >—</span>
-      </template>
-
-      <template #email-cell="{ row }">
-        <UButton
-          v-if="row.original.email"
-          :href="`mailto:${row.original.email}`"
-          variant="link"
-          size="xs"
-          icon="i-lucide-mail"
-          color="neutral"
-        >
-          {{ row.original.email }}
-        </UButton>
-        <span
-          v-else
-          class="text-gray-400"
-        >—</span>
-      </template>
-
-      <template #vacancy-cell="{ row }">
-        <NuxtLink
-          v-if="row.original.vacancyId"
-          :to="`/vacancies/${row.original.vacancyId}`"
-          class="text-sm text-primary hover:underline"
-        >
-          {{ row.original.vacancyCompany }}
-        </NuxtLink>
-        <span
-          v-else
-          class="text-gray-400"
-        >—</span>
-      </template>
-
-      <template #actions-cell="{ row }">
-        <div class="flex items-center gap-1">
+        <template #telegram-cell="{ row }">
           <UButton
-            variant="ghost"
-            icon="i-lucide-pencil"
+            v-if="row.original.telegram"
+            :href="`tg://resolve?domain=${encodeURIComponent(row.original.telegram.replace('@', ''))}`"
+            variant="link"
             size="xs"
-            @click="editingRecruiter = row.original"
-          />
+            icon="i-simple-icons-telegram"
+          >
+            {{ row.original.telegram }}
+          </UButton>
+          <span
+            v-else
+            class="text-gray-400"
+          >—</span>
+        </template>
+
+        <template #email-cell="{ row }">
           <UButton
-            variant="ghost"
-            icon="i-lucide-trash-2"
+            v-if="row.original.email"
+            :href="`mailto:${row.original.email}`"
+            variant="link"
             size="xs"
-            color="error"
-            @click="confirmDeleteId = row.original.id"
-          />
-        </div>
-      </template>
-    </UTable>
+            icon="i-lucide-mail"
+            color="neutral"
+          >
+            {{ row.original.email }}
+          </UButton>
+          <span
+            v-else
+            class="text-gray-400"
+          >—</span>
+        </template>
+
+        <template #vacancy-cell="{ row }">
+          <NuxtLink
+            v-if="row.original.vacancyId"
+            :to="`/vacancies/${row.original.vacancyId}`"
+            class="text-sm text-primary hover:underline"
+          >
+            {{ row.original.vacancyCompany }}
+          </NuxtLink>
+          <span
+            v-else
+            class="text-gray-400"
+          >—</span>
+        </template>
+
+        <template #actions-cell="{ row }">
+          <div class="flex items-center gap-1">
+            <UButton
+              variant="ghost"
+              icon="i-lucide-pencil"
+              size="xs"
+              @click="editingRecruiter = row.original"
+            />
+            <UButton
+              variant="ghost"
+              icon="i-lucide-trash-2"
+              size="xs"
+              color="error"
+              @click="confirmDeleteId = row.original.id"
+            />
+          </div>
+        </template>
+      </UTable>
+    </div>
 
     <!-- Edit modal -->
     <RecruiterFormModal

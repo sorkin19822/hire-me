@@ -129,38 +129,45 @@ async function submitQuickAdd() {
 </script>
 
 <template>
-  <div class="flex flex-row gap-3 overflow-x-auto min-h-[calc(100vh-64px)] p-4 pb-8 items-start bg-gray-50 dark:bg-gray-900/40">
+  <div class="flex flex-row gap-3 overflow-x-auto kanban-scroll min-h-[calc(100vh-64px)] p-5 pb-8 items-start">
     <div
       v-for="stage in stages"
       :key="stage.id"
-      class="flex-shrink-0 w-[272px] flex flex-col rounded-2xl transition-all duration-200"
+      class="flex-shrink-0 w-[272px] flex flex-col rounded-[7px] transition-all duration-200"
       :class="dragOverStageId === stage.id
-        ? 'ring-2 ring-primary-400 bg-primary-50/80 dark:bg-primary-950/30'
-        : 'bg-gray-100/80 dark:bg-gray-800/40'"
+        ? 'ring-2 ring-primary/40 bg-primary/5 dark:bg-primary/10'
+        : 'bg-white/60 dark:bg-[oklch(27.84%_0.027_257.53)]/60'"
+      style="box-shadow: rgba(145,158,171,0.10) 0px 1px 4px;"
       @dragover="onDragOver($event, stage.id)"
       @dragleave="onDragLeave"
       @drop="onDrop($event, stage.id)"
     >
       <!-- Column header -->
-      <div class="flex items-center justify-between px-3 pt-3 pb-2">
+      <div class="flex items-center justify-between px-3 pt-3 pb-1.5">
         <div class="flex items-center gap-2 min-w-0">
           <span
-            class="w-2 h-2 rounded-full shrink-0"
+            class="w-2.5 h-2.5 rounded-full shrink-0 ring-2 ring-white dark:ring-[oklch(27.84%_0.027_257.53)]"
             :style="{ backgroundColor: stage.color }"
           />
-          <span class="text-xs font-semibold uppercase tracking-wide text-gray-600 dark:text-gray-300 truncate">
+          <span class="text-[11px] font-bold uppercase tracking-widest text-[oklch(52.16%_0.047_260.80)] dark:text-[oklch(64.54%_0.049_258.74)] truncate">
             {{ stage.name }}
           </span>
         </div>
-        <span class="text-xs font-semibold text-gray-400 dark:text-gray-500 tabular-nums">
+        <span
+          class="text-[11px] font-bold tabular-nums px-1.5 py-0.5 rounded-full"
+          :style="{
+            backgroundColor: stage.color + '22',
+            color: stage.color
+          }"
+        >
           {{ vacanciesForStage(stage.id).length }}
         </span>
       </div>
 
       <!-- Thin color accent bar -->
       <div
-        class="mx-3 mb-2 h-0.5 rounded-full opacity-60"
-        :style="{ backgroundColor: stage.color }"
+        class="mx-3 mb-2 h-[3px] rounded-full"
+        :style="{ backgroundColor: stage.color + 'cc' }"
       />
 
       <!-- Cards -->
@@ -180,7 +187,7 @@ async function submitQuickAdd() {
           variant="ghost"
           size="xs"
           block
-          class="text-gray-400 dark:text-gray-500 text-xs"
+          class="text-[oklch(52.16%_0.047_260.80)] dark:text-[oklch(64.54%_0.049_258.74)] text-xs"
           @click="toggleExpand(stage.id)"
         >
           <template v-if="!expandedColumns.has(stage.id)">
@@ -194,13 +201,19 @@ async function submitQuickAdd() {
         <!-- Empty state -->
         <div
           v-if="vacanciesForStage(stage.id).length === 0"
-          class="flex flex-col items-center justify-center py-6 text-gray-300 dark:text-gray-600"
+          class="flex flex-col items-center justify-center py-8 text-[oklch(87%_0.01_260)] dark:text-[oklch(40%_0.03_260)]"
         >
-          <UIcon
-            name="i-lucide-inbox"
-            class="w-6 h-6 mb-1.5"
-          />
-          <p class="text-xs">
+          <div
+            class="w-10 h-10 rounded-full flex items-center justify-center mb-2"
+            :style="{ backgroundColor: stage.color + '18' }"
+          >
+            <UIcon
+              name="i-lucide-inbox"
+              class="w-5 h-5"
+              :style="{ color: stage.color + 'aa' }"
+            />
+          </div>
+          <p class="text-xs text-[oklch(70%_0.02_260)] dark:text-[oklch(50%_0.02_260)]">
             Немає вакансій
           </p>
         </div>
@@ -209,7 +222,10 @@ async function submitQuickAdd() {
       <!-- Quick add area -->
       <div class="px-2 pb-2">
         <template v-if="quickAdd.stageId === stage.id">
-          <div class="space-y-1.5 bg-white dark:bg-gray-800 rounded-xl p-2 shadow-sm">
+          <div
+            class="space-y-1.5 bg-white dark:bg-[oklch(27.84%_0.027_257.53)] rounded-[7px] p-2"
+            style="box-shadow: rgba(145,158,171,0.2) 0px 0px 2px 0px, rgba(145,158,171,0.12) 0px 12px 24px -4px;"
+          >
             <UInput
               v-model="quickAdd.company"
               placeholder="Компанія"
@@ -243,7 +259,7 @@ async function submitQuickAdd() {
             </div>
             <p
               v-if="quickAddError"
-              class="text-xs text-red-500"
+              class="text-xs text-error"
             >
               {{ quickAddError }}
             </p>
@@ -255,7 +271,7 @@ async function submitQuickAdd() {
             icon="i-lucide-plus"
             size="xs"
             block
-            class="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 rounded-xl"
+            class="text-[oklch(70%_0.02_260)] hover:text-[oklch(32.70%_0.035_260.11)] dark:text-[oklch(50%_0.03_260)] dark:hover:text-white rounded-[7px] transition-colors"
             @click="openQuickAdd(stage.id)"
           >
             Додати вакансію

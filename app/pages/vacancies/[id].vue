@@ -227,10 +227,10 @@ async function saveNotes() {
               @error="($event.target as HTMLImageElement).style.display = 'none'"
             >
             <div>
-              <h1 class="text-2xl font-bold text-dark dark:text-white">
+              <h1 class="text-2xl font-bold text-[oklch(32.70%_0.035_260.11)] dark:text-white">
                 {{ vacancy.company }}
               </h1>
-              <p class="text-lg text-gray-500 dark:text-gray-400">
+              <p class="text-lg text-[oklch(52.16%_0.047_260.80)] dark:text-[oklch(64.54%_0.049_258.74)]">
                 {{ vacancy.position }}
               </p>
             </div>
@@ -298,11 +298,14 @@ async function saveNotes() {
       </div>
 
       <!-- Fields grid -->
-      <UCard class="mb-4 rounded-lg border border-gray-200 dark:border-gray-700 shadow-none">
+      <UCard
+        class="mb-4 rounded-[7px] border-0"
+        style="box-shadow: rgba(145,158,171,0.2) 0px 0px 2px 0px, rgba(145,158,171,0.12) 0px 12px 24px -4px;"
+      >
         <div class="grid grid-cols-2 gap-6 text-sm">
           <div class="flex flex-col gap-1.5">
             <div class="flex items-center gap-1">
-              <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Дата відгуку</span>
+              <span class="text-sm font-medium text-[oklch(52.16%_0.047_260.80)] dark:text-[oklch(64.54%_0.049_258.74)]">Дата відгуку</span>
               <UTooltip
                 text="Дата, коли ви подали заявку на цю вакансію"
                 :delay-duration="400"
@@ -329,7 +332,7 @@ async function saveNotes() {
           </div>
           <div class="flex flex-col gap-1.5">
             <div class="flex items-center gap-1">
-              <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Повідомлень</span>
+              <span class="text-sm font-medium text-[oklch(52.16%_0.047_260.80)] dark:text-[oklch(64.54%_0.049_258.74)]">Повідомлень</span>
               <UTooltip
                 text="Кількість повідомлень у листуванні з рекрутером"
                 :delay-duration="400"
@@ -340,13 +343,13 @@ async function saveNotes() {
                 />
               </UTooltip>
             </div>
-            <p class="font-medium text-dark dark:text-white">
+            <p class="font-medium text-[oklch(32.70%_0.035_260.11)] dark:text-white">
               {{ vacancy.messagesCount }}
             </p>
           </div>
           <div class="flex flex-col gap-1.5">
             <div class="flex items-center gap-1">
-              <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Додано</span>
+              <span class="text-sm font-medium text-[oklch(52.16%_0.047_260.80)] dark:text-[oklch(64.54%_0.049_258.74)]">Додано</span>
               <UTooltip
                 text="Дата додавання вакансії до системи"
                 :delay-duration="400"
@@ -357,13 +360,13 @@ async function saveNotes() {
                 />
               </UTooltip>
             </div>
-            <p class="font-medium text-dark dark:text-white">
+            <p class="font-medium text-[oklch(32.70%_0.035_260.11)] dark:text-white">
               {{ vacancy.createdAt?.slice(0, 10) }}
             </p>
           </div>
           <div class="col-span-2 flex flex-col gap-1.5">
             <div class="flex items-center gap-1">
-              <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Версія CV</span>
+              <span class="text-sm font-medium text-[oklch(52.16%_0.047_260.80)] dark:text-[oklch(64.54%_0.049_258.74)]">Версія CV</span>
               <UTooltip
                 text="Резюме, яке ви надіслали на цю вакансію"
                 :delay-duration="400"
@@ -399,11 +402,14 @@ async function saveNotes() {
       </UCard>
 
       <!-- Links -->
-      <UCard class="mb-4 rounded-lg border border-gray-200 dark:border-gray-700 shadow-none">
+      <UCard
+        class="mb-4 rounded-[7px] border-0"
+        style="box-shadow: rgba(145,158,171,0.2) 0px 0px 2px 0px, rgba(145,158,171,0.12) 0px 12px 24px -4px;"
+      >
         <template #header>
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-1.5">
-              <span class="text-lg font-semibold text-dark dark:text-white">Посилання</span>
+              <span class="text-[15px] font-semibold text-[oklch(32.70%_0.035_260.11)] dark:text-white">Посилання</span>
               <UTooltip
                 text="Посилання на оголошення вакансії та сайт компанії"
                 :delay-duration="400"
@@ -506,11 +512,14 @@ async function saveNotes() {
       </UCard>
 
       <!-- Description -->
-      <UCard class="mb-4 rounded-lg border border-gray-200 dark:border-gray-700 shadow-none">
+      <UCard
+        class="mb-4 rounded-[7px] border-0"
+        style="box-shadow: rgba(145,158,171,0.2) 0px 0px 2px 0px, rgba(145,158,171,0.12) 0px 12px 24px -4px;"
+      >
         <template #header>
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-1.5">
-              <span class="text-lg font-semibold text-dark dark:text-white">Опис вакансії</span>
+              <span class="text-[15px] font-semibold text-[oklch(32.70%_0.035_260.11)] dark:text-white">Опис вакансії</span>
               <UTooltip
                 text="Повний текст оголошення — використовується для AI аналізу"
                 :delay-duration="400"
@@ -533,7 +542,7 @@ async function saveNotes() {
         <div v-if="!editingDescription">
           <p
             v-if="vacancy.description"
-            class="text-sm whitespace-pre-wrap text-dark dark:text-white"
+            class="text-sm whitespace-pre-wrap text-[oklch(32.70%_0.035_260.11)] dark:text-white"
           >
             {{ vacancy.description }}
           </p>
@@ -575,11 +584,14 @@ async function saveNotes() {
       </UCard>
 
       <!-- Notes -->
-      <UCard class="mb-4 rounded-lg border border-gray-200 dark:border-gray-700 shadow-none">
+      <UCard
+        class="mb-4 rounded-[7px] border-0"
+        style="box-shadow: rgba(145,158,171,0.2) 0px 0px 2px 0px, rgba(145,158,171,0.12) 0px 12px 24px -4px;"
+      >
         <template #header>
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-1.5">
-              <span class="text-lg font-semibold text-dark dark:text-white">Нотатки</span>
+              <span class="text-[15px] font-semibold text-[oklch(32.70%_0.035_260.11)] dark:text-white">Нотатки</span>
               <UTooltip
                 text="Особисті нотатки про вакансію: враження від співбесіди, умови, питання тощо"
                 :delay-duration="400"
@@ -602,7 +614,7 @@ async function saveNotes() {
         <div v-if="!editingNotes">
           <p
             v-if="vacancy.notes"
-            class="text-sm whitespace-pre-wrap text-dark dark:text-white"
+            class="text-sm whitespace-pre-wrap text-[oklch(32.70%_0.035_260.11)] dark:text-white"
           >
             {{ vacancy.notes }}
           </p>
@@ -649,11 +661,14 @@ async function saveNotes() {
       </UCard>
 
       <!-- Recruiters -->
-      <UCard class="mb-4 rounded-lg border border-gray-200 dark:border-gray-700 shadow-none">
+      <UCard
+        class="mb-4 rounded-[7px] border-0"
+        style="box-shadow: rgba(145,158,171,0.2) 0px 0px 2px 0px, rgba(145,158,171,0.12) 0px 12px 24px -4px;"
+      >
         <template #header>
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-1.5">
-              <span class="text-lg font-semibold text-dark dark:text-white">Рекрутери</span>
+              <span class="text-[15px] font-semibold text-[oklch(32.70%_0.035_260.11)] dark:text-white">Рекрутери</span>
               <UTooltip
                 text="Контакти рекрутерів по цій вакансії. Можна синхронізувати листування з Telegram"
                 :delay-duration="400"
@@ -734,7 +749,7 @@ async function saveNotes() {
           <div
             v-for="r in recruitersList"
             :key="r.id"
-            class="flex items-center justify-between border-b last:border-0 border-gray-100 dark:border-gray-700"
+            class="flex items-center justify-between border-b last:border-0 border-[oklch(92.03%_0.015_260.73)] dark:border-[oklch(36.67%_0.041_262.29)]"
           >
             <RecruiterCard
               :recruiter="r"
@@ -775,10 +790,13 @@ async function saveNotes() {
       </UCard>
 
       <!-- Messages timeline -->
-      <UCard class="mb-4 rounded-lg border border-gray-200 dark:border-gray-700 shadow-none">
+      <UCard
+        class="mb-4 rounded-[7px] border-0"
+        style="box-shadow: rgba(145,158,171,0.2) 0px 0px 2px 0px, rgba(145,158,171,0.12) 0px 12px 24px -4px;"
+      >
         <template #header>
           <div class="flex items-center gap-1.5">
-            <span class="text-lg font-semibold text-dark dark:text-white">Переписка</span>
+            <span class="text-[15px] font-semibold text-[oklch(32.70%_0.035_260.11)] dark:text-white">Переписка</span>
             <UTooltip
               text="Хронологія повідомлень з рекрутером. Імпортується з Telegram або вводиться вручну"
               :delay-duration="400"
@@ -803,10 +821,13 @@ async function saveNotes() {
       </UCard>
 
       <!-- AI analysis -->
-      <UCard class="rounded-lg border border-gray-200 dark:border-gray-700 shadow-none">
+      <UCard
+        class="rounded-[7px] border-0"
+        style="box-shadow: rgba(145,158,171,0.2) 0px 0px 2px 0px, rgba(145,158,171,0.12) 0px 12px 24px -4px;"
+      >
         <template #header>
           <div class="flex items-center gap-1.5">
-            <span class="text-lg font-semibold text-dark dark:text-white">AI Аналіз</span>
+            <span class="text-[15px] font-semibold text-[oklch(32.70%_0.035_260.11)] dark:text-white">AI Аналіз</span>
             <UTooltip
               text="Автоматичний аналіз компанії та рекрутера на основі листування. Генерує промпт для Claude AI"
               :delay-duration="400"

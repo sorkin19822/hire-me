@@ -185,44 +185,49 @@ const columns = [
       />
     </div>
 
-    <!-- Table -->
-    <UTable
-      v-model:row-selection="rowSelection"
-      :data="vacancies ?? []"
-      :columns="columns"
-      :loading="!vacancies"
+    <!-- Table wrapped in card -->
+    <div
+      class="rounded-[7px] bg-white dark:bg-[oklch(27.84%_0.027_257.53)] overflow-hidden"
+      style="box-shadow: rgba(145,158,171,0.2) 0px 0px 2px 0px, rgba(145,158,171,0.12) 0px 12px 24px -4px;"
     >
-      <template #company-cell="{ row }">
-        <NuxtLink
-          :to="`/vacancies/${row.original.id}`"
-          class="flex items-center gap-2 font-medium hover:underline"
-        >
-          <img
-            v-if="getFaviconUrl(row.original.urlSite)"
-            :src="getFaviconUrl(row.original.urlSite)!"
-            class="w-4 h-4 rounded-sm shrink-0"
-            :alt="row.original.company"
-            @error="($event.target as HTMLImageElement).style.display = 'none'"
+      <UTable
+        v-model:row-selection="rowSelection"
+        :data="vacancies ?? []"
+        :columns="columns"
+        :loading="!vacancies"
+      >
+        <template #company-cell="{ row }">
+          <NuxtLink
+            :to="`/vacancies/${row.original.id}`"
+            class="flex items-center gap-2 font-medium hover:underline"
           >
-          {{ row.original.company }}
-        </NuxtLink>
-      </template>
+            <img
+              v-if="getFaviconUrl(row.original.urlSite)"
+              :src="getFaviconUrl(row.original.urlSite)!"
+              class="w-4 h-4 rounded-sm shrink-0"
+              :alt="row.original.company"
+              @error="($event.target as HTMLImageElement).style.display = 'none'"
+            >
+            {{ row.original.company }}
+          </NuxtLink>
+        </template>
 
-      <template #stage-cell="{ row }">
-        <UBadge
-          v-if="row.original.stageName"
-          :style="{ backgroundColor: row.original.stageColor + '22', color: row.original.stageColor, borderColor: row.original.stageColor + '44' }"
-          variant="outline"
-          size="sm"
-        >
-          {{ row.original.stageName }}
-        </UBadge>
-      </template>
+        <template #stage-cell="{ row }">
+          <UBadge
+            v-if="row.original.stageName"
+            :style="{ backgroundColor: row.original.stageColor + '22', color: row.original.stageColor, borderColor: row.original.stageColor + '44' }"
+            variant="outline"
+            size="sm"
+          >
+            {{ row.original.stageName }}
+          </UBadge>
+        </template>
 
-      <template #applyDate-cell="{ row }">
-        {{ row.original.applyDate ?? '—' }}
-      </template>
-    </UTable>
+        <template #applyDate-cell="{ row }">
+          {{ row.original.applyDate ?? '—' }}
+        </template>
+      </UTable>
+    </div>
 
     <!-- Confirm delete single -->
     <ConfirmModal

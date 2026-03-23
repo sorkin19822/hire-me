@@ -1,24 +1,115 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap');
 @import "tailwindcss";
 @import "@nuxt/ui";
 
-@layer base {
-  button, [role="button"], a {
-    cursor: pointer;
-  }
+@theme {
+  --font-sans: 'DM Sans', sans-serif;
+
+  /* Brand colors */
+  --color-primary: oklch(65.33% 0.184 266.79);
+  --color-primary-emphasis: oklch(58.11% 0.161 266.76);
+  --color-primary-light: oklch(65.33% 0.184 266.79 / 12.50%);
+
+  --color-secondary: oklch(76.32% 0.139 237.2);
+  --color-secondary-emphasis: oklch(67.79% 0.122 236.84);
+  --color-secondary-light: oklch(76.32% 0.139 237.2 / 12.50%);
+
+  /* Semantic UI colors */
+  --color-success: oklch(80.48% 0.150 174.63);
+  --color-warning: oklch(80.94% 0.165 74.03);
+  --color-error: oklch(74.75% 0.144 35.82);
+  --color-info: oklch(68.98% 0.165 257.10);
+
+  /* Text */
+  --color-bodytext: oklch(52.16% 0.047 260.80);
+  --color-link: oklch(32.70% 0.035 260.11);
+  --color-darklink: oklch(64.54% 0.049 258.74);
+
+  /* Borders & surfaces */
+  --color-border: oklch(92.03% 0.015 260.73);
+  --color-darkborder: oklch(36.67% 0.041 262.29);
+  --color-lightgray: oklch(98.07% 0.005 247.88);
+  --color-surface: oklch(27.84% 0.027 257.53);
+
+  /* Shadows */
+  --shadow-card: rgba(145, 158, 171, 0.2) 0px 0px 2px 0px, rgba(145, 158, 171, 0.12) 0px 12px 24px -4px;
+  --shadow-card-dark: rgba(145, 158, 171, 0.3) 0px 0px 2px 0px, rgba(145, 158, 171, 0.02) 0px 12px 24px -4px;
+  --shadow-sm: rgba(145, 158, 171, 0.16) 0px 1px 4px;
+
+  /* Radius */
+  --radius-sm: 4px;
+  --radius-md: 7px;
 }
 
-@theme static {
-  --font-sans: 'Public Sans', sans-serif;
+/* ── Base ──────────────────────────────────────────────────────────────────── */
 
-  --color-green-50: #EFFDF5;
-  --color-green-100: #D9FBE8;
-  --color-green-200: #B3F5D1;
-  --color-green-300: #75EDAE;
-  --color-green-400: #00DC82;
-  --color-green-500: #00C16A;
-  --color-green-600: #00A155;
-  --color-green-700: #007F45;
-  --color-green-800: #016538;
-  --color-green-900: #0A5331;
-  --color-green-950: #052E16;
+html {
+  font-family: 'DM Sans', sans-serif;
+}
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  color: oklch(52.16% 0.047 260.80);
+  background-color: oklch(98.07% 0.005 247.88);
+}
+
+.dark body {
+  background-color: oklch(22% 0.02 257.53);
+  color: oklch(85% 0.01 260);
+}
+
+button, [role="button"], a {
+  cursor: pointer;
+}
+
+/* ── Card utility ──────────────────────────────────────────────────────────── */
+
+@utility card {
+  @apply rounded-[7px] bg-white dark:bg-[oklch(27.84%_0.027_257.53)] relative w-full;
+  box-shadow: rgba(145, 158, 171, 0.2) 0px 0px 2px 0px, rgba(145, 158, 171, 0.12) 0px 12px 24px -4px;
+}
+
+@utility card-body {
+  @apply p-6;
+}
+
+/* ── Sidebar nav active state ─────────────────────────────────────────────── */
+
+.nav-item-active {
+  background-color: oklch(65.33% 0.184 266.79 / 10%);
+  color: oklch(58.11% 0.161 266.76);
+  font-weight: 600;
+}
+
+.dark .nav-item-active {
+  background-color: oklch(65.33% 0.184 266.79 / 15%);
+  color: oklch(75% 0.15 266.79);
+}
+
+/* ── Kanban scrollbar ─────────────────────────────────────────────────────── */
+
+.kanban-scroll::-webkit-scrollbar {
+  height: 6px;
+}
+.kanban-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.kanban-scroll::-webkit-scrollbar-thumb {
+  background: oklch(87% 0.01 260);
+  border-radius: 3px;
+}
+.dark .kanban-scroll::-webkit-scrollbar-thumb {
+  background: oklch(40% 0.03 260);
+}
+
+/* ── UHeader override — make it feel part of the design system ────────────── */
+
+header[data-ui-header] {
+  border-bottom: 1px solid oklch(92.03% 0.015 260.73);
+  background: white;
+}
+
+.dark header[data-ui-header] {
+  border-bottom: 1px solid oklch(36.67% 0.041 262.29);
+  background: oklch(27.84% 0.027 257.53);
 }

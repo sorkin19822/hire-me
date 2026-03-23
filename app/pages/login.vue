@@ -44,15 +44,25 @@ async function onSubmit() {
 </script>
 
 <template>
-  <div class="min-h-screen bg-gray-100 flex items-center justify-center p-4">
-    <div class="bg-white shadow-lg rounded-2xl flex w-full max-w-4xl overflow-hidden">
+  <div
+    class="min-h-screen flex items-center justify-center p-4"
+    style="background-color: oklch(98.07% 0.005 247.88);"
+  >
+    <div
+      class="flex w-full max-w-4xl overflow-hidden rounded-[7px] bg-white"
+      style="box-shadow: rgba(145,158,171,0.2) 0px 0px 2px 0px, rgba(145,158,171,0.12) 0px 12px 24px -4px;"
+    >
       <!-- Left: form -->
       <div class="w-full lg:w-1/2 p-8 sm:p-12 flex flex-col justify-center">
         <!-- Logo + title -->
         <div class="mb-8 text-center">
-          <div class="inline-flex items-center justify-center w-12 h-12 bg-indigo-100 rounded-xl mb-4">
+          <div
+            class="inline-flex items-center justify-center w-12 h-12 rounded-xl mb-4"
+            style="background-color: oklch(65.33% 0.184 266.79 / 12%);"
+          >
             <svg
-              class="w-7 h-7 text-indigo-600"
+              class="w-7 h-7"
+              style="color: oklch(65.33% 0.184 266.79);"
               fill="none"
               stroke="currentColor"
               stroke-width="2"
@@ -65,10 +75,16 @@ async function onSubmit() {
               />
             </svg>
           </div>
-          <h1 class="text-2xl xl:text-3xl font-extrabold text-gray-900">
-            hire-me
+          <h1
+            class="text-2xl xl:text-3xl font-extrabold"
+            style="color: oklch(32.70% 0.035 260.11);"
+          >
+            hire<span style="color: oklch(65.33% 0.184 266.79);">-me</span>
           </h1>
-          <p class="text-sm text-gray-500 mt-1">
+          <p
+            class="text-sm mt-1"
+            style="color: oklch(52.16% 0.047 260.80)"
+          >
             Job Search CRM
           </p>
         </div>
@@ -121,10 +137,16 @@ async function onSubmit() {
         <!-- Divider -->
         <div class="relative mb-6">
           <div class="absolute inset-0 flex items-center">
-            <div class="w-full border-t border-gray-200" />
+            <div
+              class="w-full border-t"
+              style="border-color: oklch(92.03% 0.015 260.73);"
+            />
           </div>
           <div class="relative flex justify-center text-xs">
-            <span class="px-3 bg-white text-gray-400 tracking-wide">або через email</span>
+            <span
+              class="px-3 bg-white tracking-wide"
+              style="color: oklch(52.16% 0.047 260.80);"
+            >або через email</span>
           </div>
         </div>
 
@@ -172,16 +194,23 @@ async function onSubmit() {
           </UButton>
         </UForm>
 
-        <p class="text-xs text-gray-400 text-center mt-6">
+        <p
+          class="text-xs text-center mt-6"
+          style="color: oklch(52.16% 0.047 260.80);"
+        >
           Перший вхід — автоматична реєстрація
         </p>
       </div>
 
       <!-- Right: decorative panel (hidden on mobile) -->
-      <div class="hidden lg:flex lg:w-1/2 bg-indigo-100 items-center justify-center p-12">
+      <div
+        class="hidden lg:flex lg:w-1/2 items-center justify-center p-12"
+        style="background: linear-gradient(135deg, oklch(65.33% 0.184 266.79 / 8%) 0%, oklch(76.32% 0.139 237.2 / 12%) 100%);"
+      >
         <div class="text-center">
           <svg
-            class="w-64 h-64 text-indigo-300 mx-auto mb-6"
+            class="w-64 h-64 mx-auto mb-6"
+            style="color: oklch(65.33% 0.184 266.79 / 40%);"
             fill="none"
             stroke="currentColor"
             stroke-width="1"
@@ -273,10 +302,16 @@ async function onSubmit() {
               stroke-linecap="round"
             />
           </svg>
-          <h2 class="text-2xl font-bold text-indigo-700 mb-2">
+          <h2
+            class="text-2xl font-bold mb-2"
+            style="color: oklch(58.11% 0.161 266.76);"
+          >
             Твій Job Tracker
           </h2>
-          <p class="text-indigo-400 text-sm leading-relaxed max-w-xs mx-auto">
+          <p
+            class="text-sm leading-relaxed max-w-xs mx-auto"
+            style="color: oklch(52.16% 0.047 260.80);"
+          >
             Відстежуй вакансії, рекрутерів та переписку в одному місці
           </p>
         </div>
