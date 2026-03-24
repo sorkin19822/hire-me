@@ -39,7 +39,8 @@ const navItems = [
   { to: '/recruiters', icon: 'i-lucide-users', label: 'Рекрутери' },
   { to: '/analytics', icon: 'i-lucide-bar-chart-2', label: 'Аналітика' },
   { to: '/cv-versions', icon: 'i-lucide-file-text', label: 'CV' },
-  { to: '/import', icon: 'i-lucide-upload', label: 'Імпорт' }
+  { to: '/import', icon: 'i-lucide-upload', label: 'Імпорт' },
+  { to: '/settings', icon: 'i-lucide-settings', label: 'Налаштування' }
 ]
 
 function isActive(to: string) {
