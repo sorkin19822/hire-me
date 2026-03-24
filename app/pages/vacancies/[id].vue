@@ -559,7 +559,6 @@ async function saveNotes() {
           <ClientOnly>
             <RichTextEditor
               v-model="descriptionValue"
-              placeholder="Вставте текст оголошення вакансії..."
               class="w-full"
             />
           </ClientOnly>

@@ -2,12 +2,9 @@
 import { useEditor, EditorContent } from '@tiptap/vue-3'
 import StarterKit from '@tiptap/starter-kit'
 import Underline from '@tiptap/extension-underline'
-import TextAlign from '@tiptap/extension-text-align'
-import Placeholder from '@tiptap/extension-placeholder'
 
 const props = defineProps<{
   modelValue: string
-  placeholder?: string
 }>()
 
 const emit = defineEmits<{ 'update:modelValue': [value: string] }>()
@@ -17,8 +14,6 @@ const editor = useEditor({
   extensions: [
     StarterKit,
     Underline,
-    TextAlign.configure({ types: ['heading', 'paragraph'] }),
-    Placeholder.configure({ placeholder: props.placeholder ?? 'Введіть текст...' }),
   ],
   onUpdate ({ editor }) {
     emit('update:modelValue', editor.getHTML())
@@ -157,6 +152,8 @@ onBeforeUnmount(() => editor.value?.destroy())
 </template>
 
 <style scoped>
+@reference "~/assets/css/main.css";
+
 .toolbar-btn {
   @apply p-1.5 rounded text-[oklch(52.16%_0.047_260.80)] dark:text-[oklch(64.54%_0.049_258.74)] hover:bg-white dark:hover:bg-[oklch(32%_0.03_260)] hover:text-primary transition-colors;
 }
