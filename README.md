@@ -19,7 +19,7 @@ Each vacancy has:
 - **Apply date** — calendar picker
 - **Links** — vacancy URL and company site
 - **CV version** — which resume you sent (with preview)
-- **Job description** — full text of the vacancy (used for AI analysis)
+- **Job description** — rich text editor (bold, italic, underline, headings, lists, blockquote, code); paste HTML directly from job boards
 - **Notes** — personal observations
 - **Recruiters** — contacts with Telegram, email, LinkedIn
 - **Message timeline** — full conversation history
@@ -37,7 +37,10 @@ Upload multiple versions of your resume (PDF or DOCX), add comments to each ("wi
 Generates a detailed prompt with all available context (vacancy text, recruiter info, full message history) → copy to claude.ai → paste the JSON response back. The app shows: company score 0–10, recruiter score 0–10, green flags, red flags, summary.
 
 ### Analytics
-Funnel chart showing how many vacancies are at each stage, Gantt timeline of applications over time, summary statistics.
+Funnel chart showing conversion between active pipeline stages (terminal stages like "Rejected" / "No response" are excluded from conversion percentages), Gantt timeline of applications over time, summary statistics.
+
+### Settings
+`/settings` page for managing integrations. Currently: Telegram MTProto authentication (enter phone → receive SMS code → confirm). Status badge shows live connection state.
 
 ---
 
