@@ -540,12 +540,13 @@ async function saveNotes() {
           </div>
         </template>
         <div v-if="!editingDescription">
-          <!-- eslint-disable-next-line vue/no-v-html -->
+          <!-- eslint-disable vue/no-v-html -->
           <div
             v-if="vacancy.description"
             class="prose-content"
             v-html="vacancy.description"
           />
+          <!-- eslint-enable vue/no-v-html -->
           <p
             v-else
             class="text-sm text-gray-400 dark:text-gray-500"
