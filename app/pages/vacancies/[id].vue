@@ -540,12 +540,11 @@ async function saveNotes() {
           </div>
         </template>
         <div v-if="!editingDescription">
-          <p
+          <div
             v-if="vacancy.description"
-            class="text-sm whitespace-pre-wrap text-[oklch(32.70%_0.035_260.11)] dark:text-white"
-          >
-            {{ vacancy.description }}
-          </p>
+            class="prose-content"
+            v-html="vacancy.description"
+          />
           <p
             v-else
             class="text-sm text-gray-400 dark:text-gray-500"
@@ -557,13 +556,13 @@ async function saveNotes() {
           v-else
           class="flex flex-col gap-4"
         >
-          <UTextarea
-            v-model="descriptionValue"
-            :rows="8"
-            autofocus
-            placeholder="Вставте текст оголошення вакансії..."
-            class="w-full"
-          />
+          <ClientOnly>
+            <RichTextEditor
+              v-model="descriptionValue"
+              placeholder="Вставте текст оголошення вакансії..."
+              class="w-full"
+            />
+          </ClientOnly>
           <div class="flex gap-2 justify-end">
             <UButton
               variant="ghost"
