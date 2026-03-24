@@ -104,7 +104,10 @@ await fetchStatus()
               class="w-9 h-9 rounded-lg flex items-center justify-center"
               style="background: oklch(65% 0.18 230 / 12%);"
             >
-              <UIcon name="i-lucide-send" class="w-5 h-5 text-[oklch(55%_0.18_230)]" />
+              <UIcon
+                name="i-lucide-send"
+                class="w-5 h-5 text-[oklch(55%_0.18_230)]"
+              />
             </div>
             <div>
               <h2 class="text-[15px] font-semibold text-[oklch(32.70%_0.035_260.11)] dark:text-white">
@@ -148,16 +151,25 @@ await fetchStatus()
             class="flex items-center gap-3 p-4 rounded-[7px]"
             style="background: oklch(80.48% 0.150 174.63 / 8%);"
           >
-            <UIcon name="i-lucide-check-circle" class="w-5 h-5 text-success flex-shrink-0" />
+            <UIcon
+              name="i-lucide-check-circle"
+              class="w-5 h-5 text-success flex-shrink-0"
+            />
             <p class="text-sm text-[oklch(32.70%_0.035_260.11)] dark:text-white">
               Telegram акаунт підключено. Імпорт повідомлень від рекрутерів доступний.
             </p>
           </div>
 
           <!-- Not connected: auth form -->
-          <div v-else class="space-y-4">
+          <div
+            v-else
+            class="space-y-4"
+          >
             <!-- Step 1: phone input -->
-            <div v-if="!codeSent" class="space-y-3">
+            <div
+              v-if="!codeSent"
+              class="space-y-3"
+            >
               <p class="text-sm text-[oklch(52.16%_0.047_260.80)] dark:text-[oklch(64.54%_0.049_258.74)]">
                 Введіть номер телефону, пов'язаний з вашим Telegram акаунтом. На нього буде надіслано SMS-код.
               </p>
@@ -183,12 +195,18 @@ await fetchStatus()
             </div>
 
             <!-- Step 2: code verification -->
-            <div v-else class="space-y-3">
+            <div
+              v-else
+              class="space-y-3"
+            >
               <div
                 class="flex items-center gap-2 p-3 rounded-[7px]"
                 style="background: oklch(65.33% 0.184 266.79 / 8%);"
               >
-                <UIcon name="i-lucide-info" class="w-4 h-4 text-primary flex-shrink-0" />
+                <UIcon
+                  name="i-lucide-info"
+                  class="w-4 h-4 text-primary flex-shrink-0"
+                />
                 <p class="text-sm text-[oklch(32.70%_0.035_260.11)] dark:text-white">
                   Код надіслано на <strong>{{ phone }}</strong>
                 </p>

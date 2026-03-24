@@ -24,32 +24,32 @@ const TOOLBAR: ToolbarGroup[] = [
     buttons: [
       { icon: 'i-lucide-bold', action: 'bold' },
       { icon: 'i-lucide-italic', action: 'italic' },
-      { icon: 'i-lucide-underline', action: 'underline' },
-    ],
+      { icon: 'i-lucide-underline', action: 'underline' }
+    ]
   },
   {
     buttons: [
       { icon: 'i-lucide-heading-2', action: 'heading', attrs: { level: 2 } },
-      { icon: 'i-lucide-heading-3', action: 'heading', attrs: { level: 3 } },
-    ],
+      { icon: 'i-lucide-heading-3', action: 'heading', attrs: { level: 3 } }
+    ]
   },
   {
     buttons: [
       { icon: 'i-lucide-list', action: 'bulletList' },
-      { icon: 'i-lucide-list-ordered', action: 'orderedList' },
-    ],
+      { icon: 'i-lucide-list-ordered', action: 'orderedList' }
+    ]
   },
   {
     buttons: [
       { icon: 'i-lucide-quote', action: 'blockquote' },
-      { icon: 'i-lucide-code', action: 'code' },
-    ],
-  },
+      { icon: 'i-lucide-code', action: 'code' }
+    ]
+  }
 ]
 
 const HISTORY: ToolbarButton[] = [
   { icon: 'i-lucide-undo', action: 'undo' },
-  { icon: 'i-lucide-redo', action: 'redo' },
+  { icon: 'i-lucide-redo', action: 'redo' }
 ]
 
 const editor = useEditor({
@@ -57,7 +57,7 @@ const editor = useEditor({
   extensions: [StarterKit, Underline],
   onUpdate({ editor }) {
     emit('update:modelValue', editor.getHTML())
-  },
+  }
 })
 
 watch(() => props.modelValue, (val) => {
@@ -93,7 +93,7 @@ function btnProps(active: boolean) {
     size: 'xs' as const,
     square: true,
     color: (active ? 'primary' : 'neutral') as 'primary' | 'neutral',
-    variant: (active ? 'soft' : 'ghost') as 'soft' | 'ghost',
+    variant: (active ? 'soft' : 'ghost') as 'soft' | 'ghost'
   }
 }
 </script>
@@ -101,8 +101,14 @@ function btnProps(active: boolean) {
 <template>
   <div class="border border-[oklch(92.03%_0.015_260.73)] dark:border-[oklch(36.67%_0.041_262.29)] rounded-[7px] overflow-hidden">
     <div class="flex flex-wrap items-center gap-0.5 p-1.5 border-b border-[oklch(92.03%_0.015_260.73)] dark:border-[oklch(36.67%_0.041_262.29)] bg-[oklch(98.07%_0.005_247.88)] dark:bg-[oklch(27.84%_0.027_257.53)]">
-      <template v-for="(group, gi) in TOOLBAR" :key="gi">
-        <div v-if="gi > 0" class="w-px h-5 bg-gray-200 dark:bg-gray-600 mx-0.5" />
+      <template
+        v-for="(group, gi) in TOOLBAR"
+        :key="gi"
+      >
+        <div
+          v-if="gi > 0"
+          class="w-px h-5 bg-gray-200 dark:bg-gray-600 mx-0.5"
+        />
         <UButton
           v-for="btn in group.buttons"
           :key="btn.action + JSON.stringify(btn.attrs)"
@@ -124,6 +130,9 @@ function btnProps(active: boolean) {
       />
     </div>
 
-    <EditorContent :editor="editor" class="prose-editor" />
+    <EditorContent
+      :editor="editor"
+      class="prose-editor"
+    />
   </div>
 </template>
