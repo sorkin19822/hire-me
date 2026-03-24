@@ -18,10 +18,11 @@ function barWidth(count: number): string {
 
 function dropOff(index: number): string | null {
   if (index === 0) return null
-  const prev = props.stages[index - 1]!.count
-  if (prev === 0) return null
-  const current = props.stages[index]!.count
-  const pct = Math.round((current / prev) * 100)
+  const curr = props.stages[index]!
+  const prev = props.stages[index - 1]!
+  if (curr.isTerminal || prev.isTerminal) return null
+  if (prev.count === 0) return null
+  const pct = Math.round((curr.count / prev.count) * 100)
   return `${pct}% від попередньої`
 }
 </script>
