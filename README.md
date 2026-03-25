@@ -21,6 +21,7 @@ Each vacancy has:
 - **CV version** — which resume you sent (with preview)
 - **Job description** — rich text editor (bold, italic, underline, headings, lists, blockquote, code); paste HTML directly from job boards
 - **Notes** — personal observations
+- **Stage progress tracker** — horizontal dot indicator, independent of the stage selector. Click a dot to activate it, click again to open a popover with status (Waiting / Passed / Failed) and a short comment. Hover shows the comment as a tooltip. Shows `X of N stages` counter.
 - **Recruiters** — contacts with Telegram, email, LinkedIn
 - **Message timeline** — full conversation history
 - **AI analysis** — company and recruiter evaluation
@@ -40,7 +41,7 @@ Generates a detailed prompt with all available context (vacancy text, recruiter 
 Funnel chart showing conversion between active pipeline stages (terminal stages like "Rejected" / "No response" are excluded from conversion percentages), Gantt timeline of applications over time, summary statistics.
 
 ### Settings
-`/settings` page for managing integrations. Currently: Telegram MTProto authentication (enter phone → receive SMS code → confirm). Status badge shows live connection state.
+`/settings` page for managing integrations. Currently: Telegram MTProto authentication (enter phone → receive SMS code → confirm). Status badge shows live connection state. Email IMAP integration connects to ukr.net using an app-specific password.
 
 ---
 

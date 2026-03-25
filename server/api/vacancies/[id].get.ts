@@ -27,6 +27,7 @@ export default defineEventHandler(async (event) => {
       urlSite: vacancies.urlSite,
       cvVersionId: vacancies.cvVersionId,
       description: vacancies.description,
+      stageNotes: vacancies.stageNotes,
       createdAt: vacancies.createdAt,
       updatedAt: vacancies.updatedAt,
       messagesCount: sql<number>`(select count(*) from messages where messages.vacancy_id = ${vacancies.id})`

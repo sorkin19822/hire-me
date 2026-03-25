@@ -16,8 +16,10 @@ if (!vacancy.value) {
 
 useSeoMeta({ title: `${vacancy.value?.company} — hire-me` })
 
+interface Stage { id: number, name: string, color: string, order: number, is_terminal: number }
+
 const stageOptions = computed(() =>
-  (stages.value ?? []).map((s: { id: number, name: string, color: string }) => ({
+  (stages.value ?? []).map((s: Stage) => ({
     label: s.name,
     value: s.id
   }))
@@ -25,6 +27,78 @@ const stageOptions = computed(() =>
 
 const selectedStageId = ref<number | undefined>(vacancy.value?.stageId ?? undefined)
 const stageSaving = ref(false)
+
+const progressStages = computed(() =>
+  ((stages.value ?? []) as Stage[])
+    .filter(s => !s.is_terminal)
+    .sort((a, b) => a.order - b.order)
+)
+
+type StageStatus = 'pending' | 'passed' | 'failed'
+interface StageEntry { active: boolean, status: StageStatus, note: string }
+
+const STATUS_OPTIONS: { label: string, value: StageStatus, color: string }[] = [
+  { label: 'Очікую', value: 'pending', color: '#f59e0b' },
+  { label: 'Пройшов', value: 'passed', color: '#10b981' },
+  { label: 'Не пройшов', value: 'failed', color: '#ef4444' }
+]
+
+function dotColor(entry: StageEntry | undefined, stageColor: string): string {
+  if (!entry?.active) return ''
+  if (entry.status === 'passed') return '#10b981'
+  if (entry.status === 'failed') return '#ef4444'
+  return stageColor
+}
+
+const stageData = ref<Record<number, StageEntry>>(
+  vacancy.value?.stageNotes ? JSON.parse(vacancy.value.stageNotes) : {}
+)
+const openPopoverId = ref<number | null>(null)
+const stageDataSaving = ref(false)
+
+async function saveStageData() {
+  stageDataSaving.value = true
+  try {
+    await $fetch(`/api/vacancies/${id}`, {
+      method: 'PATCH',
+      body: { stageNotes: JSON.stringify(stageData.value) }
+    })
+  } finally {
+    stageDataSaving.value = false
+  }
+}
+
+function handleDotClick(stageId: number) {
+  const entry = stageData.value[stageId]
+  if (!entry?.active) {
+    stageData.value = { ...stageData.value, [stageId]: { active: true, status: 'pending', note: '' } }
+    openPopoverId.value = stageId
+    saveStageData()
+  } else {
+    openPopoverId.value = openPopoverId.value === stageId ? null : stageId
+  }
+}
+
+function setStageStatus(stageId: number, status: StageStatus) {
+  const entry = stageData.value[stageId]
+  if (!entry) return
+  stageData.value = { ...stageData.value, [stageId]: { ...entry, status } }
+  saveStageData()
+}
+
+function setStageNote(stageId: number, note: string) {
+  const entry = stageData.value[stageId]
+  if (!entry) return
+  stageData.value = { ...stageData.value, [stageId]: { ...entry, note } }
+}
+
+function deactivateStage(stageId: number) {
+  const updated = { ...stageData.value }
+  delete updated[stageId]
+  stageData.value = updated
+  openPopoverId.value = null
+  saveStageData()
+}
 
 async function changeStage(newId: number | null) {
   stageSaving.value = true
@@ -276,26 +350,101 @@ async function saveNotes() {
           </div>
         </div>
 
-        <div class="flex items-center gap-2">
-          <UTooltip
-            text="Поточний етап розгляду вашої кандидатури"
-            :delay-duration="400"
-          >
-            <span class="inline-flex cursor-help">
-              <UIcon
-                name="i-lucide-help-circle"
-                class="w-4 h-4 text-gray-400 dark:text-gray-500 shrink-0"
-              />
-            </span>
-          </UTooltip>
-          <USelect
-            v-model="selectedStageId"
-            :items="stageOptions"
-            value-key="value"
-            label-key="label"
-            :loading="stageSaving"
-            class="w-44"
-          />
+        <div class="flex flex-col items-end gap-2">
+          <div class="flex items-center gap-2">
+            <UTooltip
+              text="Поточний етап розгляду вашої кандидатури"
+              :delay-duration="400"
+            >
+              <span class="inline-flex cursor-help">
+                <UIcon
+                  name="i-lucide-help-circle"
+                  class="w-4 h-4 text-gray-400 dark:text-gray-500 shrink-0"
+                />
+              </span>
+            </UTooltip>
+            <USelect
+              v-model="selectedStageId"
+              :items="stageOptions"
+              value-key="value"
+              label-key="label"
+              :loading="stageSaving"
+              class="w-44"
+            />
+          </div>
+
+          <!-- Progress indicator — manual, independent of stage selector -->
+          <div class="flex flex-col items-end gap-1.5">
+            <div class="flex items-center gap-1">
+              <template
+                v-for="(stage, i) in progressStages"
+                :key="stage.id"
+              >
+                <UPopover
+                  :open="openPopoverId === stage.id"
+                  @update:open="(v) => { if (!v) openPopoverId = null }"
+                >
+                  <UTooltip
+                    :text="stageData[stage.id]?.note || stage.name"
+                    :delay-duration="300"
+                  >
+                    <span
+                      class="inline-flex w-3 h-3 rounded-full cursor-pointer transition-all hover:scale-125"
+                      :class="stageData[stage.id]?.active ? 'shadow-sm' : 'bg-gray-200 dark:bg-gray-700'"
+                      :style="stageData[stage.id]?.active ? `background:${dotColor(stageData[stage.id], stage.color)}` : ''"
+                      @click="handleDotClick(stage.id)"
+                    />
+                  </UTooltip>
+                  <template #content>
+                    <div class="p-3 flex flex-col gap-2 w-48">
+                      <p class="text-xs font-semibold text-[oklch(32.70%_0.035_260.11)] dark:text-white">
+                        {{ stage.name }}
+                      </p>
+                      <div class="flex flex-col gap-1">
+                        <button
+                          v-for="opt in STATUS_OPTIONS"
+                          :key="opt.value"
+                          class="flex items-center gap-2 px-2 py-1.5 rounded-md text-xs text-left transition-colors hover:bg-gray-100 dark:hover:bg-gray-800"
+                          :class="stageData[stage.id]?.status === opt.value ? 'bg-gray-100 dark:bg-gray-800 font-medium' : ''"
+                          @click="setStageStatus(stage.id, opt.value)"
+                        >
+                          <span
+                            class="w-2 h-2 rounded-full flex-shrink-0"
+                            :style="`background:${opt.color}`"
+                          />
+                          {{ opt.label }}
+                        </button>
+                      </div>
+                      <UInput
+                        :model-value="stageData[stage.id]?.note || ''"
+                        size="xs"
+                        placeholder="Коментар..."
+                        @blur="setStageNote(stage.id, ($event.target as HTMLInputElement).value); saveStageData()"
+                        @keyup.enter="setStageNote(stage.id, ($event.target as HTMLInputElement).value); saveStageData()"
+                      />
+                      <UButton
+                        size="xs"
+                        color="neutral"
+                        variant="ghost"
+                        icon="i-lucide-circle-slash"
+                        class="w-full justify-center"
+                        @click="deactivateStage(stage.id)"
+                      >
+                        Деактивувати
+                      </UButton>
+                    </div>
+                  </template>
+                </UPopover>
+                <span
+                  v-if="i < progressStages.length - 1"
+                  class="w-3 h-px bg-gray-200 dark:bg-gray-700"
+                />
+              </template>
+            </div>
+            <p class="text-[11px] text-gray-400 dark:text-gray-500 leading-none">
+              {{ Object.values(stageData).filter(e => e.active).length }} з {{ progressStages.length }} етапів
+            </p>
+          </div>
         </div>
       </div>
 
