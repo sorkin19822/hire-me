@@ -299,6 +299,7 @@ async function saveNotes() {
               class="w-6 h-6 rounded-sm mt-1 shrink-0"
               :alt="vacancy.company"
               @error="($event.target as HTMLImageElement).style.display = 'none'"
+              @load="(e: Event) => { const img = e.target as HTMLImageElement; if (img.naturalWidth <= 16) img.style.display = 'none' }"
             >
             <div>
               <h1 class="text-2xl font-bold text-[oklch(32.70%_0.035_260.11)] dark:text-white">

@@ -241,6 +241,7 @@ const columns: TableColumn<VacancyRow>[] = [
               class="w-4 h-4 rounded-sm shrink-0"
               :alt="row.original.company"
               @error="($event.target as HTMLImageElement).style.display = 'none'"
+              @load="(e: Event) => { const img = e.target as HTMLImageElement; if (img.naturalWidth <= 16) img.style.display = 'none' }"
             >
             {{ row.original.company }}
           </NuxtLink>
