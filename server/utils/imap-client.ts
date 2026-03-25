@@ -33,7 +33,7 @@ function connect(imap: Imap): Promise<void> {
 
 function openBox(imap: Imap, name: string): Promise<void> {
   return new Promise((resolve, reject) => {
-    imap.openBox(name, true, (err) => err ? reject(err) : resolve())
+    imap.openBox(name, true, err => err ? reject(err) : resolve())
   })
 }
 
@@ -49,7 +49,9 @@ function fetchMessage(imap: Imap, uid: number): Promise<string> {
     let raw = ''
     f.on('message', (msg) => {
       msg.on('body', (stream: NodeJS.ReadableStream) => {
-        stream.on('data', (chunk: Buffer) => { raw += chunk.toString() })
+        stream.on('data', (chunk: Buffer) => {
+          raw += chunk.toString()
+        })
       })
       msg.once('end', () => resolve(raw))
     })
@@ -69,7 +71,7 @@ async function fetchFromFolder(
     return []
   }
 
-  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
   const since = new Date()
   since.setMonth(since.getMonth() - 6)
   const sinceStr = `${String(since.getDate()).padStart(2, '0')}-${months[since.getMonth()]}-${since.getFullYear()}`
@@ -95,8 +97,8 @@ async function fetchFromFolder(
       const date = parsed.date ? parsed.date.toISOString() : new Date().toISOString()
       const subject = parsed.subject ?? ''
       const body = parsed.text?.trim() ?? ''
-      const messageId = (typeof parsed.messageId === 'string' ? parsed.messageId : '') ||
-        `${date}::${emailAddress}::${subject}`
+      const messageId = (typeof parsed.messageId === 'string' ? parsed.messageId : '')
+        || `${date}::${emailAddress}::${subject}`
 
       if (!body && !subject) continue
 
@@ -131,7 +133,9 @@ async function fetchEmailsInternal(
     }
     return [...inbox, ...sent]
   } finally {
-    try { imap.end() } catch { /* ignore */ }
+    try {
+      imap.end()
+    } catch { /* ignore */ }
   }
 }
 

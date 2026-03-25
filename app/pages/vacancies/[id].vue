@@ -16,10 +16,10 @@ if (!vacancy.value) {
 
 useSeoMeta({ title: `${vacancy.value?.company} — hire-me` })
 
-interface Stage { id: number, name: string, color: string, order: number, is_terminal: number }
+interface Stage { id: number, name: string, color: string, order: number, isTerminal: boolean }
 
 const stageOptions = computed(() =>
-  (stages.value ?? []).map((s: Stage) => ({
+  (stages.value ?? []).map(s => ({
     label: s.name,
     value: s.id
   }))
@@ -29,8 +29,8 @@ const selectedStageId = ref<number | undefined>(vacancy.value?.stageId ?? undefi
 const stageSaving = ref(false)
 
 const progressStages = computed(() =>
-  ((stages.value ?? []) as Stage[])
-    .filter(s => !s.is_terminal)
+  ((stages.value ?? []) as unknown as Stage[])
+    .filter(s => !s.isTerminal)
     .sort((a, b) => a.order - b.order)
 )
 
@@ -93,8 +93,7 @@ function setStageNote(stageId: number, note: string) {
 }
 
 function deactivateStage(stageId: number) {
-  const updated = { ...stageData.value }
-  delete updated[stageId]
+  const { [stageId]: _removed, ...updated } = stageData.value
   stageData.value = updated
   openPopoverId.value = null
   saveStageData()
