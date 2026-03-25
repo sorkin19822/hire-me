@@ -30,7 +30,6 @@ const stageSaving = ref(false)
 
 const progressStages = computed(() =>
   ((stages.value ?? []) as unknown as Stage[])
-    .filter(s => !s.isTerminal)
     .sort((a, b) => a.order - b.order)
 )
 
@@ -54,6 +53,7 @@ const stageData = ref<Record<number, StageEntry>>(
   vacancy.value?.stageNotes ? JSON.parse(vacancy.value.stageNotes) : {}
 )
 const openPopoverId = ref<number | null>(null)
+const popoverNote = ref('')
 const stageDataSaving = ref(false)
 
 async function saveStageData() {
@@ -75,6 +75,7 @@ function handleDotClick(stageId: number) {
     openPopoverId.value = stageId
     saveStageData()
   } else {
+    popoverNote.value = stageData.value[stageId]?.note || ''
     openPopoverId.value = openPopoverId.value === stageId ? null : stageId
   }
 }
@@ -395,32 +396,34 @@ async function saveNotes() {
                     />
                   </UTooltip>
                   <template #content>
-                    <div class="p-3 flex flex-col gap-2 w-48">
+                    <div class="p-3 flex flex-col gap-2.5 w-52">
                       <p class="text-xs font-semibold text-[oklch(32.70%_0.035_260.11)] dark:text-white">
                         {{ stage.name }}
                       </p>
-                      <div class="flex flex-col gap-1">
-                        <button
-                          v-for="opt in STATUS_OPTIONS"
-                          :key="opt.value"
-                          class="flex items-center gap-2 px-2 py-1.5 rounded-md text-xs text-left transition-colors hover:bg-gray-100 dark:hover:bg-gray-800"
-                          :class="stageData[stage.id]?.status === opt.value ? 'bg-gray-100 dark:bg-gray-800 font-medium' : ''"
-                          @click="setStageStatus(stage.id, opt.value)"
-                        >
-                          <span
-                            class="w-2 h-2 rounded-full flex-shrink-0"
-                            :style="`background:${opt.color}`"
-                          />
-                          {{ opt.label }}
-                        </button>
-                      </div>
-                      <UInput
-                        :model-value="stageData[stage.id]?.note || ''"
+                      <USelect
+                        :model-value="stageData[stage.id]?.status"
+                        :items="STATUS_OPTIONS"
+                        value-key="value"
+                        label-key="label"
                         size="xs"
-                        placeholder="Коментар..."
-                        @blur="setStageNote(stage.id, ($event.target as HTMLInputElement).value); saveStageData()"
-                        @keyup.enter="setStageNote(stage.id, ($event.target as HTMLInputElement).value); saveStageData()"
+                        @update:model-value="(v: StageStatus) => setStageStatus(stage.id, v)"
                       />
+                      <div class="flex gap-1">
+                        <UInput
+                          v-model="popoverNote"
+                          size="xs"
+                          placeholder="Коментар..."
+                          class="flex-1"
+                          @keyup.enter="setStageNote(stage.id, popoverNote); saveStageData()"
+                        />
+                        <UButton
+                          size="xs"
+                          square
+                          icon="i-lucide-check"
+                          :loading="stageDataSaving"
+                          @click="setStageNote(stage.id, popoverNote); saveStageData()"
+                        />
+                      </div>
                       <UButton
                         size="xs"
                         color="neutral"
@@ -794,16 +797,31 @@ async function saveNotes() {
           class="flex flex-col gap-6"
         >
           <div class="flex flex-col gap-1.5">
-            <label class="text-sm font-medium text-gray-700 dark:text-gray-300 block">
-              Нотатки
-            </label>
+            <div class="flex items-center justify-between">
+              <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                Нотатки
+              </label>
+              <span
+                class="text-xs tabular-nums"
+                :class="notesValue.length > 5000 ? 'text-error font-medium' : 'text-gray-400 dark:text-gray-500'"
+              >
+                {{ notesValue.length }} / 5000
+              </span>
+            </div>
             <UTextarea
               v-model="notesValue"
               :rows="4"
               autofocus
               placeholder="Додайте нотатки про вакансію..."
+              :class="notesValue.length > 5000 ? 'ring-2 ring-error' : ''"
               class="w-full rounded-md border border-gray-200 dark:border-gray-600 bg-transparent px-3 py-2 text-sm shadow-none transition-[color,box-shadow] placeholder:text-gray-400 focus-visible:outline-none focus-visible:border-primary focus-visible:ring-0"
             />
+            <p
+              v-if="notesValue.length > 5000"
+              class="text-xs text-error"
+            >
+              Перевищено ліміт на {{ notesValue.length - 5000 }} символів
+            </p>
           </div>
           <div class="flex gap-2 justify-end">
             <UButton
@@ -816,6 +834,7 @@ async function saveNotes() {
             <UButton
               size="sm"
               :loading="notesSaving"
+              :disabled="notesValue.length > 5000"
               @click="saveNotes"
             >
               Зберегти
