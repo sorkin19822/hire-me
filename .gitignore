@@ -70,3 +70,4 @@ pnpm-workspace.yaml
 # Local temporary specs
 temp/
 CLAUDE.md
+test-imap.mjs

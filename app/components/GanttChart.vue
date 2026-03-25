@@ -15,13 +15,17 @@ const validRows = computed(() =>
   props.rows.filter(r => r.applyDate && !isNaN(new Date(r.applyDate).getTime()))
 )
 
+const todayStart = new Date()
+todayStart.setHours(0, 0, 0, 0)
+const todayMs = todayStart.getTime()
+
 const timeRange = computed(() => {
-  if (!validRows.value.length) return { min: Date.now(), max: Date.now() }
+  if (!validRows.value.length) return { min: todayMs, max: todayMs }
   const starts = validRows.value.map(r => new Date(r.applyDate!).getTime())
   const ends = validRows.value.map(r => new Date(r.updatedAt).getTime())
   return {
     min: Math.min(...starts),
-    max: Math.max(...ends, Date.now())
+    max: Math.max(...ends, todayMs)
   }
 })
 

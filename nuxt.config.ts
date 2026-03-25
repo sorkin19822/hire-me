@@ -23,6 +23,7 @@ export default defineNuxtConfig({
     imapUser: '',
     imapPassword: '',
     googleDriveMcpUrl: '',
+    googleBackupFolderId: '',
     telegramMcpUrl: '',
     telegramApiId: process.env.TELEGRAM_API_ID ?? '',
     telegramApiHash: process.env.TELEGRAM_API_HASH ?? '',
@@ -35,7 +36,7 @@ export default defineNuxtConfig({
     // Required for better-sqlite3 and GramJS (CJS native/non-standard modules)
     externals: {
       inline: ['imap-simple', 'imap', 'utf8', 'uuencode', 'quoted-printable', 'iconv-lite'],
-      external: ['telegram']
+      external: ['telegram', 'googleapis']
     }
   },
 

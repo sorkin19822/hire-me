@@ -11,6 +11,8 @@ const _require = createRequire(import.meta.url)
 const Database: any = _require('better-sqlite3')
 
 let _db: ReturnType<typeof drizzle<typeof schema>> | null = null
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let _sqlite: any = null
 
 export function useDatabase() {
   if (_db) return _db
@@ -19,10 +21,23 @@ export function useDatabase() {
 
   mkdirSync(dirname(url), { recursive: true })
 
-  const sqlite = new Database(url)
-  sqlite.pragma('journal_mode = WAL')
-  sqlite.pragma('foreign_keys = ON')
+  _sqlite = new Database(url)
+  _sqlite.pragma('journal_mode = WAL')
+  _sqlite.pragma('foreign_keys = ON')
 
-  _db = drizzle(sqlite, { schema })
+  _db = drizzle(_sqlite, { schema })
   return _db
+}
+
+export function closeDatabase() {
+  if (_sqlite) {
+    try {
+      _sqlite.close()
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (_e) {
+      // ignore errors on close
+    }
+    _sqlite = null
+  }
+  _db = null
 }

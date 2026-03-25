@@ -1,8 +1,16 @@
 import { useDatabase } from '../../database/index'
-import { users } from '../../database/schema'
+import { users, settings } from '../../database/schema'
 
 export default defineOAuthGoogleEventHandler({
-  async onSuccess(event, { user: googleUser }) {
+  config: {
+    scope: ['openid', 'email', 'profile', 'https://www.googleapis.com/auth/drive.file'],
+    authorizationParams: {
+      access_type: 'offline',
+      prompt: 'consent'
+    }
+  },
+
+  async onSuccess(event, { user: googleUser, tokens }) {
     const config = useRuntimeConfig(event)
     const allowedEmails = (config.allowedEmails as string)
       .split(',')
@@ -15,9 +23,8 @@ export default defineOAuthGoogleEventHandler({
       return sendRedirect(event, '/login?error=unauthorized')
     }
 
-    // Upsert user in DB
     const db = useDatabase()
-    // better-sqlite3 is synchronous — .run() completes before continuing
+
     db.insert(users)
       .values({
         email,
@@ -32,6 +39,15 @@ export default defineOAuthGoogleEventHandler({
         }
       })
       .run()
+
+    // Save Google Drive refresh token for backup feature
+    const refreshToken = (tokens as Record<string, unknown>).refresh_token as string | undefined
+    if (refreshToken) {
+      db.insert(settings)
+        .values({ key: 'google_drive_refresh_token', value: refreshToken })
+        .onConflictDoUpdate({ target: settings.key, set: { value: refreshToken } })
+        .run()
+    }
 
     await setUserSession(event, {
       user: {
