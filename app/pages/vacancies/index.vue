@@ -40,12 +40,38 @@ const stageOptions = computed(() => [
   ...(stages.value ?? []).map((s: { id: number, name: string }) => ({ label: s.name, value: s.id }))
 ])
 
+// Pagination
+const currentPage = ref(1)
+const perPage = ref(10)
+const perPageOptions = [
+  { label: '10', value: 10 },
+  { label: '25', value: 25 },
+  { label: '50', value: 50 },
+  { label: '100', value: 100 }
+]
+
+const allVacancies = computed(() => vacancies.value ?? [])
+const totalItems = computed(() => allVacancies.value.length)
+const showingFrom = computed(() => totalItems.value === 0 ? 0 : (currentPage.value - 1) * perPage.value + 1)
+const showingTo = computed(() => Math.min(currentPage.value * perPage.value, totalItems.value))
+const paginatedVacancies = computed(() => {
+  const start = (currentPage.value - 1) * perPage.value
+  return allVacancies.value.slice(start, start + perPage.value)
+})
+
+watch([search, stageFilter, perPage], () => {
+  currentPage.value = 1
+})
+watch(currentPage, () => {
+  rowSelection.value = {}
+})
+
 // Row selection
 const rowSelection = ref<Record<string, boolean>>({})
 const selectedIds = computed(() => {
   return Object.entries(rowSelection.value)
     .filter(([, v]) => v)
-    .map(([i]) => (vacancies.value ?? [])[Number(i)]?.id)
+    .map(([i]) => paginatedVacancies.value[Number(i)]?.id)
     .filter(Boolean) as number[]
 })
 
@@ -200,7 +226,7 @@ const columns: TableColumn<VacancyRow>[] = [
     >
       <UTable
         v-model:row-selection="rowSelection"
-        :data="vacancies ?? []"
+        :data="paginatedVacancies"
         :columns="columns"
         :loading="!vacancies"
       >
@@ -235,6 +261,33 @@ const columns: TableColumn<VacancyRow>[] = [
           {{ row.original.applyDate ?? '—' }}
         </template>
       </UTable>
+
+      <!-- Pagination footer -->
+      <div class="flex items-center justify-between px-4 py-3 border-t border-[oklch(92.03%_0.015_260.73)] dark:border-[oklch(36.67%_0.041_262.29)]">
+        <span class="text-sm text-[oklch(52.16%_0.047_260.80)] dark:text-[oklch(64.54%_0.049_258.74)]">
+          Показано {{ showingFrom }}–{{ showingTo }} з {{ totalItems }}
+        </span>
+        <div class="flex items-center gap-4">
+          <div class="flex items-center gap-2">
+            <span class="text-sm text-[oklch(52.16%_0.047_260.80)] dark:text-[oklch(64.54%_0.049_258.74)]">Рядків:</span>
+            <USelect
+              v-model="perPage"
+              :items="perPageOptions"
+              value-key="value"
+              label-key="label"
+              size="sm"
+              class="w-20"
+            />
+          </div>
+          <UPagination
+            v-model:page="currentPage"
+            :total="totalItems"
+            :items-per-page="perPage"
+            size="sm"
+            :show-edges="true"
+          />
+        </div>
+      </div>
     </div>
 
     <!-- Confirm delete single -->
