@@ -49,8 +49,10 @@ export default defineEventHandler(async (event) => {
   let emails: Awaited<ReturnType<typeof fetchEmailsByAddress>>
   try {
     emails = await fetchEmailsByAddress(email, imapConfig)
-  } catch {
-    throw createError({ statusCode: 502, statusMessage: 'Failed to fetch emails' })
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err)
+    console.error('[imap] fetch failed:', msg)
+    throw createError({ statusCode: 502, statusMessage: `Failed to fetch emails: ${msg}` })
   }
 
   // Fetch existing email messages for this recruiter to dedup by sentAt::content

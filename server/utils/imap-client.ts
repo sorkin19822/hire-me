@@ -1,26 +1,6 @@
-// @ts-expect-error — imap-simple has no type declarations
-import imapSimpleLib from 'imap-simple'
-
-const imapSimple = imapSimpleLib as {
-  connect: (config: object) => Promise<ImapConnection>
-}
-
-interface MessagePart {
-  which: string
-  size: number
-  body: string | Record<string, string[]>
-}
-
-interface ImapMessage {
-  attributes: { uid: number, date: Date }
-  parts: MessagePart[]
-}
-
-interface ImapConnection {
-  openBox: (folder: string) => Promise<unknown>
-  search: (criteria: unknown[], options: object) => Promise<ImapMessage[]>
-  end: () => void
-}
+import Imap from 'imap'
+import { simpleParser } from 'mailparser'
+import { Readable } from 'node:stream'
 
 export interface EmailMessage {
   messageId: string
@@ -30,77 +10,97 @@ export interface EmailMessage {
   direction: 'in' | 'out'
 }
 
-function buildConfig(host: string, port: number, user: string, password: string) {
-  return {
-    imap: {
-      host,
-      port,
-      user,
-      password,
-      tls: true,
-      authTimeout: 10000
-    }
-  }
+function createImap(config: { host: string, port: number, user: string, password: string }): Imap {
+  return new Imap({
+    host: config.host,
+    port: config.port,
+    user: config.user,
+    password: config.password,
+    tls: true,
+    tlsOptions: { rejectUnauthorized: false },
+    authTimeout: 15000,
+    connTimeout: 15000
+  })
 }
 
-function extractHeader(headers: Record<string, string[]>, name: string): string {
-  return (headers[name.toLowerCase()] ?? [])[0] ?? ''
+function connect(imap: Imap): Promise<void> {
+  return new Promise((resolve, reject) => {
+    imap.once('ready', resolve)
+    imap.once('error', reject)
+    imap.connect()
+  })
 }
 
-function stripHtml(html: string): string {
-  return html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim()
+function openBox(imap: Imap, name: string): Promise<void> {
+  return new Promise((resolve, reject) => {
+    imap.openBox(name, true, (err) => err ? reject(err) : resolve())
+  })
+}
+
+function searchUids(imap: Imap, criteria: unknown[]): Promise<number[]> {
+  return new Promise((resolve, reject) => {
+    imap.search(criteria, (err, uids) => err ? reject(err) : resolve(uids))
+  })
+}
+
+function fetchMessage(imap: Imap, uid: number): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const f = imap.fetch([uid], { bodies: '', struct: false })
+    let raw = ''
+    f.on('message', (msg) => {
+      msg.on('body', (stream: NodeJS.ReadableStream) => {
+        stream.on('data', (chunk: Buffer) => { raw += chunk.toString() })
+      })
+      msg.once('end', () => resolve(raw))
+    })
+    f.once('error', reject)
+  })
 }
 
 async function fetchFromFolder(
-  connection: ImapConnection,
+  imap: Imap,
   folder: string,
   emailAddress: string,
   direction: 'in' | 'out'
 ): Promise<EmailMessage[]> {
   try {
-    await connection.openBox(folder)
+    await openBox(imap, folder)
   } catch {
     return []
   }
 
-  // node-imap expects nested arrays for criteria
-  const criterion = direction === 'in' ? [['FROM', emailAddress]] : [['TO', emailAddress]]
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+  const since = new Date()
+  since.setMonth(since.getMonth() - 6)
+  const sinceStr = `${String(since.getDate()).padStart(2, '0')}-${months[since.getMonth()]}-${since.getFullYear()}`
 
-  let messages: ImapMessage[]
+  const addressCriterion = direction === 'in' ? ['FROM', emailAddress] : ['TO', emailAddress]
+
+  let uids: number[]
   try {
-    messages = await connection.search(criterion, {
-      bodies: ['HEADER.FIELDS (FROM TO SUBJECT DATE MESSAGE-ID)', 'TEXT'],
-      struct: false
-    })
+    uids = await searchUids(imap, [addressCriterion, ['SINCE', sinceStr]])
   } catch {
     return []
   }
+
+  if (!uids.length) return []
 
   const results: EmailMessage[] = []
 
-  for (const message of messages) {
+  for (const uid of uids) {
     try {
-      const headerPart = message.parts.find(p => p.which.startsWith('HEADER'))
-      const textPart = message.parts.find(p => p.which === 'TEXT')
+      const raw = await fetchMessage(imap, uid)
+      const parsed = await simpleParser(Readable.from(raw))
 
-      const headers = (headerPart?.body ?? {}) as Record<string, string[]>
-      const rawDate = extractHeader(headers, 'date')
-      const subject = extractHeader(headers, 'subject') || '(no subject)'
-      const rawMsgId = extractHeader(headers, 'message-id')
+      const date = parsed.date ? parsed.date.toISOString() : new Date().toISOString()
+      const subject = parsed.subject ?? ''
+      const body = parsed.text?.trim() ?? ''
+      const messageId = (typeof parsed.messageId === 'string' ? parsed.messageId : '') ||
+        `${date}::${emailAddress}::${subject}`
 
-      const parsedDate = rawDate ? new Date(rawDate) : new Date()
-      if (isNaN(parsedDate.getTime())) continue
-      const date = parsedDate.toISOString()
+      if (!body && !subject) continue
 
-      // Include subject in fallback to avoid same-second collisions
-      const msgId = rawMsgId.trim() || `${date}::${emailAddress}::${subject}`
-
-      const rawBody = typeof textPart?.body === 'string' ? textPart.body : ''
-      const body = rawBody.toLowerCase().includes('<html')
-        ? stripHtml(rawBody)
-        : rawBody.trim()
-
-      results.push({ messageId: msgId, subject, body, date, direction })
+      results.push({ messageId, subject, body, date, direction })
     } catch {
       // Skip unparseable messages
     }
@@ -109,27 +109,38 @@ async function fetchFromFolder(
   return results
 }
 
-export async function fetchEmailsByAddress(
+async function fetchEmailsInternal(
   emailAddress: string,
   config: { host: string, port: number, user: string, password: string }
 ): Promise<EmailMessage[]> {
-  let connection: ImapConnection
+  const imap = createImap(config)
 
   try {
-    connection = await imapSimple.connect(buildConfig(config.host, config.port, config.user, config.password))
+    await connect(imap)
   } catch (err) {
-    console.error('[imap] connection failed:', err)
-    throw new Error('IMAP connection failed')
+    const msg = err instanceof Error ? err.message : JSON.stringify(err)
+    console.error('[imap] connection failed:', msg)
+    throw new Error(msg)
   }
 
   try {
-    // Must run sequentially — a single IMAP connection can only have one mailbox open at a time
-    const inbox = await fetchFromFolder(connection, 'INBOX', emailAddress, 'in')
-    const sent = await fetchFromFolder(connection, 'Sent', emailAddress, 'out')
+    const inbox = await fetchFromFolder(imap, 'INBOX', emailAddress, 'in')
+    let sent = await fetchFromFolder(imap, 'Sent', emailAddress, 'out')
+    if (!sent.length) {
+      sent = await fetchFromFolder(imap, 'Надіслані', emailAddress, 'out')
+    }
     return [...inbox, ...sent]
   } finally {
-    try {
-      connection.end()
-    } catch { /* ignore */ }
+    try { imap.end() } catch { /* ignore */ }
   }
+}
+
+export function fetchEmailsByAddress(
+  emailAddress: string,
+  config: { host: string, port: number, user: string, password: string }
+): Promise<EmailMessage[]> {
+  const timeout = new Promise<never>((_, reject) =>
+    setTimeout(() => reject(new Error('IMAP timeout after 60s')), 60000)
+  )
+  return Promise.race([fetchEmailsInternal(emailAddress, config), timeout])
 }

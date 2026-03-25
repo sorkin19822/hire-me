@@ -281,10 +281,12 @@ async function saveNotes() {
             text="Поточний етап розгляду вашої кандидатури"
             :delay-duration="400"
           >
-            <UIcon
-              name="i-lucide-help-circle"
-              class="w-4 h-4 text-gray-400 dark:text-gray-500 shrink-0"
-            />
+            <span class="inline-flex cursor-help">
+              <UIcon
+                name="i-lucide-help-circle"
+                class="w-4 h-4 text-gray-400 dark:text-gray-500 shrink-0"
+              />
+            </span>
           </UTooltip>
           <USelect
             v-model="selectedStageId"
@@ -310,10 +312,12 @@ async function saveNotes() {
                 text="Дата, коли ви подали заявку на цю вакансію"
                 :delay-duration="400"
               >
-                <UIcon
-                  name="i-lucide-help-circle"
-                  class="w-3.5 h-3.5 text-gray-400 dark:text-gray-500"
-                />
+                <span class="inline-flex cursor-help">
+                  <UIcon
+                    name="i-lucide-help-circle"
+                    class="w-3.5 h-3.5 text-gray-400 dark:text-gray-500"
+                  />
+                </span>
               </UTooltip>
             </div>
             <UPopover v-model:open="applyDateOpen">
@@ -337,10 +341,12 @@ async function saveNotes() {
                 text="Кількість повідомлень у листуванні з рекрутером"
                 :delay-duration="400"
               >
-                <UIcon
-                  name="i-lucide-help-circle"
-                  class="w-3.5 h-3.5 text-gray-400 dark:text-gray-500"
-                />
+                <span class="inline-flex cursor-help">
+                  <UIcon
+                    name="i-lucide-help-circle"
+                    class="w-3.5 h-3.5 text-gray-400 dark:text-gray-500"
+                  />
+                </span>
               </UTooltip>
             </div>
             <p class="font-medium text-[oklch(32.70%_0.035_260.11)] dark:text-white">
@@ -354,10 +360,12 @@ async function saveNotes() {
                 text="Дата додавання вакансії до системи"
                 :delay-duration="400"
               >
-                <UIcon
-                  name="i-lucide-help-circle"
-                  class="w-3.5 h-3.5 text-gray-400 dark:text-gray-500"
-                />
+                <span class="inline-flex cursor-help">
+                  <UIcon
+                    name="i-lucide-help-circle"
+                    class="w-3.5 h-3.5 text-gray-400 dark:text-gray-500"
+                  />
+                </span>
               </UTooltip>
             </div>
             <p class="font-medium text-[oklch(32.70%_0.035_260.11)] dark:text-white">
@@ -371,10 +379,12 @@ async function saveNotes() {
                 text="Резюме, яке ви надіслали на цю вакансію"
                 :delay-duration="400"
               >
-                <UIcon
-                  name="i-lucide-help-circle"
-                  class="w-3.5 h-3.5 text-gray-400 dark:text-gray-500"
-                />
+                <span class="inline-flex cursor-help">
+                  <UIcon
+                    name="i-lucide-help-circle"
+                    class="w-3.5 h-3.5 text-gray-400 dark:text-gray-500"
+                  />
+                </span>
               </UTooltip>
             </div>
             <div class="flex items-center gap-2 mt-1">
@@ -414,10 +424,12 @@ async function saveNotes() {
                 text="Посилання на оголошення вакансії та сайт компанії"
                 :delay-duration="400"
               >
-                <UIcon
-                  name="i-lucide-help-circle"
-                  class="w-4 h-4 text-gray-400 dark:text-gray-500"
-                />
+                <span class="inline-flex cursor-help">
+                  <UIcon
+                    name="i-lucide-help-circle"
+                    class="w-4 h-4 text-gray-400 dark:text-gray-500"
+                  />
+                </span>
               </UTooltip>
             </div>
             <UButton
@@ -524,10 +536,12 @@ async function saveNotes() {
                 text="Повний текст оголошення — використовується для AI аналізу"
                 :delay-duration="400"
               >
-                <UIcon
-                  name="i-lucide-help-circle"
-                  class="w-4 h-4 text-gray-400 dark:text-gray-500"
-                />
+                <span class="inline-flex cursor-help">
+                  <UIcon
+                    name="i-lucide-help-circle"
+                    class="w-4 h-4 text-gray-400 dark:text-gray-500"
+                  />
+                </span>
               </UTooltip>
             </div>
             <UButton
@@ -596,10 +610,12 @@ async function saveNotes() {
                 text="Особисті нотатки про вакансію: враження від співбесіди, умови, питання тощо"
                 :delay-duration="400"
               >
-                <UIcon
-                  name="i-lucide-help-circle"
-                  class="w-4 h-4 text-gray-400 dark:text-gray-500"
-                />
+                <span class="inline-flex cursor-help">
+                  <UIcon
+                    name="i-lucide-help-circle"
+                    class="w-4 h-4 text-gray-400 dark:text-gray-500"
+                  />
+                </span>
               </UTooltip>
             </div>
             <UButton
@@ -673,10 +689,12 @@ async function saveNotes() {
                 text="Контакти рекрутерів по цій вакансії. Можна синхронізувати листування з Telegram"
                 :delay-duration="400"
               >
-                <UIcon
-                  name="i-lucide-help-circle"
-                  class="w-4 h-4 text-gray-400 dark:text-gray-500"
-                />
+                <span class="inline-flex cursor-help">
+                  <UIcon
+                    name="i-lucide-help-circle"
+                    class="w-4 h-4 text-gray-400 dark:text-gray-500"
+                  />
+                </span>
               </UTooltip>
             </div>
             <UButton
@@ -801,10 +819,12 @@ async function saveNotes() {
               text="Хронологія повідомлень з рекрутером. Імпортується з Telegram або вводиться вручну"
               :delay-duration="400"
             >
-              <UIcon
-                name="i-lucide-help-circle"
-                class="w-4 h-4 text-gray-400 dark:text-gray-500"
-              />
+              <span class="inline-flex cursor-help">
+                <UIcon
+                  name="i-lucide-help-circle"
+                  class="w-4 h-4 text-gray-400 dark:text-gray-500"
+                />
+              </span>
             </UTooltip>
           </div>
         </template>
@@ -832,10 +852,12 @@ async function saveNotes() {
               text="Автоматичний аналіз компанії та рекрутера на основі листування. Генерує промпт для Claude AI"
               :delay-duration="400"
             >
-              <UIcon
-                name="i-lucide-help-circle"
-                class="w-4 h-4 text-gray-400 dark:text-gray-500"
-              />
+              <span class="inline-flex cursor-help">
+                <UIcon
+                  name="i-lucide-help-circle"
+                  class="w-4 h-4 text-gray-400 dark:text-gray-500"
+                />
+              </span>
             </UTooltip>
           </div>
         </template>

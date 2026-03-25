@@ -15,6 +15,7 @@ const sendingCode = ref(false)
 const verifying = ref(false)
 const error = ref<string | null>(null)
 
+
 async function fetchStatus() {
   statusLoading.value = true
   try {
@@ -26,6 +27,7 @@ async function fetchStatus() {
     statusLoading.value = false
   }
 }
+
 
 async function sendCode() {
   if (!phone.value.trim()) {
@@ -76,7 +78,9 @@ function goBack() {
   error.value = null
 }
 
-await fetchStatus()
+onMounted(() => {
+  fetchStatus()
+})
 </script>
 
 <template>

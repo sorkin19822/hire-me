@@ -34,8 +34,11 @@
   },
   "devDependencies": {
     "@nuxt/eslint": "^1.15.2",
+    "@types/imap": "^0.8.43",
+    "@types/mailparser": "^3.4.6",
     "drizzle-kit": "^0.31.10",
     "eslint": "^10.0.3",
+    "mailparser": "^3.9.6",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
     "vue-tsc": "^3.2.5"
