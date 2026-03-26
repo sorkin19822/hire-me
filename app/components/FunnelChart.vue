@@ -21,7 +21,7 @@ function dropOff(index: number): string | null {
   const curr = props.stages[index]!
   const prev = props.stages[index - 1]!
   if (curr.isTerminal || prev.isTerminal) return null
-  if (prev.count === 0) return null
+  if (prev.count === 0 || curr.count > prev.count) return null
   const pct = Math.round((curr.count / prev.count) * 100)
   return `${pct}% від попередньої`
 }
