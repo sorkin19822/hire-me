@@ -3,7 +3,7 @@ import { users, settings } from '../../database/schema'
 
 export default defineOAuthGoogleEventHandler({
   config: {
-    scope: ['openid', 'email', 'profile', 'https://www.googleapis.com/auth/drive.file'],
+    scope: ['openid', 'email', 'profile', 'https://www.googleapis.com/auth/drive.file', 'https://www.googleapis.com/auth/calendar.events'],
     authorizationParams: {
       access_type: 'offline',
       prompt: 'consent'

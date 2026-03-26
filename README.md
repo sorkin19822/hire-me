@@ -28,6 +28,7 @@ Each vacancy has:
 - **Recruiters** — contacts with Telegram, email, LinkedIn
 - **Message timeline** — full conversation history
 - **AI analysis** — company and recruiter evaluation
+- **Google Calendar** — create a calendar event directly from the vacancy: select event type (interview stage), pick date/time, set duration. Event title is auto-generated from stage + company name. A push reminder is sent 1 hour before (shows up on Android).
 
 ### Message sync
 - **Telegram** — connects via MTProto (GramJS), fetches full dialog with a recruiter by their username
@@ -59,7 +60,7 @@ Funnel chart showing conversion between active pipeline stages (terminal stages 
 - **Google OAuth** via nuxt-auth-utils (optional login method + Drive backup)
 - **Claude API** for AI analysis
 - **Telegram MTProto** (GramJS) + IMAP for message sync
-- **googleapis** for Google Drive backup
+- **googleapis** for Google Drive backup + Google Calendar events
 
 ---
 
@@ -134,6 +135,13 @@ See [.env.example](.env.example) for all variables.
    - `http://localhost:3000/auth/google-drive` — Drive backup authorization
 5. Copy **Client ID** and **Client Secret** → paste into `.env`
 6. Set `NUXT_OAUTH_GOOGLE_REDIRECT_URL=http://localhost:3000/auth/google` in `.env`
+
+### Google Calendar setup
+
+1. **Enable Calendar API**: [console.cloud.google.com](https://console.cloud.google.com) → **APIs & Services → Enable APIs and Services** → search "Google Calendar API" → Enable
+2. Add `https://www.googleapis.com/auth/calendar.events` scope in **OAuth consent screen → Scopes**
+3. In the app: **Settings → Оновити дозволи** → re-authorize Google → done
+4. On any vacancy page: click **"Додати до Google Calendar"** → fill in event details → save
 
 ### Google Drive Backup setup
 

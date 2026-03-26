@@ -271,6 +271,50 @@ async function saveNotes() {
     notesSaving.value = false
   }
 }
+
+// Calendar modal
+const calendarOpen = ref(false)
+const calendarDateOpen = ref(false)
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const calendarDate = ref<any>(null)
+const calendarTime = ref('10:00')
+const calendarDuration = ref(60)
+const calendarStageId = ref<number | undefined>(undefined)
+const creatingEvent = ref(false)
+const calendarLink = ref<string | null>(null)
+
+const calendarDateDisplay = computed(() =>
+  calendarDate.value ? calendarDate.value.toString() : 'Оберіть дату'
+)
+
+const calendarStartDateTime = computed(() => {
+  if (!calendarDate.value) return ''
+  return `${calendarDate.value.toString()}T${calendarTime.value}`
+})
+
+const calendarEventTitle = computed(() => {
+  const stageName = stageOptions.value.find(s => s.value === calendarStageId.value)?.label
+  const base = vacancy.value?.company ?? ''
+  return stageName ? `${stageName} — ${base}` : `Співбесіда — ${base}`
+})
+
+async function createCalendarEvent() {
+  if (!calendarStartDateTime.value) return
+  creatingEvent.value = true
+  try {
+    const result = await $fetch<{ htmlLink: string }>(`/api/vacancies/${id}/calendar`, {
+      method: 'POST',
+      body: {
+        startDateTime: calendarStartDateTime.value,
+        durationMinutes: Number(calendarDuration.value) || 60,
+        title: calendarEventTitle.value
+      }
+    })
+    calendarLink.value = result.htmlLink
+  } finally {
+    creatingEvent.value = false
+  }
+}
 </script>
 
 <template>
@@ -485,6 +529,14 @@ async function saveNotes() {
                 <UCalendar v-model="applyDateValue" />
               </template>
             </UPopover>
+            <UButton
+              variant="ghost"
+              icon="i-lucide-calendar-plus"
+              size="xs"
+              @click="() => { calendarLink = null; calendarDate = null; calendarTime = '10:00'; calendarStageId = selectedStageId; calendarOpen = true }"
+            >
+              Нагадування
+            </UButton>
           </div>
           <div class="flex flex-col gap-1.5">
             <div class="flex items-center gap-1">
@@ -1035,5 +1087,101 @@ async function saveNotes() {
         />
       </UCard>
     </template>
+
+    <!-- Calendar event modal -->
+    <UModal
+      v-model:open="calendarOpen"
+      title="Додати до Google Calendar"
+    >
+      <template #body>
+        <div class="space-y-4 p-4">
+          <div
+            v-if="calendarLink"
+            class="p-3 bg-green-50 dark:bg-green-950 rounded-lg text-sm text-green-700 dark:text-green-300"
+          >
+            Подію створено!
+            <a
+              :href="calendarLink"
+              target="_blank"
+              class="underline ml-1"
+            >Відкрити в Calendar →</a>
+          </div>
+          <UFormField label="Тип події">
+            <USelect
+              v-model="calendarStageId"
+              :items="stageOptions"
+              value-key="value"
+              label-key="label"
+              placeholder="Оберіть стадію…"
+              class="w-full"
+            />
+          </UFormField>
+          <p class="text-xs text-[oklch(52.16%_0.047_260.80)] dark:text-[oklch(64.54%_0.049_258.74)] -mt-2">
+            Назва події: <span class="font-medium">{{ calendarEventTitle }}</span>
+          </p>
+          <UFormField
+            label="Дата"
+            required
+          >
+            <UPopover v-model:open="calendarDateOpen">
+              <UButton
+                variant="outline"
+                icon="i-lucide-calendar"
+                color="neutral"
+                class="w-full justify-start font-normal"
+              >
+                {{ calendarDateDisplay }}
+              </UButton>
+              <template #content>
+                <UCalendar
+                  v-model="calendarDate"
+                  @update:model-value="calendarDateOpen = false"
+                />
+              </template>
+            </UPopover>
+          </UFormField>
+          <UFormField
+            label="Час початку"
+            required
+          >
+            <UInput
+              v-model="calendarTime"
+              type="time"
+              class="w-full"
+            />
+          </UFormField>
+          <UFormField label="Тривалість (хв)">
+            <UInput
+              v-model="calendarDuration"
+              type="number"
+              :min="15"
+              :max="480"
+              class="w-full"
+            />
+          </UFormField>
+          <p class="text-xs text-[oklch(52.16%_0.047_260.80)] dark:text-[oklch(64.54%_0.049_258.74)]">
+            Нагадування буде надіслано за 1 годину до початку (push на Android)
+          </p>
+        </div>
+      </template>
+      <template #footer>
+        <div class="flex justify-end gap-2 p-4">
+          <UButton
+            variant="ghost"
+            @click="calendarOpen = false"
+          >
+            Скасувати
+          </UButton>
+          <UButton
+            icon="i-lucide-calendar-plus"
+            :loading="creatingEvent"
+            :disabled="!calendarStartDateTime || creatingEvent"
+            @click="createCalendarEvent"
+          >
+            Створити подію
+          </UButton>
+        </div>
+      </template>
+    </UModal>
   </UContainer>
 </template>

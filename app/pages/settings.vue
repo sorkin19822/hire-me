@@ -430,7 +430,7 @@ onMounted(() => {
           </div>
 
           <!-- Action row -->
-          <div class="flex items-center gap-3">
+          <div class="flex items-center gap-3 flex-wrap">
             <UButton
               icon="i-lucide-cloud-upload"
               :loading="backupCreating"
@@ -438,6 +438,15 @@ onMounted(() => {
               @click="createBackup"
             >
               Створити резервну копію
+            </UButton>
+            <UButton
+              icon="i-lucide-refresh-cw"
+              variant="ghost"
+              color="neutral"
+              to="/auth/google-drive"
+              external
+            >
+              Оновити дозволи
             </UButton>
           </div>
 
