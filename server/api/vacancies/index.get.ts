@@ -1,12 +1,14 @@
 import { z } from 'zod'
 import { useDatabase } from '../../database/index'
 import { vacancies, pipelineStages, messages } from '../../database/schema'
-import { eq, like, or, and, sql, desc } from 'drizzle-orm'
+import { eq, like, or, and, sql, desc, gte, lte, isNull } from 'drizzle-orm'
 
 const querySchema = z.object({
   stage_id: z.coerce.number().int().positive().optional(),
   search: z.string().max(200).optional(),
-  order: z.enum(['apply_date', 'created_at']).optional()
+  order: z.enum(['apply_date', 'created_at']).optional(),
+  date_from: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+  date_to: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional()
 })
 
 export default defineEventHandler(async (event) => {
@@ -17,7 +19,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: parsed.error.issues[0]?.message ?? 'Invalid query' })
   }
 
-  const { stage_id: stageId, search, order = 'created_at' } = parsed.data
+  const { stage_id: stageId, search, order = 'created_at', date_from: dateFrom, date_to: dateTo } = parsed.data
 
   const db = useDatabase()
 
@@ -32,6 +34,22 @@ export default defineEventHandler(async (event) => {
   if (search) {
     const pattern = `%${search}%`
     conditions.push(or(like(vacancies.company, pattern), like(vacancies.position, pattern))!)
+  }
+  if (dateFrom) {
+    conditions.push(
+      or(
+        gte(vacancies.applyDate, dateFrom),
+        and(isNull(vacancies.applyDate), gte(vacancies.createdAt, dateFrom))
+      )!
+    )
+  }
+  if (dateTo) {
+    conditions.push(
+      or(
+        lte(vacancies.applyDate, dateTo),
+        and(isNull(vacancies.applyDate), lte(vacancies.createdAt, dateTo + 'T23:59:59'))
+      )!
+    )
   }
 
   const q = db

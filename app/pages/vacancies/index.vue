@@ -23,16 +23,12 @@ type VacancyRow = {
 
 useSeoMeta({ title: 'Вакансії — hire-me' })
 
-const search = ref('')
-const stageFilter = ref<number | null>(null)
+const store = useVacanciesStore()
 
 const { data: stages } = await useFetch('/api/pipeline-stages')
 
-const { data: vacancies, refresh } = await useFetch('/api/vacancies', {
-  query: computed(() => ({
-    search: search.value || undefined,
-    stage_id: stageFilter.value ?? undefined
-  }))
+onMounted(() => {
+  store.fetchVacancies()
 })
 
 const stageOptions = computed(() => [
@@ -40,39 +36,17 @@ const stageOptions = computed(() => [
   ...(stages.value ?? []).map((s: { id: number, name: string }) => ({ label: s.name, value: s.id }))
 ])
 
-// Pagination
-const currentPage = ref(1)
-const perPage = ref(10)
-const perPageOptions = [
-  { label: '10', value: 10 },
-  { label: '25', value: 25 },
-  { label: '50', value: 50 },
-  { label: '100', value: 100 }
-]
-
-const allVacancies = computed(() => vacancies.value ?? [])
-const totalItems = computed(() => allVacancies.value.length)
-const showingFrom = computed(() => totalItems.value === 0 ? 0 : (currentPage.value - 1) * perPage.value + 1)
-const showingTo = computed(() => Math.min(currentPage.value * perPage.value, totalItems.value))
-const paginatedVacancies = computed(() => {
-  const start = (currentPage.value - 1) * perPage.value
-  return allVacancies.value.slice(start, start + perPage.value)
-})
-
-watch([search, stageFilter, perPage], () => {
-  currentPage.value = 1
-})
-watch(currentPage, () => {
-  rowSelection.value = {}
-})
-
 // Row selection
 const rowSelection = ref<Record<string, boolean>>({})
 const selectedIds = computed(() => {
   return Object.entries(rowSelection.value)
     .filter(([, v]) => v)
-    .map(([i]) => paginatedVacancies.value[Number(i)]?.id)
+    .map(([i]) => store.paginatedItems[Number(i)]?.id)
     .filter(Boolean) as number[]
+})
+
+watch(() => store.currentPage, () => {
+  rowSelection.value = {}
 })
 
 // Delete — single
@@ -93,7 +67,7 @@ async function confirmDeleteOne() {
   try {
     await $fetch(`/api/vacancies/${pendingDeleteId.value}`, { method: 'DELETE' })
     confirmSingle.value = false
-    await refresh()
+    await store.fetchVacancies()
   } finally {
     deleting.value = false
   }
@@ -109,7 +83,7 @@ async function confirmDeleteSelected() {
     await Promise.all(selectedIds.value.map(id => $fetch(`/api/vacancies/${id}`, { method: 'DELETE' })))
     rowSelection.value = {}
     confirmBulk.value = false
-    await refresh()
+    await store.fetchVacancies()
   } finally {
     deleting.value = false
   }
@@ -128,7 +102,7 @@ async function createVacancy() {
     showModal.value = false
     form.company = ''
     form.position = ''
-    await refresh()
+    await store.fetchVacancies()
   } finally {
     saving.value = false
   }
@@ -203,19 +177,76 @@ const columns: TableColumn<VacancyRow>[] = [
     </PageHeader>
 
     <!-- Filters -->
-    <div class="flex gap-3 mb-4">
+    <div class="flex gap-3 mb-3">
       <UInput
-        v-model="search"
+        v-model="store.search"
         placeholder="Пошук по компанії / позиції…"
         icon="i-lucide-search"
         class="flex-1"
       />
       <USelect
-        v-model="stageFilter"
+        v-model="store.stageId"
         :items="stageOptions"
         value-key="value"
         label-key="label"
         class="w-48"
+      />
+    </div>
+
+    <!-- Date filter -->
+    <div class="flex items-center gap-2 mb-4 flex-wrap">
+      <span class="text-sm text-[oklch(52.16%_0.047_260.80)] dark:text-[oklch(64.54%_0.049_258.74)] shrink-0">
+        Дата:
+      </span>
+      <div class="flex rounded-lg overflow-hidden border border-[oklch(88.35%_0.02_264.36)] dark:border-[oklch(36.67%_0.041_262.29)]">
+        <button
+          v-for="preset in store.datePresets"
+          :key="preset.label"
+          class="px-3 py-1.5 text-xs font-medium transition-colors"
+          :class="store.datePreset === preset.label
+            ? 'bg-[oklch(65.33%_0.184_266.79)] text-white'
+            : 'bg-white dark:bg-[oklch(27.84%_0.027_257.53)] text-[oklch(52.16%_0.047_260.80)] dark:text-[oklch(64.54%_0.049_258.74)] hover:bg-[oklch(65.33%_0.184_266.79/12.50%)] hover:text-[oklch(65.33%_0.184_266.79)] dark:hover:bg-[oklch(65.33%_0.184_266.79/12.50%)] dark:hover:text-[oklch(65.33%_0.184_266.79)]'"
+          @click="store.applyPreset(preset.label, preset.days)"
+        >
+          {{ preset.label }}
+        </button>
+      </div>
+      <UPopover v-model:open="store.dateFromOpen">
+        <UButton
+          variant="outline"
+          icon="i-lucide-calendar"
+          size="sm"
+          color="neutral"
+          class="w-36 justify-start font-normal"
+        >
+          {{ store.dateFrom || 'Від' }}
+        </UButton>
+        <template #content>
+          <UCalendar v-model="store.dateFromValue" />
+        </template>
+      </UPopover>
+      <span class="text-[oklch(64.54%_0.049_258.74)] text-sm">—</span>
+      <UPopover v-model:open="store.dateToOpen">
+        <UButton
+          variant="outline"
+          icon="i-lucide-calendar"
+          size="sm"
+          color="neutral"
+          class="w-36 justify-start font-normal"
+        >
+          {{ store.dateTo || 'До' }}
+        </UButton>
+        <template #content>
+          <UCalendar v-model="store.dateToValue" />
+        </template>
+      </UPopover>
+      <UButton
+        v-if="store.dateFrom || store.dateTo"
+        variant="ghost"
+        icon="i-lucide-x"
+        size="sm"
+        color="neutral"
+        @click="store.clearDateFilter()"
       />
     </div>
 
@@ -226,9 +257,9 @@ const columns: TableColumn<VacancyRow>[] = [
     >
       <UTable
         v-model:row-selection="rowSelection"
-        :data="paginatedVacancies"
+        :data="store.paginatedItems"
         :columns="columns"
-        :loading="!vacancies"
+        :loading="store.loading"
       >
         <template #company-cell="{ row }">
           <NuxtLink
@@ -266,14 +297,14 @@ const columns: TableColumn<VacancyRow>[] = [
       <!-- Pagination footer -->
       <div class="flex items-center justify-between px-4 py-3 border-t border-[oklch(92.03%_0.015_260.73)] dark:border-[oklch(36.67%_0.041_262.29)]">
         <span class="text-sm text-[oklch(52.16%_0.047_260.80)] dark:text-[oklch(64.54%_0.049_258.74)]">
-          Показано {{ showingFrom }}–{{ showingTo }} з {{ totalItems }}
+          Показано {{ store.showingFrom }}–{{ store.showingTo }} з {{ store.totalItems }}
         </span>
         <div class="flex items-center gap-4">
           <div class="flex items-center gap-2">
             <span class="text-sm text-[oklch(52.16%_0.047_260.80)] dark:text-[oklch(64.54%_0.049_258.74)]">Рядків:</span>
             <USelect
-              v-model="perPage"
-              :items="perPageOptions"
+              v-model="store.perPage"
+              :items="store.perPageOptions"
               value-key="value"
               label-key="label"
               size="sm"
@@ -281,9 +312,9 @@ const columns: TableColumn<VacancyRow>[] = [
             />
           </div>
           <UPagination
-            v-model:page="currentPage"
-            :total="totalItems"
-            :items-per-page="perPage"
+            v-model:page="store.currentPage"
+            :total="store.totalItems"
+            :items-per-page="store.perPage"
             size="sm"
             :show-edges="true"
           />

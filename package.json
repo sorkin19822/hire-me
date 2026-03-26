@@ -19,6 +19,7 @@
     "@iconify-json/lucide": "^1.2.98",
     "@iconify-json/simple-icons": "^1.2.74",
     "@nuxt/ui": "^4.5.1",
+    "@pinia/nuxt": "^0.11.3",
     "@tiptap/extension-underline": "^3.20.4",
     "@tiptap/starter-kit": "^3.20.4",
     "@tiptap/vue-3": "^3.20.4",
@@ -29,6 +30,7 @@
     "imap-simple": "^5.1.0",
     "nuxt": "^4.4.2",
     "nuxt-auth-utils": "^0.5.29",
+    "pinia": "^3.0.4",
     "tailwindcss": "^4.2.1",
     "telegram": "^2.26.22",
     "zod": "^4.3.6"
