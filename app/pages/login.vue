@@ -99,12 +99,12 @@ async function onSubmit() {
 
         <!-- Google button -->
         <UButton
-          href="/auth/google"
           variant="soft"
           color="neutral"
           block
           size="xl"
           class="mb-6 rounded-xl"
+          @click="navigateTo('/auth/google', { external: true })"
         >
           <template #leading>
             <span class="flex items-center justify-center w-6 h-6 bg-white rounded-full shadow-sm">
