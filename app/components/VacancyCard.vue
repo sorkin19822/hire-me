@@ -8,6 +8,8 @@ defineProps<{
     messagesCount: number
   }
 }>()
+
+const hovered = ref(false)
 </script>
 
 <template>
@@ -17,9 +19,9 @@ defineProps<{
     class="group block p-3 rounded-[7px] bg-white dark:bg-[oklch(32%_0.03_260)]
            hover:-translate-y-0.5 active:opacity-60 active:scale-95
            transition-all duration-150 cursor-grab active:cursor-grabbing"
-    style="box-shadow: rgba(145,158,171,0.16) 0px 1px 4px 0px;"
-    onmouseenter="this.style.boxShadow='rgba(145,158,171,0.28) 0px 4px 16px -2px'"
-    onmouseleave="this.style.boxShadow='rgba(145,158,171,0.16) 0px 1px 4px 0px'"
+    :style="{ boxShadow: hovered ? 'rgba(145,158,171,0.28) 0px 4px 16px -2px' : 'rgba(145,158,171,0.16) 0px 1px 4px 0px' }"
+    @mouseenter="hovered = true"
+    @mouseleave="hovered = false"
   >
     <!-- Company + messages badge -->
     <div class="flex items-start justify-between gap-2">
