@@ -14,7 +14,7 @@ When you're applying to 20–50 companies simultaneously, things get out of hand
 Vacancies move through stages: New → CV Sent → Interview → Offer → Rejected, etc. Drag and drop between stages. Stages are configurable and stored in the database.
 
 ### Vacancy list
-Sortable, searchable table with filtering by stage. Pagination with configurable rows per page (10 / 25 / 50 / 100).
+Searchable table with filtering by stage and date range. Date filter has quick presets (7d / 30d / 3m / 1y) and calendar pickers (from / to). All filter state is stored in a Pinia store — survives navigation. Filters trigger server-side DB queries. Pagination with configurable rows per page (10 / 25 / 50 / 100).
 
 ### Vacancy detail page
 Each vacancy has:
@@ -55,6 +55,7 @@ Funnel chart showing conversion between active pipeline stages (terminal stages 
 - **Nuxt 3** + Vue 3 + TypeScript
 - **Nuxt UI v4** + Tailwind CSS v4
 - **SQLite** + Drizzle ORM + better-sqlite3
+- **Pinia** for client-side state management (vacancies store)
 - **Google OAuth** via nuxt-auth-utils (optional login method + Drive backup)
 - **Claude API** for AI analysis
 - **Telegram MTProto** (GramJS) + IMAP for message sync
@@ -110,6 +111,7 @@ See [.env.example](.env.example) for all variables.
 | `NUXT_ALLOWED_EMAILS` | ✓ | Comma-separated whitelist of allowed emails |
 | `NUXT_OAUTH_GOOGLE_CLIENT_ID` | — | Google OAuth client ID (login + Drive backup) |
 | `NUXT_OAUTH_GOOGLE_CLIENT_SECRET` | — | Google OAuth client secret |
+| `NUXT_OAUTH_GOOGLE_REDIRECT_URL` | — | Must match redirect URI in Google Console (default: `http://localhost:3000/auth/google`) |
 | `NUXT_GOOGLE_BACKUP_FOLDER_ID` | — | Google Drive folder ID for backups |
 | `NUXT_ANTHROPIC_API_KEY` | — | Claude API key (AI analysis feature) |
 | `NUXT_IMAP_HOST` | — | IMAP host (default: `imap.ukr.net`) |
@@ -127,10 +129,11 @@ See [.env.example](.env.example) for all variables.
 1. Go to [console.cloud.google.com](https://console.cloud.google.com) → select your project
 2. **APIs & Services → Credentials → Create Credentials → OAuth 2.0 Client ID**
 3. Application type: **Web application**
-4. Add **Authorized redirect URIs**:
-   - `http://localhost:3000/auth/google` — if using Google login
-   - `http://localhost:3000/auth/google-drive` — for Drive backup
+4. Add **Authorized redirect URIs** (both are required):
+   - `http://localhost:3000/auth/google` — Google login callback
+   - `http://localhost:3000/auth/google-drive` — Drive backup authorization
 5. Copy **Client ID** and **Client Secret** → paste into `.env`
+6. Set `NUXT_OAUTH_GOOGLE_REDIRECT_URL=http://localhost:3000/auth/google` in `.env`
 
 ### Google Drive Backup setup
 
