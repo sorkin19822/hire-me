@@ -49,9 +49,19 @@ function formatDate(iso: string) {
     <div
       v-for="msg in messages"
       :key="msg.id"
-      class="flex"
+      class="flex items-end gap-2"
       :class="msg.direction === 'out' ? 'justify-end' : 'justify-start'"
     >
+      <!-- Recruiter avatar for incoming messages -->
+      <UAvatar
+        v-if="msg.direction === 'in'"
+        :src="msg.recruiterAvatar ?? undefined"
+        :alt="msg.recruiterName ?? ''"
+        size="xs"
+        icon="i-lucide-user"
+        class="shrink-0 mb-5"
+      />
+
       <div
         class="max-w-[75%] group relative"
         :class="msg.direction === 'out' ? 'items-end' : 'items-start'"

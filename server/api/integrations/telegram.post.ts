@@ -108,9 +108,20 @@ export default defineEventHandler(async (event) => {
     imported++
   }
 
-  // Update tg_synced_at to now so next sync only fetches newer messages
+  // Fetch and store recruiter's Telegram profile photo as base64 data URI
+  let tgAvatar: string | null = null
+  try {
+    const photoBuffer = await client.downloadProfilePhoto(username) as Buffer | null
+    if (photoBuffer && photoBuffer.length > 0) {
+      tgAvatar = `data:image/jpeg;base64,${photoBuffer.toString('base64')}`
+    }
+  } catch {
+    // Avatar download is best-effort — don't fail the sync
+  }
+
+  // Update tg_synced_at and avatar
   db.update(recruiters)
-    .set({ tgSyncedAt: new Date().toISOString() })
+    .set({ tgSyncedAt: new Date().toISOString(), ...(tgAvatar ? { tgAvatar } : {}) })
     .where(eq(recruiters.id, recruiterId))
     .run()
 

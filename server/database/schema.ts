@@ -57,6 +57,7 @@ export const recruiters = sqliteTable('recruiters', {
   email: text('email'),
   linkedin: text('linkedin'),
   tgSyncedAt: text('tg_synced_at'),
+  tgAvatar: text('tg_avatar'),
   createdAt: text('created_at').notNull().default(sql`(datetime('now'))`)
 })
 

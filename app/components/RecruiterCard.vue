@@ -6,6 +6,7 @@ const props = defineProps<{
     telegram: string | null
     email: string | null
     linkedin: string | null
+    tgAvatar?: string | null
   }
   vacancyId?: number
 }>()
@@ -70,6 +71,7 @@ async function syncEmail() {
 <template>
   <div class="flex items-center gap-3 py-2">
     <UAvatar
+      :src="recruiter.tgAvatar ?? undefined"
       :alt="recruiter.name"
       size="sm"
       icon="i-lucide-user"

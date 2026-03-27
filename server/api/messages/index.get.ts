@@ -23,6 +23,7 @@ export default defineEventHandler(async (event) => {
       vacancyId: messages.vacancyId,
       recruiterId: messages.recruiterId,
       recruiterName: recruiters.name,
+      recruiterAvatar: recruiters.tgAvatar,
       source: messages.source,
       direction: messages.direction,
       content: messages.content,

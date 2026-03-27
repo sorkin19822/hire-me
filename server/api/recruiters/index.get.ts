@@ -32,6 +32,7 @@ export default defineEventHandler(async (event) => {
       telegram: recruiters.telegram,
       email: recruiters.email,
       linkedin: recruiters.linkedin,
+      tgAvatar: recruiters.tgAvatar,
       createdAt: recruiters.createdAt,
       vacancyCompany: vacancies.company,
       vacancyPosition: vacancies.position
