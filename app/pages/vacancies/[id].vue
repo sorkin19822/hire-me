@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { z } from 'zod'
 import type { CalendarDate } from '@internationalized/date'
 import { parseDate } from '@internationalized/date'
 import { getFaviconUrl } from '~/composables/useFavicon'
@@ -183,6 +184,21 @@ const linksValue = reactive({
   urlSite: vacancy.value?.urlSite ?? ''
 })
 const linksSaving = ref(false)
+
+const linksSchema = z.object({
+  urlDou: z.string().url('Введіть повний URL (https://...)').or(z.literal('')),
+  urlSite: z.string().url('Введіть повний URL (https://...)').or(z.literal(''))
+})
+
+const linksErrors = computed(() => {
+  const result = linksSchema.safeParse(linksValue)
+  if (result.success) return { urlDou: '', urlSite: '' }
+  return {
+    urlDou: result.error.issues.find(i => i.path[0] === 'urlDou')?.message ?? '',
+    urlSite: result.error.issues.find(i => i.path[0] === 'urlSite')?.message ?? ''
+  }
+})
+const linksValid = computed(() => linksSchema.safeParse(linksValue).success)
 
 async function saveLinks() {
   linksSaving.value = true
@@ -693,14 +709,20 @@ async function createCalendarEvent() {
           class="flex flex-col gap-4"
         >
           <div class="grid grid-cols-1 gap-3">
-            <UFormField label="Посилання на вакансію">
+            <UFormField
+              label="Посилання на вакансію"
+              :error="linksErrors.urlDou"
+            >
               <UInput
                 v-model="linksValue.urlDou"
                 placeholder="https://jobs.dou.ua/... або будь-яке інше"
                 class="w-full"
               />
             </UFormField>
-            <UFormField label="Сайт компанії">
+            <UFormField
+              label="Сайт компанії"
+              :error="linksErrors.urlSite"
+            >
               <UInput
                 v-model="linksValue.urlSite"
                 placeholder="https://company.com"
@@ -719,6 +741,7 @@ async function createCalendarEvent() {
             <UButton
               size="sm"
               :loading="linksSaving"
+              :disabled="!linksValid"
               @click="saveLinks"
             >
               Зберегти
