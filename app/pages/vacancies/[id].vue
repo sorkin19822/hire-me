@@ -1095,17 +1095,20 @@ async function createCalendarEvent() {
     >
       <template #body>
         <div class="space-y-4 p-4">
-          <div
+          <UAlert
             v-if="calendarLink"
-            class="p-3 bg-green-50 dark:bg-green-950 rounded-lg text-sm text-green-700 dark:text-green-300"
+            color="success"
+            variant="soft"
+            title="Подію створено!"
           >
-            Подію створено!
-            <a
-              :href="calendarLink"
-              target="_blank"
-              class="underline ml-1"
-            >Відкрити в Calendar →</a>
-          </div>
+            <template #description>
+              <a
+                :href="calendarLink"
+                target="_blank"
+                class="underline"
+              >Відкрити в Calendar →</a>
+            </template>
+          </UAlert>
           <UFormField label="Тип події">
             <USelect
               v-model="calendarStageId"

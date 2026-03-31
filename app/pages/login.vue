@@ -90,12 +90,13 @@ async function onSubmit() {
         </div>
 
         <!-- Error alert -->
-        <div
+        <UAlert
           v-if="credError || errorMsg"
-          class="mb-4 px-4 py-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700"
-        >
-          {{ credError ?? errorMsg }}
-        </div>
+          color="error"
+          variant="soft"
+          :description="credError ?? errorMsg ?? ''"
+          class="mb-4"
+        />
 
         <!-- Google button -->
         <UButton

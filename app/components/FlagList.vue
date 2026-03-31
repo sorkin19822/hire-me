@@ -11,7 +11,7 @@ defineProps<{
     v-if="flags.length"
     class="space-y-1"
   >
-    <p :class="['text-xs font-semibold', type === 'success' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400']">
+    <p :class="['text-xs font-semibold', type === 'success' ? 'text-success' : 'text-error']">
       {{ label }}
     </p>
     <ul class="space-y-0.5">
