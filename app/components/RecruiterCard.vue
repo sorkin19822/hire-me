@@ -17,7 +17,7 @@ const toast = useToast()
 const syncing = ref(false)
 const syncingEmail = ref(false)
 
-async function syncTelegram() {
+async function syncTelegram(force = false) {
   if (!props.recruiter.telegram || !props.vacancyId) return
   syncing.value = true
   try {
@@ -26,7 +26,8 @@ async function syncTelegram() {
       body: {
         recruiterId: props.recruiter.id,
         vacancyId: props.vacancyId,
-        telegramUsername: props.recruiter.telegram
+        telegramUsername: props.recruiter.telegram,
+        ...(force ? { force: true } : {})
       }
     })
     toast.add({
@@ -35,12 +36,15 @@ async function syncTelegram() {
       icon: 'i-simple-icons-telegram'
     })
     emit('synced')
-  } catch {
-    toast.add({ title: 'Помилка синхронізації Telegram', color: 'error', icon: 'i-lucide-alert-circle' })
   } finally {
     syncing.value = false
   }
 }
+
+const telegramSyncItems = [[
+  { label: 'Синхронізувати нові', icon: 'i-lucide-refresh-cw', onSelect: () => syncTelegram() },
+  { label: 'Перезавантажити все', icon: 'i-lucide-rotate-ccw', onSelect: () => syncTelegram(true) }
+]]
 
 async function syncEmail() {
   if (!props.recruiter.email || !props.vacancyId) return
@@ -114,16 +118,20 @@ async function syncEmail() {
       </div>
     </div>
 
-    <!-- Telegram sync button — only when telegram is set and vacancyId provided -->
-    <UButton
+    <!-- Telegram sync dropdown — only when telegram is set and vacancyId provided -->
+    <UDropdownMenu
       v-if="recruiter.telegram && vacancyId"
-      variant="ghost"
-      icon="i-simple-icons-telegram"
-      size="xs"
-      :loading="syncing"
-      title="Завантажити з Telegram"
-      @click.prevent="syncTelegram"
-    />
+      :items="telegramSyncItems"
+    >
+      <UButton
+        variant="ghost"
+        icon="i-simple-icons-telegram"
+        size="xs"
+        :loading="syncing"
+        title="Telegram: синхронізувати"
+        @click.prevent="syncTelegram()"
+      />
+    </UDropdownMenu>
 
     <!-- Email sync button — only when email is set and vacancyId provided -->
     <UButton

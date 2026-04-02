@@ -7,7 +7,11 @@ import { getTelegramClient, loadSetting } from '../../utils/telegram-client'
 const schema = z.object({
   recruiterId: z.number().int().positive(),
   vacancyId: z.number().int().positive(),
-  telegramUsername: z.string().regex(/^@?[A-Za-z0-9_]{5,32}$/, 'Invalid Telegram username')
+  telegramUsername: z.string().regex(
+    /^(@?[A-Za-z0-9_]{5,32}|\+?[0-9]{7,15})$/,
+    'Invalid Telegram username or phone number'
+  ),
+  force: z.boolean().optional()
 })
 
 export default defineEventHandler(async (event) => {
@@ -19,7 +23,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: parsed.error.issues[0]?.message ?? 'Invalid input' })
   }
 
-  const { recruiterId, vacancyId, telegramUsername } = parsed.data
+  const { recruiterId, vacancyId, telegramUsername, force } = parsed.data
 
   // Guard: require an active Telegram session before attempting sync
   const sessionStr = loadSetting('telegram_session')
@@ -43,8 +47,12 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'Recruiter does not belong to this vacancy' })
   }
 
-  const username = telegramUsername.replace('@', '')
-  const tgSyncedAt = recruiter.tgSyncedAt ? new Date(recruiter.tgSyncedAt) : null
+  // Normalize: strip @, add + prefix for phone numbers (digits only)
+  const isPhone = /^[0-9]{7,15}$/.test(telegramUsername.replace('+', ''))
+  const username = isPhone
+    ? (telegramUsername.startsWith('+') ? telegramUsername : `+${telegramUsername}`)
+    : telegramUsername.replace('@', '')
+  const tgSyncedAt = (!force && recruiter.tgSyncedAt) ? new Date(recruiter.tgSyncedAt) : null
 
   let client: Awaited<ReturnType<typeof getTelegramClient>>['client']
   try {
@@ -83,29 +91,55 @@ export default defineEventHandler(async (event) => {
     // GramJS message objects: msg.date is a Unix timestamp (seconds), msg.message is the text.
     // msg.out === true means the message was sent by the authenticated user.
     const text: string = msg.message ?? ''
-    if (!text.trim()) continue
-
-    total++
+    const msgDate = new Date((msg.date as number) * 1000)
 
     // For incremental sync: skip messages older than or equal to last sync timestamp
-    const msgDate = new Date((msg.date as number) * 1000)
     if (tgSyncedAt && msgDate <= tgSyncedAt) continue
 
     const sentAt = msgDate.toISOString()
-    const key = `${sentAt}::${text}`
-    if (existingKeys.has(key)) continue
 
-    db.insert(messages).values({
-      vacancyId,
-      recruiterId,
-      source: 'telegram',
-      direction: msg.out ? 'out' : 'in',
-      content: text,
-      sentAt
-    }).run()
+    if (text.trim()) {
+      total++
+      const key = `${sentAt}::${text}`
+      if (!existingKeys.has(key)) {
+        db.insert(messages).values({
+          vacancyId,
+          recruiterId,
+          source: 'telegram',
+          direction: msg.out ? 'out' : 'in',
+          content: text,
+          sentAt
+        }).run()
+        existingKeys.add(key)
+        imported++
+      }
+    }
 
-    existingKeys.add(key)
-    imported++
+    // Import chosen reactions (emoji the authenticated user placed on this message).
+    // GramJS uses chosenOrder (TL flag) to mark the current user's reaction — not a boolean `chosen`.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const chosenReactions: string[] = (msg.reactions?.results ?? [])
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .filter((r: any) => r.chosen === true || r.chosenOrder !== undefined)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .map((r: any) => r.reaction?.emoticon ?? r.reaction?.documentId?.toString() ?? '?')
+      .filter(Boolean)
+
+    for (const emoji of chosenReactions) {
+      const reactionKey = `${sentAt}::reaction:${emoji}`
+      if (!existingKeys.has(reactionKey)) {
+        db.insert(messages).values({
+          vacancyId,
+          recruiterId,
+          source: 'telegram',
+          direction: 'out',
+          content: emoji,
+          sentAt
+        }).run()
+        existingKeys.add(reactionKey)
+        imported++
+      }
+    }
   }
 
   // Fetch and store recruiter's Telegram profile photo as base64 data URI
