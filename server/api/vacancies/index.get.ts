@@ -33,7 +33,13 @@ export default defineEventHandler(async (event) => {
   if (stageId !== undefined) conditions.push(eq(vacancies.stageId, stageId))
   if (search) {
     const pattern = `%${search}%`
-    conditions.push(or(like(vacancies.company, pattern), like(vacancies.position, pattern))!)
+    conditions.push(or(
+      like(vacancies.company, pattern),
+      like(vacancies.position, pattern),
+      like(vacancies.description, pattern),
+      like(vacancies.notes, pattern),
+      like(vacancies.stageNotes, pattern)
+    )!)
   }
   if (dateFrom) {
     conditions.push(

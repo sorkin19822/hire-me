@@ -218,10 +218,23 @@ const columns: TableColumn<VacancyRow>[] = [
       <div class="flex gap-3 mb-3">
         <UInput
           v-model="store.search"
-          placeholder="Пошук по компанії / позиції…"
+          placeholder="Пошук по компанії / позиції / описі…"
           icon="i-lucide-search"
           class="flex-1"
-        />
+        >
+          <template
+            v-if="store.search"
+            #trailing
+          >
+            <UButton
+              variant="ghost"
+              size="xs"
+              icon="i-lucide-x"
+              color="neutral"
+              @click="store.search = ''"
+            />
+          </template>
+        </UInput>
         <USelect
           v-model="store.stageId"
           :items="stageOptions"
