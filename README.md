@@ -14,13 +14,13 @@ When you're applying to 20–50 companies simultaneously, things get out of hand
 Vacancies move through stages: New → CV Sent → Interview → Offer → Rejected, etc. Drag and drop between stages. Stages are configurable and stored in the database.
 
 ### Vacancy list
-Searchable table with filtering by stage and date range. Date filter has quick presets (7d / 30d / 3m / 1y) and calendar pickers (from / to). All filter state is stored in a Pinia store — survives navigation. Filters trigger server-side DB queries. Pagination with configurable rows per page (10 / 25 / 50 / 100).
+Searchable table with filtering by stage and date range. Search covers company, position, description, notes, and stage notes — full-text substring match. The search input has a clear (✕) button. Date filter has quick presets (7d / 30d / 3m / 1y) and calendar pickers (from / to). All filter state is stored in a Pinia store — survives navigation. Filters trigger server-side DB queries. Pagination with configurable rows per page (10 / 25 / 50 / 100).
 
 ### Vacancy detail page
 Each vacancy has:
 - **Company + position** — inline editable
 - **Apply date** — calendar picker
-- **Links** — vacancy URL and company site
+- **Links** — vacancy URL and company site (validated on input — must be a valid URL or empty)
 - **CV version** — which resume you sent (with preview)
 - **Job description** — rich text editor (bold, italic, underline, headings, lists, blockquote, code); paste HTML directly from job boards
 - **Notes** — personal observations (5000 char limit with counter)
@@ -31,7 +31,7 @@ Each vacancy has:
 - **Google Calendar** — create a calendar event directly from the vacancy: select event type (interview stage), pick date/time, set duration. Event title is auto-generated from stage + company name. A push reminder is sent 1 hour before (shows up on Android).
 
 ### Message sync
-- **Telegram** — connects via MTProto (GramJS), fetches full dialog with a recruiter by their username
+- **Telegram** — connects via MTProto (GramJS), fetches full dialog with a recruiter by `@username` or phone number. Sync button has a dropdown: **incremental** (new messages only) or **force reload** (re-fetches all 200 messages, ignores last-sync timestamp). Recruiter's Telegram profile photo is fetched on first sync and shown as an avatar. Emoji reactions placed by the user are imported as outgoing messages.
 - **Email** — fetches from IMAP (ukr.net), matches by recruiter email
 - **Manual** — add any message with custom date/time
 
